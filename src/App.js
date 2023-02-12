@@ -13,7 +13,7 @@ import {
 function App() {
   return (
     <div className="App">
-    <BrowserRouter>
+    <BrowserRouter> 
      <Header/>
       <Routes>
         <Route exact path="/" element={<Home />} />
