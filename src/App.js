@@ -1,28 +1,32 @@
-import './App.css';
-import { About } from './components/About';
-import { Footer } from './components/Footer';
-import { Header } from './components/Header';
-import { Home } from './components/Home';
-
+import React from 'react'
 import {
-  BrowserRouter,
-  Routes,
-  Route,
+  createBrowserRouter,
+  RouterProvider,
 } from "react-router-dom";
+import Root from './routes/root';
+import {Home} from './components/Home'
+import {About} from './components/About'
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root/>,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/about",
+        element: <About />,
+      },
+    ],
+  },
+]);
 
-function App() {
+export const App = () => {
   return (
-    <div className="App">
-    <BrowserRouter> 
-     <Header/>
-      <Routes>
-        <Route exact path="/" element={<Home />} />
-        <Route exact path="/about" element={<About />} />
-      </Routes>
-     <Footer/>
-    </BrowserRouter>
-    </div>
-  );
+    <RouterProvider router={router} />
+  )
 }
 
 export default App;

@@ -2,77 +2,86 @@ import React from 'react'
 
 export const Footer = () => {
   return (
-    <div>
-	<div className="footer-area">
-		<div className="container">
-			<div className="row">
-				<div className="col-lg-3 col-md-6">
-					<div className="footer-box about-widget">
-						<h2 className="widget-title">About us</h2>
-						<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.</p>
-					</div>
-				</div>
-				<div className="col-lg-3 col-md-6">
-					<div className="footer-box get-in-touch">
-						<h2 className="widget-title">Get in Touch</h2>
-						<ul>
-							<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
-							<li>support@fruitkha.com</li>
-							<li>+00 111 222 3333</li>
-						</ul>
-					</div>
-				</div>
-				<div className="col-lg-3 col-md-6">
-					<div className="footer-box pages">
-						<h2 className="widget-title">Pages</h2>
-						<ul>
-							<li><a href="index.html">Home</a></li>
-							<li><a href="about.html">About</a></li>
-							<li><a href="services.html">Shop</a></li>
-							<li><a href="news.html">News</a></li>
-							<li><a href="contact.html">Contact</a></li>
-						</ul>
-					</div>
-				</div>
-				<div className="col-lg-3 col-md-6">
-					<div className="footer-box subscribe">
-						<h2 className="widget-title">Subscribe</h2>
-						<p>Subscribe to our mailing list to get the latest updates.</p>
-						<form action="index.html">
-							<input type="email" placeholder="Email"/>
-							<button type="submit"><i className="fas fa-paper-plane"></i></button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	{/* <!-- end footer --> */}
-	
-	{/* <!-- copyright --> */}
-	<div className="copyright">
-		<div className="container">
-			<div className="row">
-				<div className="col-lg-6 col-md-12">
-					<p>Copyrights &copy; 2023 - <a href="/">Gadget Bazaar</a>  All Rights Reserved.<br/>
-					</p>
-				</div>
-				<div className="col-lg-6 text-right col-md-12">
-					<div className="social-icons">
-						<ul>
-							<li><a href="#" target="_blank"><i className="fab fa-facebook-f"></i></a></li>
-							<li><a href="#" target="_blank"><i className="fab fa-twitter"></i></a></li>
-							<li><a href="#" target="_blank"><i className="fab fa-instagram"></i></a></li>
-							<li><a href="#" target="_blank"><i className="fab fa-linkedin"></i></a></li>
-							<li><a href="#" target="_blank"><i className="fab fa-dribbble"></i></a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	{/* <!-- end copyright --> */}
-	
-    </div>
+    <>
+	{/* <!-- footer start --> */}
+      <footer>
+         <div className="container">
+            <div className="row">
+               <div className="col-md-4">
+                   <div className="full">
+                      <div className="logo_footer">
+                        <a href="#"><img width="210" src="images/logo.png" alt="#" /></a>
+                      </div>
+                      <div className="information_f">
+                        <p><strong>ADDRESS:</strong> 28 White tower, Street Name New York City, USA</p>
+                        <p><strong>TELEPHONE:</strong> +91 987 654 3210</p>
+                        <p><strong>EMAIL:</strong> yourmain@gmail.com</p>
+                      </div>
+                   </div>
+               </div>
+               <div className="col-md-8">
+                  <div className="row">
+                  <div className="col-md-7">
+                     <div className="row">
+                        <div className="col-md-6">
+                     <div className="widget_menu">
+                        <h3>Menu</h3>
+                        <ul>
+                           <li><a href="#">Home</a></li>
+                           <li><a href="#">About</a></li>
+                           <li><a href="#">Services</a></li>
+                           <li><a href="#">Testimonial</a></li>
+                           <li><a href="#">Blog</a></li>
+                           <li><a href="#">Contact</a></li>
+                        </ul>
+                     </div>
+                  </div>
+                  <div className="col-md-6">
+                     <div className="widget_menu">
+                        <h3>Account</h3>
+                        <ul>
+                           <li><a href="#">Account</a></li>
+                           <li><a href="#">Checkout</a></li>
+                           <li><a href="#">Login</a></li>
+                           <li><a href="#">Register</a></li>
+                           <li><a href="#">Shopping</a></li>
+                           <li><a href="#">Widget</a></li>
+                        </ul>
+                     </div>
+                  </div>
+                     </div>
+                  </div>     
+                  <div className="col-md-5">
+                     <div className="widget_menu">
+                        <h3>Newsletter</h3>
+                        <div className="information_f">
+                          <p>Subscribe by our newsletter and get update protidin.</p>
+                        </div>
+                        <div className="form_sub">
+                           <form>
+                              <fieldset>
+                                 <div className="field">
+                                    <input type="email" placeholder="Enter Your Mail" name="email" />
+                                    <input type="submit" value="Subscribe" />
+                                 </div>
+                              </fieldset>
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </footer>
+      {/* <!-- footer end --> */}
+      <div className="cpy_">
+         <p className="mx-auto">© 2021 All Rights Reserved By <a href="https://html.design/">Free Html Templates</a><br/>
+         
+            Distributed By <a href="https://themewagon.com/" target="_blank">ThemeWagon</a>
+         
+         </p>
+      </div>
+    </>
   )
 }
