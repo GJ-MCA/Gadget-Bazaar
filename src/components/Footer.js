@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const Footer = () => {
   return (
@@ -76,10 +77,7 @@ export const Footer = () => {
       </footer>
       {/* <!-- footer end --> */}
       <div className="cpy_">
-         <p className="mx-auto">© 2021 All Rights Reserved By <a href="https://html.design/">Free Html Templates</a><br/>
-         
-            Distributed By <a href="https://themewagon.com/" target="_blank">ThemeWagon</a>
-         
+         <p className="mx-auto">© 2023 All Rights Reserved By <Link to="/">Gadget Bazaar</Link>         
          </p>
       </div>
     </>
