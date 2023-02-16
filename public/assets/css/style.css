@@ -150,13 +150,16 @@ a:focus {
 
 .custom_nav-container .navbar-nav .nav-item .nav-link {
     padding: 5px 20px;
-    color: #131313;
+    color: #ff0037;
     text-align: center;
     text-transform: uppercase;
     border-radius: 5px;
     -webkit-transition: all 0.3s;
     transition: all 0.3s;
     font-weight: 700;
+}
+.custom_nav-container .navbar-nav .nav-item .nav-link.cart {
+    color: #000;
 }
 
 .custom_nav-container .navbar-nav .nav-item .nav-link svg {
@@ -167,12 +170,14 @@ a:focus {
 }
 
 .custom_nav-container .navbar-nav .nav-item:hover .nav-link, .custom_nav-container .navbar-nav .nav-item.active .nav-link {
-  color: #f7444e;
+  color: #feb828;
+  background-color: #000;
+}
+.custom_nav-container .navbar-nav .nav-item:hover .nav-link.cart, .custom_nav-container .navbar-nav .nav-item.active .nav-link.cart {
+  background-color: transparent;
 }
 
-.custom_nav-container .navbar-nav .nav-item:hover .nav-link svg, .custom_nav-container .navbar-nav .nav-item.active .nav-link svg {
-  fill: #f7444e;
-}
+
 
 .custom_nav-container .nav_search-btn {
   width: 35px;
@@ -183,7 +188,7 @@ a:focus {
 }
 
 .custom_nav-container .nav_search-btn:hover {
-  color: #f7444e;
+  color: #feb828;
 }
 
 .custom_nav-container .navbar-toggler {
@@ -1123,4 +1128,12 @@ form input[type="submit"]:focus {
 /* -- Custom -- */
 .svg-img{
   width: 55px;
+}
+
+.cart-icon{
+  width: 17px;
+  height: 17px;
+}
+.navbar-nav{
+  gap: 10px;
 }

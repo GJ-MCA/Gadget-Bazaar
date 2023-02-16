@@ -11,12 +11,12 @@ export const Footer = () => {
                <div className="col-md-4">
                    <div className="full">
                       <div className="logo_footer">
-                        <a href="#"><img width="210" src="images/logo.png" alt="#" /></a>
+                        <a href="#"><img width="210" src="/assets/img/logo.png" alt="#" /></a>
                       </div>
                       <div className="information_f">
-                        <p><strong>ADDRESS:</strong> 28 White tower, Street Name New York City, USA</p>
+                        <p><strong>ADDRESS:</strong> Gadget Bazaar Corporate House, CH-01 Adani Shantigram, Inspire Business Park, S. G. Highway, Ahmedabad-382421</p>
                         <p><strong>TELEPHONE:</strong> +91 987 654 3210</p>
-                        <p><strong>EMAIL:</strong> yourmain@gmail.com</p>
+                        <p><strong>EMAIL:</strong> contact@gadgetbazaar.com</p>
                       </div>
                    </div>
                </div>
