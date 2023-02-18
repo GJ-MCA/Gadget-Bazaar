@@ -1,0 +1,135 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "GadgetBazaar",
+    "dateExported": "2023-02-18T05:16:40.742Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "5be601f4-78c7-4b9d-a78a-8315a6e79e31",
+            "name": "Authentication",
+            "containerId": "",
+            "created": "2023-02-15T06:12:05.955Z",
+            "sortNum": 10000
+        },
+        {
+            "_id": "14b5dd7c-3de8-49aa-bb23-54b4688f4c0a",
+            "name": "Admin",
+            "containerId": "",
+            "created": "2023-02-15T13:12:20.223Z",
+            "sortNum": 20000
+        },
+        {
+            "_id": "932f1cbd-6243-45bd-b573-041e33d57d65",
+            "name": "Products",
+            "containerId": "14b5dd7c-3de8-49aa-bb23-54b4688f4c0a",
+            "created": "2023-02-15T13:12:27.006Z",
+            "sortNum": 30000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "2f154b86-98c6-4f51-a9a7-f4e3c9f7e88d",
+            "colId": "9c33251e-16d9-422d-8167-ae42fb2a7907",
+            "containerId": "5be601f4-78c7-4b9d-a78a-8315a6e79e31",
+            "name": "Create a New User",
+            "url": "localhost:5000/gadgetbazaar/auth/createuser",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2023-02-15T06:12:12.654Z",
+            "modified": "2023-02-15T11:44:54.784Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"Ganesh\",\n  \"email\": \"ganesh14@gmail.com\",\n  \"password\": \"123456\",\n  \"isadmin\": true,\n  \"contact\": \"9408905780\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "9a9ea6a8-7b90-4abb-8b0b-b8fe207697d6",
+            "colId": "9c33251e-16d9-422d-8167-ae42fb2a7907",
+            "containerId": "5be601f4-78c7-4b9d-a78a-8315a6e79e31",
+            "name": "Login User",
+            "url": "localhost:5000/gadgetbazaar/auth/login",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2023-02-15T10:38:20.395Z",
+            "modified": "2023-02-16T07:39:31.652Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"ganesh14@gmail.com\",\n  \"password\": \"123456\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "8b251179-e553-4a7b-8731-78d096637ffa",
+            "colId": "9c33251e-16d9-422d-8167-ae42fb2a7907",
+            "containerId": "5be601f4-78c7-4b9d-a78a-8315a6e79e31",
+            "name": "Get User",
+            "url": "localhost:5000/gadgetbazaar/auth/getuser",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2023-02-15T11:56:27.714Z",
+            "modified": "2023-02-15T11:57:02.749Z",
+            "headers": [
+                {
+                    "name": "auth-token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNlY2I5NjVkNGExMGJmOWQyM2VlZDNhIn0sImlhdCI6MTY3NjQ2MTUzNX0.x5SYxRh-0xokZfwSEPNQP-BKufAWc0kPGF2aJUj5NeI"
+                }
+            ],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "2b4c1c62-b0dc-4169-8206-b65fdb2883a7",
+            "colId": "9c33251e-16d9-422d-8167-ae42fb2a7907",
+            "containerId": "932f1cbd-6243-45bd-b573-041e33d57d65",
+            "name": "Add Product",
+            "url": "localhost:5000/gadgetbazaar/admin/products/add",
+            "method": "POST",
+            "sortNum": 50000,
+            "created": "2023-02-15T13:12:34.930Z",
+            "modified": "2023-02-17T12:36:40.920Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "multipart/form-data"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formdata",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "iPhone"
+                    },
+                    {
+                        "name": "desc",
+                        "value": "This is a Demo Product, And This Description Must Contain At Least 20 Characters"
+                    },
+                    {
+                        "name": "sku",
+                        "value": "P1"
+                    },
+                    {
+                        "name": "price",
+                        "value": "100000"
+                    }
+                ],
+                "files": [
+                    {
+                        "name": "image",
+                        "value": "/home/cp/Downloads/iphone.webp"
+                    }
+                ]
+            },
+            "tests": []
+        }
+    ]
+}
