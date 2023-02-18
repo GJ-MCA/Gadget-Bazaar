@@ -19,17 +19,16 @@ router.post('/createuser',[
     }
     try{
         //Check whether the user with this email exists already
-        let user = await User.findOne({email: req.body.email});
+/*         let user = await User.findOne({email: req.body.email});
         if(user){
             return res.status(400).json({error: "Sorry, User With This Email Already Exists"})
-        }
+        } */
         const salt = await bcrypt.genSalt(10);
         const securedPass = await bcrypt.hash(req.body.password, salt);
         user = await User.create({
             name: req.body.name,
             email: req.body.email,
             password: securedPass,
-            isadmin: req.body.isadmin,
             contact: req.body.contact,
         });
         const data = {
@@ -89,7 +88,7 @@ router.post('/login',[
     
 })
 
-//ROUTE: 3 - Get Logged in User Details - POST "gadgetbazaar/auth/getuser"
+//ROUTE: 3 - Get Logged in User Details - POST "gadgetbazaar/auth/getuser" Login Required
 router.post('/getuser', fetchuser, async (req,res)=> {
     try{
         userID = req.user.id;

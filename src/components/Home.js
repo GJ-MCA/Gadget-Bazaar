@@ -96,6 +96,25 @@ export const Home = () => {
                </div>
             </div>
          </section>
+         <form method="POST" action="http://localhost:5000/gadgetbazaar/admin/products/add" encType="application/x-www-form-urlencoded">
+               <label htmlFor="name">Name:</label>
+               <input type="text" name="name" required/>
+               <b/>
+               <label htmlFor="desc">Description:</label>
+               <input type="text" name="desc" required/>
+               <br/>
+               <label htmlFor="sku">SKU:</label>
+               <input type="text" name="sku" required/>
+               <br/>
+               <label htmlFor="category">Category:</label>
+               <input type="text" name="category" required/>
+               <br/>
+               <label htmlFor="price">Price:</label>
+               <input type="number" name="price" required/>
+               <br/>
+               <button type="submit">Add Product</button>
+            </form>
+
          {/* <!-- end slider section --> */}
       </div>
       {/* <!-- why section --> */}

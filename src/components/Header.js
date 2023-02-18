@@ -37,7 +37,7 @@ export const Header = () => {
 								</li>
 								<li className="nav-item">
 									<Link className="nav-link cart" to="#">
-								    <i class="fa fa-shopping-cart"></i>
+								    <i className="fa fa-shopping-cart"></i>
 									</Link>
 								</li>
 								<form className="form-inline">

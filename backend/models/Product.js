@@ -7,7 +7,7 @@ const productSchema = new Schema({
     required: true,
     unique: true
   },
-  desc: {
+  description: {
     type: String,
     required: true
   },
@@ -19,7 +19,7 @@ const productSchema = new Schema({
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
-    required: true
+    default: null
   },
   price: {
     type: Number,
@@ -30,7 +30,7 @@ const productSchema = new Schema({
       return parseFloat(value);
     }
   },
-  image: { type: String, required: true }
+  image: { type: String, default: null }
 },
 { 
     toJSON: { getters: true }
