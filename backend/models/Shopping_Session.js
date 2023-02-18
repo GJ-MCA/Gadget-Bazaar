@@ -23,4 +23,4 @@ const shoppingSessionSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('shopping_session',shoppingSessionSchema)
+module.exports = mongoose.model('Shopping_Session',shoppingSessionSchema)

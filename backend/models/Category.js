@@ -10,10 +10,7 @@ const categorySchema = new Schema({
     type: String,
     required: true
   },
-  image: { 
-    data: Buffer, 
-    contentType: String 
-  },
+  image: { type: String, required: true },
   status: {
     type: Boolean,
     required: true
@@ -29,4 +26,4 @@ const categorySchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('category',categorySchema)
+module.exports = mongoose.model('Category',categorySchema)

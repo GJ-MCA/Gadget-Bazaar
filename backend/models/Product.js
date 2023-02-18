@@ -23,9 +23,14 @@ const productSchema = new Schema({
   },
   price: {
     type: Number,
-    get: v => (v/100).toFixed(2),
-    set: v => v*100
+    get: function(value) {
+      return value.toFixed(2);
+    },
+    set: function(value) {
+      return parseFloat(value);
+    }
   },
+  image: { type: String, required: true }
 },
 { 
     toJSON: { getters: true }
@@ -37,4 +42,4 @@ const productSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('product',productSchema)
+module.exports = mongoose.model('Product',productSchema)

@@ -31,4 +31,4 @@ const productReviewSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('product_review',productReviewSchema)
+module.exports = mongoose.model('Product_Review',productReviewSchema)

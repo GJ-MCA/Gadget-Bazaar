@@ -28,4 +28,4 @@ const paymentDetailsSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('payment_details',paymentDetailsSchema)
+module.exports = mongoose.model('Payment_Details',paymentDetailsSchema)
