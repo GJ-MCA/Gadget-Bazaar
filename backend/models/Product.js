@@ -30,7 +30,15 @@ const productSchema = new Schema({
       return parseFloat(value);
     }
   },
-  image: { type: String, default: null }
+  quantity: {
+    type: Number,
+    default: 1
+  },
+  image: { type: String, default: null },
+  status: {
+    type: Boolean,
+    default: true
+  }
 },
 { 
     toJSON: { getters: true }

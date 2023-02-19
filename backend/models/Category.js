@@ -6,9 +6,10 @@ const categorySchema = new Schema({
     type: String,
     required: true
   },
-  desc: {
+  description: {
     type: String,
-    required: true
+    required: true,
+    maxlength: 500
   },
   image: { type: String, required: true },
   status: {

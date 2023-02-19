@@ -11,7 +11,7 @@ export const Footer = () => {
                <div className="col-md-4">
                    <div className="full">
                       <div className="logo_footer">
-                        <a href="#"><img width="210" src="/assets/img/logo.png" alt="#" /></a>
+                        <Link to="/"><img width="210" src="/assets/img/logo.png" alt="Gadget Bazaar" /></Link>
                       </div>
                       <div className="information_f">
                         <p><strong>ADDRESS:</strong> Gadget Bazaar Corporate House, CH-01 Adani Shantigram, Inspire Business Park, S. G. Highway, Ahmedabad-382421</p>
@@ -28,12 +28,9 @@ export const Footer = () => {
                      <div className="widget_menu">
                         <h3>Menu</h3>
                         <ul>
-                           <li><a href="#">Home</a></li>
-                           <li><a href="#">About</a></li>
-                           <li><a href="#">Services</a></li>
-                           <li><a href="#">Testimonial</a></li>
-                           <li><a href="#">Blog</a></li>
-                           <li><a href="#">Contact</a></li>
+                           <li><Link to="/">Home</Link></li>
+                           <li><Link to="/about">About</Link></li>
+                           <li><Link to="/contact">Contact</Link></li>
                         </ul>
                      </div>
                   </div>
@@ -41,12 +38,8 @@ export const Footer = () => {
                      <div className="widget_menu">
                         <h3>Account</h3>
                         <ul>
-                           <li><a href="#">Account</a></li>
-                           <li><a href="#">Checkout</a></li>
-                           <li><a href="#">Login</a></li>
-                           <li><a href="#">Register</a></li>
-                           <li><a href="#">Shopping</a></li>
-                           <li><a href="#">Widget</a></li>
+                           <li><Link to="/my-account">Account</Link></li>
+                           <li><Link to="/login">Login</Link></li>
                         </ul>
                      </div>
                   </div>

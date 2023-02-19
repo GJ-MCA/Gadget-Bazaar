@@ -5,8 +5,10 @@ const {body, validationResult} = require('express-validator')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fetchuser = require('../middleware/fetchuser');
-const JWT_SECRET = "G@dgetB^z@^r_$ecured";
-
+const ForgotPasswordToken = require('../models/ForgotPasswordToken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const config = require("../../src/config/config")
 //ROUTE: 1 - Create a User - Registration - POST "gadgetbazaar/auth/createuser"
 router.post('/createuser',[
     body('name','Enter At Least 3 Characters').isLength({min: 3}),
@@ -36,8 +38,8 @@ router.post('/createuser',[
                 id: user.id
             }
         }
-        console.log(JWT_SECRET)
-        const authtoken = jwt.sign(data, JWT_SECRET);
+        console.log(config.jwtSecret)
+        const authtoken = jwt.sign(data, config.jwtSecret);
         res.json({authtoken});
     }
     catch(error){
@@ -78,7 +80,7 @@ router.post('/login',[
                 id: user.id
             }
         }
-        const authtoken = jwt.sign(data, JWT_SECRET);
+        const authtoken = jwt.sign(data, config.jwtSecret);
         res.json({authtoken});
     }
     catch(error){
@@ -103,4 +105,50 @@ router.post('/getuser', fetchuser, async (req,res)=> {
         res.status(500).send("Internal Server Error");
     }
 })
+
+//ROUTE: 4 - Forgot Password - POST "gadgetbazaar/auth/forgotpassword"
+router.post('/forgotpassword', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Create token
+    const token = crypto.randomBytes(20).toString('hex');
+    const forgotPasswordToken = new ForgotPasswordToken({
+      user: user._id,
+      token
+    });
+    await forgotPasswordToken.save();
+
+    // Send email with token
+    const transporter = nodemailer.createTransport({
+      service: config.emailService,
+      auth: {
+        user: config.emailAddress,
+        pass: config.emailPassword
+      }
+    });
+    const mailOptions = {
+      from: config.emailAddress,
+      to: user.email,
+      subject: 'Reset Password - Gadget Bazaar',
+      text: `You are receiving this email because you (or someone else) have requested to reset your password.\n\n
+        Please click on the following link, or paste this into your browser to complete the process:\n\n
+        ${config.clientUrl}/resetpassword/${token}\n\n
+        If you did not request this, please ignore this email and your password will remain unchanged.\n`
+    };
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({ success: 'An email with reset password link has been sent to your email' });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 module.exports = router;

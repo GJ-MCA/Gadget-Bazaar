@@ -7,11 +7,19 @@ const shoppingSessionSchema = new Schema({
     ref: 'User',
     required: true
   },
-  total: {
+  total:  {
     type: Number,
-    get: v => (v/100).toFixed(2),
-    set: v => v*100
-  }
+    get: function(value) {
+      return value.toFixed(2);
+    },
+    set: function(value) {
+      return parseFloat(value);
+    }
+  },
+  cart_items: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Cart_Item',
+  }],
 },
 { 
     toJSON: { getters: true }
