@@ -7,8 +7,12 @@ const jwt = require('jsonwebtoken');
 const fetchuser = require('../middleware/fetchuser');
 const ForgotPasswordToken = require('../models/ForgotPasswordToken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-const config = require("../../src/config/config")
+const config = require("../../src/config/config");
+const isLoggedIn = require('../middleware/isLoggedIn');
+const emailService = require('../services/emailService');
+
+
+
 //ROUTE: 1 - Create a User - Registration - POST "gadgetbazaar/auth/createuser"
 router.post('/createuser',[
     body('name','Enter At Least 3 Characters').isLength({min: 3}),
@@ -93,7 +97,8 @@ router.post('/login',[
 //ROUTE: 3 - Get Logged in User Details - POST "gadgetbazaar/auth/getuser" Login Required
 router.post('/getuser', fetchuser, async (req,res)=> {
     try{
-        userID = req.user.id;
+        let userID = req.user.id;
+
         const user = await User.findById(userID).select("-password");
         if(user){
             res.send(user);
@@ -126,23 +131,14 @@ router.post('/forgotpassword', async (req, res) => {
     await forgotPasswordToken.save();
 
     // Send email with token
-    const transporter = nodemailer.createTransport({
-      service: config.emailService,
-      auth: {
-        user: config.emailAddress,
-        pass: config.emailPassword
-      }
-    });
-    const mailOptions = {
-      from: config.emailAddress,
-      to: user.email,
-      subject: 'Reset Password - Gadget Bazaar',
-      text: `You are receiving this email because you (or someone else) have requested to reset your password.\n\n
-        Please click on the following link, or paste this into your browser to complete the process:\n\n
-        ${config.clientUrl}/resetpassword/${token}\n\n
-        If you did not request this, please ignore this email and your password will remain unchanged.\n`
-    };
-    await transporter.sendMail(mailOptions);
+    const subject = 'New Reset Password';
+    const html = `
+    <p>You are receiving this email because you (or someone else) have requested to reset your password.</p>
+    <p>Please click on the following link, or paste this into your browser to complete the process:</p>
+    <p><a href="${config.clientUrl}/resetpassword/${token}">${config.clientUrl}/resetpassword/${token}</a></p>
+    <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+  `;
+    await emailService.sendEmail(user.name, user.email, subject, html);
 
     return res.status(200).json({ success: 'An email with reset password link has been sent to your email' });
   } catch (error) {
@@ -150,5 +146,29 @@ router.post('/forgotpassword', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
+//ROUTE: 5 - Check If User Is Logged In - POST "gadgetbazaar/auth/checkuser" Login Required
+router.post('/checkuser', async (req, res) => {
+    console.log("checkuser is called");
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        console.log(token);
+        if (!token) {
+            console.log("token not found so not logged in");
+            res.status(401).send('Unauthorized: No token provided');
+        } else {
+          console.log("token found but need to verify");
+          const loggedIn = isLoggedIn(token);
+          if (loggedIn) {
+            console.log("token found and its verified");
+            res.status(200).send('User is logged in');
+        } else {
+            console.log("token found and its not valid");
+          res.status(401).send('Unauthorized: Invalid token');
+        }
+      }
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Internal Server Error');
+    }
+  });
 module.exports = router;

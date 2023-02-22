@@ -1,20 +1,51 @@
 import React, { useState, useEffect  } from 'react';
 import { useNavigate } from "react-router-dom";
-import isLoggedIn from '../middleware/checkLogin';
-const config = require("../../../src/config/config");
+const config = require('../../config/config');
+
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+ 
   useEffect(() => {
-    const token = localStorage.getItem('auth-token');
-    const loggedIn = isLoggedIn(token);
-    if (loggedIn) {
-      navigate('/');
+    // Checking if user is already logged in and then redirecting it to home if already logged in
+    const checkUser = async () => {
+      console.log("Check user is called inside login component")
+      const token = localStorage.getItem('auth-token');
+      console.log("Token in Login component");
+      console.log(token);
+      if (token) {
+        console.log("token found");
+        try {
+          console.log("calling checkuser api");
+          const response = await fetch(`${config.authAPIUrl}/checkuser`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+          });
+          const data = await response.text();
+          console.log("Data: ");
+          console.log(data);
+          if (response.ok) {
+            console.log("repsonse.ok is true, printing data: ")
+            console.log(data);
+            navigate('/');
+          } else {
+            console.log("repsonse.ok is false, printing data: ")
+            // handle unauthorized or other errors
+            console.error(data);
+          }
+        } catch (error) {
+          console.log("in catch found error:  ")
+          console.error(error.message);
+        }
+      }
     }
+   checkUser();
   }, [navigate]);
 
   const handleSubmit = async (event) => {
