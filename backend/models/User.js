@@ -26,6 +26,11 @@ const userSchema = new Schema({
   last_login: {
     type: Date,
     default: Date.now
+  },
+  role: {
+    type: String,
+    enum: ['customer', 'admin'],
+    default: 'customer'
   }
 },
 { 

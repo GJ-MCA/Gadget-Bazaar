@@ -15,40 +15,43 @@ const emailService = require('../services/emailService');
 
 //ROUTE: 1 - Create a User - Registration - POST "gadgetbazaar/auth/createuser"
 router.post('/createuser',[
-    body('name','Enter At Least 3 Characters').isLength({min: 3}),
-    body('email','Enter a Valid Email').isEmail(),
-    body('password','Enter At Least 6 Characters').isLength({min: 6}),
+  body('name').isLength({ min: 3 }).withMessage('Name must have at least 3 characters'),	
+  body('email').isEmail().withMessage('Invalid email'),	
+  body('password').isLength({ min: 6 }).withMessage('Password must have at least 6 characters')	
+      .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$/)	
+      .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
 ], async (req,res)=>{
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     try{
-        //Check whether the user with this email exists already
-/*         let user = await User.findOne({email: req.body.email});
-        if(user){
-            return res.status(400).json({error: "Sorry, User With This Email Already Exists"})
-        } */
-        const salt = await bcrypt.genSalt(10);
-        const securedPass = await bcrypt.hash(req.body.password, salt);
-        user = await User.create({
-            name: req.body.name,
-            email: req.body.email,
-            password: securedPass,
-            contact: req.body.contact,
-        });
-        const data = {
-            user: {
-                id: user.id
-            }
-        }
-        console.log(config.jwtSecret)
-        const authtoken = jwt.sign(data, config.jwtSecret);
-        res.json({authtoken});
+      //Check whether the user with this email exists already
+      let user = await User.findOne({email: req.body.email});
+      /*        
+      if(user){
+        return res.status(400).json({error: "Email already registered"})
+      } */
+      const salt = await bcrypt.genSalt(10);
+      const securedPass = await bcrypt.hash(req.body.password, salt);
+      user = await User.create({
+          name: req.body.name,
+          email: req.body.email,
+          password: securedPass,
+          contact: req.body.contact,
+      });
+      const data = {
+          user: {
+              id: user.id
+          }
+      }
+      console.log(config.jwtSecret)
+      const authtoken = jwt.sign(data, config.jwtSecret);
+      res.json({authtoken});
     }
     catch(error){
         console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        res.status(500).json({ error: 'Failed to create user' });
     }
     
 })

@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const cartItemSchema = new Schema({
-  session_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Shopping_Session',
-    required: true
-  },
   product_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
+    required: true
+  },
+  customer_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   quantity: {

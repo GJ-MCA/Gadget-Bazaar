@@ -1,5 +1,6 @@
 import React from 'react'
 import ProductList from './Products/ProductList'
+import { Link } from 'react-router-dom'
 
 export const Home = () => {
   return (
@@ -28,9 +29,9 @@ export const Home = () => {
                                     Explicabo esse amet tempora quibusdam laudantium, laborum eaque magnam fugiat hic? Esse dicta aliquid error repudiandae earum suscipit fugiat molestias, veniam, vel architecto veritatis delectus repellat modi impedit sequi.
                                  </p>
                                  <div className="btn-box">
-                                    <a href="" className="btn1">
+                                    <Link to="/products" className="btn1">
                                     Shop Now
-                                    </a>
+                                    </Link>
                                  </div>
                               </div>
                            </div>
@@ -53,9 +54,9 @@ export const Home = () => {
                                     Explicabo esse amet tempora quibusdam laudantium, laborum eaque magnam fugiat hic? Esse dicta aliquid error repudiandae earum suscipit fugiat molestias, veniam, vel architecto veritatis delectus repellat modi impedit sequi.
                                  </p>
                                  <div className="btn-box">
-                                    <a href="" className="btn1">
+                                    <Link to="/products" className="btn1">
                                     Shop Now
-                                    </a>
+                                    </Link>
                                  </div>
                               </div>
                            </div>
@@ -78,9 +79,9 @@ export const Home = () => {
                                     Explicabo esse amet tempora quibusdam laudantium, laborum eaque magnam fugiat hic? Esse dicta aliquid error repudiandae earum suscipit fugiat molestias, veniam, vel architecto veritatis delectus repellat modi impedit sequi.
                                  </p>
                                  <div className="btn-box">
-                                    <a href="" className="btn1">
+                                    <Link to="/products" className="btn1">
                                     Shop Now
-                                    </a>
+                                    </Link>
                                  </div>
                               </div>
                            </div>
@@ -197,9 +198,9 @@ export const Home = () => {
                      <p style={{marginRight: 20 + 'px',marginBottom: 30 + 'px'}}>
                         Vitae fugiat laboriosam officia perferendis provident aliquid voluptatibus dolorem, fugit ullam sit earum id eaque nisi hic? Tenetur commodi, nisi rem vel, ea eaque ab ipsa, autem similique ex unde!
                      </p>
-                     <a href="">
+                     <Link to="/products">
                      Shop Now
-                     </a>
+                     </Link>
                   </div>
                </div>
             </div>

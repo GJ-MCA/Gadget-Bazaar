@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
 const config = require("../../config/config")
 
 function ProductList() {
   const [products, setProducts] = useState([]);
+  const { setCartCount } = useContext(GadgetBazaarContext);
   const getAllProductsUrl = `${config.baseUrl}/gadgetbazaar/products/showall`;
   const cartAddUrl = `${config.baseUrl}/gadgetbazaar/order/cart/add`;
   const buyNowUrl = `${config.baseUrl}/gadgetbazaar/order/buy-now`;
@@ -27,26 +29,68 @@ function ProductList() {
 
   const handleAddToCart = async (product) => {
     const item = {
-      productId: product._id,
+      product_id: product._id,
       name: product.name,
       image: product.image,
       price: product.price,
       quantity: 1
     };
     try {
-      const response = await fetch(cartAddUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(item)
-      });
-      if (!response.ok) {
-        throw new Error('Unable to add item to cart');
+      		// Check if the user is logged in and set the user state accordingly
+			const token = localStorage.getItem('auth-token');
+      if(token){
+        const response = await fetch(cartAddUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'auth-token': `Bearer ${token}`
+          },
+          body: JSON.stringify(item)
+        });
+        if (!response.ok) {
+          response.json().then(error => {
+            throw new Error('Unable to add item to cart');
+          });
+        }
+        if(response.ok){
+          response.json().then(data => {
+            if(data.errcode === "OUTOFSTOCK"){
+              alert("Item is out of stock")
+            }
+          });
+        }
+				const getCartUrl = `${config.baseUrl}/gadgetbazaar/order/getcart`;
+				fetch(`${getCartUrl}`, {
+					method: 'GET',
+					headers: {
+					'Content-Type': 'application/json',
+					'auth-token': `Bearer ${token}`
+					}
+				})
+				.then(response => {
+				if (response.ok) {
+					return response.json();
+				}
+				throw new Error('Network response was not ok');
+				})
+        .then(data => {
+					var total_qty = 0;
+					if(data){
+						data.forEach(element => {
+							total_qty += element.quantity;
+						});
+					}
+					setCartCount(total_qty);
+				})
+				.catch(error => {
+				console.error('There was a problem with the fetch operation:', error);
+				});
+
       }
     } catch (error) {
       console.error(error);
     }
+
   };
 
   const handleBuyNow = async (product) => {
@@ -58,17 +102,23 @@ function ProductList() {
       quantity: 1
     };
     try {
-      const response = await fetch(buyNowUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(item)
-      });
-      if (!response.ok) {
-        throw new Error('Unable to add item to cart');
+      // Check if the user is logged in and set the user state accordingly
+			const token = localStorage.getItem('auth-token');
+      if(token){
+        const response = await fetch(buyNowUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'auth-token': `Bearer ${token}`
+          },
+          body: JSON.stringify(item)
+        });
+        if (!response.ok) {
+          throw new Error('Unable to add item to cart');
+        }
+        window.location.href = "/gadgetbazaar/order/checkout";
       }
-      window.location.href = "/gadgetbazaar/order/checkout";
+
     } catch (error) {
       console.error(error);
     }

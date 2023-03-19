@@ -17,6 +17,25 @@ const orderDetailsSchema = new Schema({
       ref: 'Payment',
       required: true
   },
+  shipping_address: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Address',
+      required: true
+  },
+  billing_address: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Address',
+      required: true
+  },
+  order_status: {
+      type: String,
+      enum: ['pending', 'processing', 'shipped', 'delivered'],
+      default: 'pending'
+  },
+  order_date: {
+      type: Date,
+      default: Date.now
+  }
 },
 { 
     toJSON: { getters: true }

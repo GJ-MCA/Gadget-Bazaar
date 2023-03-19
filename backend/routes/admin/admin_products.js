@@ -3,7 +3,6 @@ const router = express.Router();
 const { body, validationResult, check } = require("express-validator");
 const User = require("../../models/User");
 const Product = require("../../models/Product");
-const AdminUser = require("../../models/Admin_User")
 const multer = require('multer');
 const checkAdminUser = require("../../middleware/checkAdminUser");
 
@@ -102,8 +101,12 @@ router.put('/:id', upload.single('image'),checkAdminUser,[
       return res.status(404).json({ message: 'Product not found' });
     }
   // Check if the user is an admin
-    const adminUser = await AdminUser.findOne({ email: req.user.email });
-    if (!adminUser) {
+    const user = await User.findOne({ email: req.user.email });
+    if (!user) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    if (user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized' });
     }
 

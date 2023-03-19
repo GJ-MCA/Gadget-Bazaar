@@ -10,6 +10,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ProductList from './components/Products/ProductList';
+import { CartProvider } from './context/GadgetBazaarContext';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -45,7 +46,9 @@ const router = createBrowserRouter([
 
 export const App = () => {
   return (
+    <CartProvider>
     <RouterProvider router={router} />
+    </CartProvider>
   )
 }
 

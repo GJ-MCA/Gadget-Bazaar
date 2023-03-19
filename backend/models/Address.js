@@ -1,17 +1,28 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const adminUserSchema = new Schema({
-  name: {
+const addressSchema = new Schema({
+  address_line_1: {
     type: String,
     required: true
   },
-  email: {
+  address_line_2: {
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
-  password: {
+  city: {
+    type: String,
+    required: true
+  },
+  state: {
+    type: String,
+    required: true
+  },
+  country: {
+    type: String,
+    default: 'India'
+  },
+  pincode: {
     type: String,
     required: true
   },
@@ -19,18 +30,6 @@ const adminUserSchema = new Schema({
     type: String,
     required: true
   },
-  date_created: {
-    type: Date, 
-    default: Date.now 
-  },
-  last_login: {
-    type: Date,
-    default: Date.now
-  },
-  super_admin:{
-    type: Boolean,
-    default: false
-  }
 },
 { 
     toJSON: { getters: true }
@@ -42,4 +41,4 @@ const adminUserSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('Admin_User',adminUserSchema)
+module.exports = mongoose.model('Address', addressSchema);

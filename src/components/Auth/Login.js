@@ -1,5 +1,6 @@
 import React, { useState, useEffect  } from 'react';
 import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 const config = require('../../config/config');
 
 
@@ -77,15 +78,20 @@ const Login = () => {
   };
 
   return (
-    <div className="container">
-      <div className="row mt-5">
-        <div className="col-md-6 m-auto">
-          <div className="card card-body">
-            <h1 className="text-center mb-3">
-              <i className="fas fa-sign-in-alt"></i> Login
-            </h1>
-            {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-            <form onSubmit={handleSubmit}>
+    <>
+    <section className="bg-image"
+style={{backgroundImage: "url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp')"}}>
+<div className="mask d-flex align-items-center h-100 gradient-custom-3">
+  <div className="container h-100 pb-5 pt-5">
+    <div className="row d-flex justify-content-center align-items-center h-100">
+      <div className="col-12 col-md-9 col-lg-7 col-xl-6">
+        <div className="card" style={{borderRadius: "15px"}}>
+          <div className="card-body p-5">
+            <h2 className="text-uppercase text-center mb-4">Login</h2>
+
+          
+              <form onSubmit={handleSubmit}>
+              {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
               <div className="form-group">
                 <label htmlFor="email">Email</label>
                 <input
@@ -93,7 +99,6 @@ const Login = () => {
                   id="email"
                   name="email"
                   className="form-control"
-                  placeholder="Enter email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   required
@@ -106,7 +111,6 @@ const Login = () => {
                   id="password"
                   name="password"
                   className="form-control"
-                  placeholder="Enter password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
@@ -116,10 +120,16 @@ const Login = () => {
                 Login
               </button>
             </form>
+            <p className="text-center text-muted mt-4 mb-0">Don't Have an account? <Link to="/register"
+                    className="fw-bold text-body"><u>Register here</u></Link></p>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+</section>
+  </>
   );
 };
 
