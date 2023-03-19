@@ -9,6 +9,7 @@ import {About} from './components/About'
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ForgotPassword from './components/Auth/ForgotPassword';
+import ProductList from './components/Products/ProductList';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "/forgotpassword",
         element: <ForgotPassword />,
+      },
+      {
+        path: "/products",
+        element: <ProductList />,
       },
     ],
   },

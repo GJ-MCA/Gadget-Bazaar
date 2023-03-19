@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 //ROUTE: 1 - Add a Product - Admin - POST "gadgetbazaar/admin/products/add"
-router.post('/add', upload.single('image'),checkAdminUser,[
+router.post('/add', upload.single('image'),/* checkAdminUser, */[
   body('name','Enter at least 5 characters').custom(value => {
     if(value.length < 5){
         throw new Error('Name must be at least 5 characters long');

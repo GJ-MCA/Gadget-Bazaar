@@ -83,6 +83,9 @@ function ProductList() {
               Our <span>products</span>
             </h2>
           </div>
+          {products.length === 0 ? (
+            <div className="text-center lead">No products available</div>
+          ) : (
           <div className="row">
             {products.slice(0, productsToDisplay).map(product => (
               <div className="col-sm-6 col-md-4 col-lg-4" key={product._id}>
@@ -112,6 +115,7 @@ function ProductList() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </section>
     </>
