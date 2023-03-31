@@ -6,6 +6,11 @@ const paymentDetailsSchema = new Schema({
     type: Number,
     required: true
   },
+  order_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Order_Details',
+    required: true
+  },
   amount: {
       type: Number,
       get: v => (v/100).toFixed(2),
