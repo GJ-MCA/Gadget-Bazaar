@@ -17,7 +17,7 @@ const userSchema = new Schema({
   },
   contact: {
     type: String,
-    required: true
+    required: false
   },
   date_created: {
     type: Date, 

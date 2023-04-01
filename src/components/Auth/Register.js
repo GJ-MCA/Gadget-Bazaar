@@ -9,7 +9,6 @@ function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [contact, setContact] = useState('');
   const [errors, setErrors] = useState([]);
 
   useEffect(() => {
@@ -45,7 +44,7 @@ function Register() {
     const response = await fetch(`${config.authAPIUrl}/createuser`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, contact })
+      body: JSON.stringify({ name, email, password })
     });
     const data = await response.json();
     if (response.ok) {
@@ -92,11 +91,6 @@ function Register() {
                 <div className="form-outline mb-4">
                   <label className="form-label" for="password">Password</label>
                   <input type="password" id="password" name="password" className="form-control " value={password} onChange={(event) => setPassword(event.target.value)} />
-                </div>
-
-                <div className="form-outline mb-4">
-                  <label className="form-label" for="contact">Contact</label>
-                  <input type="text" id="contact" name="contact" className="form-control " value={contact} onChange={(event) => setContact(event.target.value)} />
                 </div>
 
                 <div className="form-check d-flex justify-content-center" style={{alignItems: "center",marginTop: "20px", marginBottom: "20px"}}>

@@ -1,0 +1,45 @@
+  
+    .card-registration .select-input.form-control[readonly]:not([disabled]) {
+    font-size: 1rem;
+    line-height: 2.15;
+    padding-left: .75em;
+    padding-right: .75em;
+    }
+    
+    .card-registration .select-arrow {
+    top: 13px;
+    }
+    
+    .bg-grey {
+    background-color: #eae8e8;
+    }
+    
+    @media (min-width: 992px) {
+    .card-registration-2 .bg-grey {
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    }
+    }
+    
+    @media (max-width: 991px) {
+    .card-registration-2 .bg-grey {
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    }
+    }
+
+    input[type=number]{
+        width: 60px;
+        margin: 0 10px;
+        height: 30px;
+    }
+    .btn{
+        height: 30px;
+        width: 30px;
+        vertical-align: middle;
+        line-height: 1;
+    }
+    .btn-lg{
+        width: 100%;
+        height: 45px;
+    }

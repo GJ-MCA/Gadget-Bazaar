@@ -4,11 +4,11 @@ export const About = () => {
   return (
   <>
   {/* <!-- inner page section --> */}
-      <section class="inner_page_head">
-         <div class="container_fuild">
-            <div class="row">
-               <div class="col-md-12">
-                  <div class="full">
+      <section className="inner_page_head">
+         <div className="container_fuild">
+            <div className="row">
+               <div className="col-md-12">
+                  <div className="full">
                      <h3>About us</h3>
                   </div>
                </div>

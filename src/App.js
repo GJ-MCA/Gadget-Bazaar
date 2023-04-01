@@ -11,6 +11,7 @@ import Register from './components/Auth/Register';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ProductList from './components/Products/ProductList';
 import { CartProvider } from './context/GadgetBazaarContext';
+import { ShoppingCart } from './components/Order/ShoppingCart';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "/products",
         element: <ProductList />,
+      },
+      {
+        path: "/cart",
+        element: <ShoppingCart />,
       },
     ],
   },
