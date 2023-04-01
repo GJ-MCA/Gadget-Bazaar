@@ -1,6 +1,7 @@
 import React from 'react'
 import ProductList from './Products/ProductList'
 import { Link } from 'react-router-dom'
+const config = require("../config/config");
 
 export const Home = () => {
   return (
@@ -9,7 +10,7 @@ export const Home = () => {
          {/* <!-- slider section --> */}
          <section className="slider_section ">
             <div className="slider_bg_box">
-               <img src="assets/img/slider-bg.jpg" alt=""/>
+               <img src="/assets/img/slider-bg.jpg" alt=""/>
             </div>
             <div id="customCarousel1" className="carousel slide" data-ride="carousel">
                <div className="carousel-inner">
@@ -98,7 +99,7 @@ export const Home = () => {
                </div>
             </div>
          </section>
-         <form method="POST" action="http://localhost:5000/gadgetbazaar/admin/products/add" encType="multipart/form-data">
+         <form method="POST" action={`${config.baseUrl}/admin/products/add`} encType="multipart/form-data">
             <label htmlFor="name">Name:</label>
             <input type="text" name="name" id="name" required/>
             <br/>
@@ -186,7 +187,7 @@ export const Home = () => {
          <div className="container">
             <div className="box">
                <div className="arrival_bg_box">
-                  <img src="assets/img/arrival-bg.png" alt=""/>
+                  <img src="/assets/img/arrival-bg.png" alt=""/>
                </div>
                <div className="row">
                   <div className="col-md-6 ml-auto">
@@ -244,14 +245,14 @@ export const Home = () => {
                   Customer's Testimonial
                </h2>
             </div>
-            <div id="carouselExample3Controls" className="carousel slide" data-ride="carousel">
+            <div id="homeslider" className="carousel slide" data-ride="carousel">
                <div className="carousel-inner">
                   <div className="carousel-item active">
                      <div className="box col-lg-10 mx-auto">
                         <div className="img_container">
                            <div className="img-box">
                               <div className="img_box-inner">
-                                 <img src="assets/img/client.jpg" alt=""/>
+                                 <img src="/assets/img/client.jpg" alt=""/>
                               </div>
                            </div>
                         </div>
@@ -273,7 +274,7 @@ export const Home = () => {
                         <div className="img_container">
                            <div className="img-box">
                               <div className="img_box-inner">
-                                 <img src="assets/img/client.jpg" alt=""/>
+                                 <img src="/assets/img/client.jpg" alt=""/>
                               </div>
                            </div>
                         </div>
@@ -295,7 +296,7 @@ export const Home = () => {
                         <div className="img_container">
                            <div className="img-box">
                               <div className="img_box-inner">
-                                 <img src="assets/img/client.jpg" alt=""/>
+                                 <img src="/assets/img/client.jpg" alt=""/>
                               </div>
                            </div>
                         </div>
@@ -314,11 +315,11 @@ export const Home = () => {
                   </div>
                </div>
                <div className="carousel_btn_box">
-                  <a className="carousel-control-prev" href="#carouselExample3Controls" role="button" data-slide="prev">
+                  <a className="carousel-control-prev" href="#homeslider" role="button" data-slide="prev">
                   <i className="fa fa-long-arrow-left" aria-hidden="true"></i>
                   <span className="sr-only">Previous</span>
                   </a>
-                  <a className="carousel-control-next" href="#carouselExample3Controls" role="button" data-slide="next">
+                  <a className="carousel-control-next" href="#homeslider" role="button" data-slide="next">
                   <i className="fa fa-long-arrow-right" aria-hidden="true"></i>
                   <span className="sr-only">Next</span>
                   </a>

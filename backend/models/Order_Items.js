@@ -12,6 +12,16 @@ const orderItemsSchema = new Schema({
     ref: 'Product',
     required: true
   },
+  quantity: {
+    type: Number,
+    default: 1
+  },
+  order_details_status: {
+      type: String,
+      enum: ['pending', 'processing', 'shipped', 'delivered'],
+      default: 'pending'
+  },
+
 },
 { 
     toJSON: { getters: true }

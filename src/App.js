@@ -12,42 +12,63 @@ import ForgotPassword from './components/Auth/ForgotPassword';
 import ProductList from './components/Products/ProductList';
 import { CartProvider } from './context/GadgetBazaarContext';
 import { ShoppingCart } from './components/Order/ShoppingCart';
+import NotFound from './components/NotFound';
+import Contact from './components/Contact';
+import AdminLogin from './components/Admin/Auth/AdminLogin';
+import { AdminDashboard } from './components/Admin/AdminDashboard';
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Root/>,
+    path: '/',
+    element: <Root />,
     children: [
       {
-        path: "/",
+        path: '/',
         element: <Home />,
       },
       {
-        path: "/about",
+        path: '/about',
         element: <About />,
       },
       {
-        path: "/login",
+        path: '/login',
         element: <Login />,
       },
       {
-        path: "/register",
+        path: '/register',
         element: <Register />,
       },
       {
-        path: "/forgotpassword",
+        path: '/forgotpassword',
         element: <ForgotPassword />,
       },
       {
-        path: "/products",
+        path: '/products',
         element: <ProductList />,
       },
       {
-        path: "/cart",
+        path: '/cart',
         element: <ShoppingCart />,
+      },
+      {
+        path: '/contact',
+        element: <Contact />,
+      },
+      {
+        path: '/gadgetbazaar/admin/auth',
+        element: <AdminLogin />,
+      },
+      {
+        path: '/gadgetbazaar/admin/dashboard',
+        element: <AdminDashboard />,
+      },
+      {
+        path: '*',
+        element: <NotFound />,
       },
     ],
   },
 ]);
+
 
 export const App = () => {
   return (

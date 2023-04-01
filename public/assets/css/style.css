@@ -1144,11 +1144,14 @@ h2{
     sans-serif !important;
 }
 
+.custom-button,
 button{
   background-color: #ff0037 !important;
   color: white !important;
   border: 0 !important;
+  text-transform: uppercase;
 }
+.custom-button:hover,
 button:hover{
   color: #feb828 !important;
   background-color: #000 !important;
@@ -1219,4 +1222,8 @@ select:focus {
   background-repeat: no-repeat;
   border-color: grey;
   outline: 0;
+}
+
+.admin-login-page{
+  height: 100vh !important;
 }

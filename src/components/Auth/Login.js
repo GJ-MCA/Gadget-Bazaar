@@ -60,6 +60,7 @@ const Login = () => {
         body: JSON.stringify({
           email,
           password,
+          'isadminattempt': false
         }),
       });
       const data = await response.json();

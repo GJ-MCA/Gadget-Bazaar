@@ -20,7 +20,8 @@ const paymentDetailsSchema = new Schema({
       type: String
   },
   status: {
-      type: String
+      type: String,
+      default: 'Pending'
   },
 },
 { 

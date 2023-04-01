@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 // Initialize multer
 const upload = multer({ storage: storage });
 
-//ROUTE: 1 - Add a Product - Admin - POST "gadgetbazaar/admin/products/add"
+//ROUTE: 1 - Add a Product - Admin - POST "backend-gadgetbazaar/admin/products/add"
 router.post('/add', upload.single('image'),/* checkAdminUser, */[
   body('name','Enter at least 5 characters').custom(value => {
     if(value.length < 5){
@@ -70,7 +70,7 @@ router.post('/add', upload.single('image'),/* checkAdminUser, */[
   }
 })
 
-//ROUTE: 2 - Update a Product - Admin - PUT "gadgetbazaar/admin/products/update/:id"
+//ROUTE: 2 - Update a Product - Admin - PUT "backend-gadgetbazaar/admin/products/update/:id"
 router.put('/:id', upload.single('image'),checkAdminUser,[
   body('name','Enter at least 5 characters').custom(value => {
     if(value.length < 5){
@@ -128,7 +128,7 @@ router.put('/:id', upload.single('image'),checkAdminUser,[
   }
 })
 
-//ROUTE: 3 - Disable a Product - Admin - PUT "gadgetbazaar/admin/products/disable/:id"
+//ROUTE: 3 - Disable a Product - Admin - PUT "backend-gadgetbazaar/admin/products/disable/:id"
 router.put('/:id/disable', checkAdminUser, async (req,res)=>{
   try{
     // Check if the product exists
@@ -148,7 +148,7 @@ router.put('/:id/disable', checkAdminUser, async (req,res)=>{
   }
 })
 
-//ROUTE: 4 - Enable a Product - Admin - PUT "gadgetbazaar/admin/products/enable/:id"
+//ROUTE: 4 - Enable a Product - Admin - PUT "backend-gadgetbazaar/admin/products/enable/:id"
 router.put('/:id/enable', checkAdminUser, async (req,res)=>{
   try{
     // Check if the product exists
@@ -168,7 +168,7 @@ router.put('/:id/enable', checkAdminUser, async (req,res)=>{
   }
 })
 
-//ROUTE: 4 - Delete a Product - Admin - DELETE "gadgetbazaar/admin/products/delete/:id"
+//ROUTE: 4 - Delete a Product - Admin - DELETE "backend-gadgetbazaar/admin/products/delete/:id"
 router.delete('/:id', checkAdminUser, async (req,res)=>{
   try{
     // Check if the product exists

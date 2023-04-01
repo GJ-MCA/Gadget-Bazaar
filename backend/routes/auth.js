@@ -13,7 +13,7 @@ const emailService = require('../services/emailService');
 
 
 
-//ROUTE: 1 - Create a User - Registration - POST "gadgetbazaar/auth/createuser"
+//ROUTE: 1 - Create a User - Registration - POST "backend-gadgetbazaar/auth/createuser"
 router.post('/createuser',[
   body('name').isLength({ min: 3 }).withMessage('Name must have at least 3 characters'),	
   body('email').isEmail().withMessage('Invalid email'),	
@@ -55,7 +55,7 @@ router.post('/createuser',[
     
 })
 
-//ROUTE: 2 - Authenticate the User - Login - POST "gadgetbazaar/auth/login"
+//ROUTE: 2 - Authenticate the User - Login - POST "backend-gadgetbazaar/auth/login"
 router.post('/login',[
     body('email','Enter a Valid Email').isEmail(),
     body('password','Password Can Not be Blank' ).exists(),
@@ -65,7 +65,7 @@ router.post('/login',[
       return res.status(400).json({ errors: errors.array() });
     }
  
-    const {email,password} = req.body;
+    const {email,password, isadminattempt} = req.body;
     console.log(email)
     console.log(password)
     //Check whether the user with this email exists already
@@ -86,6 +86,9 @@ router.post('/login',[
                 id: user.id
             }
         }
+        if(isadminattempt && user.role != 'admin'){
+          return res.status(401).json({error: "You are not authorized to access admin page"})
+        }
         const authtoken = jwt.sign(data, config.jwtSecret);
         res.json({authtoken});
     }
@@ -96,7 +99,7 @@ router.post('/login',[
     
 })
 
-//ROUTE: 3 - Get Logged in User Details - POST "gadgetbazaar/auth/getuser" Login Required
+//ROUTE: 3 - Get Logged in User Details - POST "backend-gadgetbazaar/auth/getuser" Login Required
 router.post('/getuser', fetchuser, async (req,res)=> {
     try{
         let userID = req.user.id;
@@ -113,7 +116,7 @@ router.post('/getuser', fetchuser, async (req,res)=> {
     }
 })
 
-//ROUTE: 4 - Forgot Password - POST "gadgetbazaar/auth/forgotpassword"
+//ROUTE: 4 - Forgot Password - POST "backend-gadgetbazaar/auth/forgotpassword"
 router.post('/forgotpassword', async (req, res) => {
   try {
     const { email } = req.body;
@@ -148,7 +151,7 @@ router.post('/forgotpassword', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-//ROUTE: 5 - Check If User Is Logged In - POST "gadgetbazaar/auth/checkuser" Login Required
+//ROUTE: 5 - Check If User Is Logged In - POST "backend-gadgetbazaar/auth/checkuser" Login Required
 router.post('/checkuser', async (req, res) => {
     console.log("checkuser is called");
     try {

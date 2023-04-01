@@ -28,10 +28,11 @@
     }
     }
 
-    input[type=number]{
-        width: 60px;
+    .input-qty{
+        width: 35px;
         margin: 0 10px;
         height: 30px;
+        text-align: center;
     }
     .btn{
         height: 30px;
@@ -42,4 +43,9 @@
     .btn-lg{
         width: 100%;
         height: 45px;
+    }
+
+    .btn-link{
+        background-color: transparent !important;
+        padding: 0;
     }

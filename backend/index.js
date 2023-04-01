@@ -16,10 +16,10 @@ app.get('/', (req, res) => {
 })
 
 // Routes
-app.use('/gadgetbazaar/auth', require('./routes/auth'));
-app.use('/gadgetbazaar/products/', require('./routes/products/products_main'));
-app.use('/gadgetbazaar/admin/products/', require('./routes/admin/admin_products'));
-app.use('/gadgetbazaar/order', require('./routes/products/products_order'));
+app.use('/backend-gadgetbazaar/auth', require('./routes/auth'));
+app.use('/backend-gadgetbazaar/products/', require('./routes/products/products_main'));
+app.use('/backend-gadgetbazaar/admin/products/', require('./routes/admin/admin_products'));
+app.use('/backend-gadgetbazaar/order', require('./routes/products/products_order'));
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`)

@@ -44,7 +44,7 @@
 		useEffect(() => {
 			if (user) {
 				const token = localStorage.getItem('auth-token');
-				const getCartUrl = `${config.baseUrl}/gadgetbazaar/order/getcart`;
+				const getCartUrl = `${config.orderAPIUrl}/getcart`;
 				fetch(`${getCartUrl}`, {
 					method: 'GET',
 					headers: {
@@ -90,7 +90,7 @@
 				<header className="header_section">
 					<div className="container">
 						<nav className="navbar navbar-expand-lg custom_nav-container ">
-							<Link className="navbar-brand" to="/"><img width="150" src="assets/img/logo.png" alt="#" /></Link>
+							<Link className="navbar-brand" to="/"><img width="150" src="/assets/img/logo.png" alt="#" /></Link>
 							<button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 								<span className=""> </span>
 							</button>

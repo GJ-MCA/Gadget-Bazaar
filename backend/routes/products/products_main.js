@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../../models/Product")
 
-//ROUTE: 1 - Get All Products - GET "gadgetbazaar/products/showall"
+//ROUTE: 1 - Get All Products - GET "backend-gadgetbazaar/products/showall"
 router.get('/showall', async (req, res) => {
   try {
     const products = await Product.find();
@@ -13,7 +13,7 @@ router.get('/showall', async (req, res) => {
   }
 });
 
-//ROUTE: 2 - Get a Single Product - GET "gadgetbazaar/products/show/:id"
+//ROUTE: 2 - Get a Single Product - GET "backend-gadgetbazaar/products/show/:id"
 router.get('/show/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -27,7 +27,7 @@ router.get('/show/:id', async (req, res) => {
   }
 });
 
-//ROUTE: 3 - Search Products - GET "gadgetbazaar/products/search?q=query"
+//ROUTE: 3 - Search Products - GET "backend-gadgetbazaar/products/search?q=query"
 router.get('/search', async (req, res) => {
   try {
     const query = req.query.q;

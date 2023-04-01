@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+const config = require("../../config/config");
 function ProductDetail({ match }) {
   const [product, setProduct] = useState({});
   const [quantity, setQuantity] = useState(1);
@@ -9,7 +9,7 @@ function ProductDetail({ match }) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`/gadgetbazaar/products/show/${productId}`);
+        const response = await fetch(`${config.baseUrl}/products/show/${productId}`);
         if (!response.ok) {
           throw new Error('Unable to fetch product');
         }
@@ -31,7 +31,7 @@ function ProductDetail({ match }) {
       quantity: quantity
     };
     try {
-      const response = await fetch('/gadgetbazaar/order/cart/add', {
+      const response = await fetch(`${config.orderAPIUrl}/cart/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

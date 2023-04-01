@@ -5,9 +5,9 @@ const config = require("../../config/config")
 function ProductList() {
   const [products, setProducts] = useState([]);
   const { setCartCount } = useContext(GadgetBazaarContext);
-  const getAllProductsUrl = `${config.baseUrl}/gadgetbazaar/products/showall`;
-  const cartAddUrl = `${config.baseUrl}/gadgetbazaar/order/cart/add`;
-  const buyNowUrl = `${config.baseUrl}/gadgetbazaar/order/buy-now`;
+  const getAllProductsUrl = `${config.baseUrl}/products/showall`;
+  const cartAddUrl = `${config.orderAPIUrl}/cart/add`;
+  const buyNowUrl = `${config.orderAPIUrl}/buy-now`;
   const productsToDisplay = 8;
 
   useEffect(() => {
@@ -59,7 +59,7 @@ function ProductList() {
             }
           });
         }
-				const getCartUrl = `${config.baseUrl}/gadgetbazaar/order/getcart`;
+				const getCartUrl = `${config.orderAPIUrl}/getcart`;
 				fetch(`${getCartUrl}`, {
 					method: 'GET',
 					headers: {
@@ -116,7 +116,7 @@ function ProductList() {
         if (!response.ok) {
           throw new Error('Unable to add item to cart');
         }
-        window.location.href = "/gadgetbazaar/order/checkout";
+        window.location.href = "/order/checkout";
       }
 
     } catch (error) {
@@ -140,7 +140,14 @@ function ProductList() {
             {products.slice(0, productsToDisplay).map(product => (
               <div className="col-sm-6 col-md-4 col-lg-4" key={product._id}>
                 <div className="box">
-                  <div className="option_container">
+                <div className="option_container">
+                {product.quantity <= 0 ? (
+                 <div className="alert alert-danger bg-light" role="alert">
+                 <i className="fa fa-exclamation-circle me-2"></i> Sorry, this item is currently out of stock. Please check back later.
+               </div>
+               
+                
+                ) : (
                     <div className="options">
                       <button className="option1" onClick={() => handleAddToCart(product)}>
                         Add to Cart
@@ -149,14 +156,25 @@ function ProductList() {
                         Buy Now
                       </button>
                     </div>
-                  </div>
+                )}
+                </div>
+
                   <div className="img-box">
                     <img src={product.image} alt={product.name} />
                   </div>
                   <div className="detail-box">
+                    
                     <h5>{product.name}</h5>
                     <h6>&#8377;{product.price}</h6>
                   </div>
+                  {product.quantity <= 0 ? (
+                    <span className="badge badge-danger text-uppercase">Out of stock</span>
+                  ) : (
+                    <span className="badge badge-success text-uppercase">In Stock</span>
+                  )}
+                  
+                  
+
                   <div className="description">
                     <span>SKU: {product.sku}</span> <br />
                     {product.description}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+const config = require("../../config/config")
 function Search() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -11,7 +11,7 @@ function Search() {
 
   const handleSearch = async () => {
     try {
-      const response = await fetch(`/gadgetbazaar/products/search?q=${query}`);
+      const response = await fetch(`${config.baseUrl}/products/search?q=${query}`);
       const data = await response.json();
       setResults(data);
       setError('');

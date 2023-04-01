@@ -12,11 +12,6 @@ const orderDetailsSchema = new Schema({
       get: v => (v/100).toFixed(2),
       set: v => v*100
   },
-  payment_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Payment',
-      required: true
-  },
   shipping_address: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Address',
@@ -27,6 +22,10 @@ const orderDetailsSchema = new Schema({
       ref: 'Address',
       required: true
   },
+  shipping_method: {
+    type: String,
+    default: 'Standard'
+  },
   order_status: {
       type: String,
       enum: ['pending', 'processing', 'shipped', 'delivered'],
@@ -35,6 +34,10 @@ const orderDetailsSchema = new Schema({
   order_date: {
       type: Date,
       default: Date.now
+  },
+  order_time: {
+    type: String,
+    default: () => new Date().toLocaleTimeString()
   }
 },
 { 
