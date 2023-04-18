@@ -238,4 +238,44 @@ router.get('/address/getsaved', async (req, res) => {
   }
 });
 
+//ROUTE: 9 - Save New Address - GET "backend-gadgetbazaar/order/address/add"
+router.post('/address/add', async (req, res) => {
+  try {
+    const { address_line_1, address_line_2, city, state, country, pincode, contact } = req.body;
+
+    // Check if address already exists in the database
+    const existingAddress = await Address.findOne({ 
+      address_line_1,
+      address_line_2,
+      city,
+      state,
+      country,
+      pincode,
+      contact
+    });
+
+    if (existingAddress) {
+      return res.status(400).json({ error: 'Address already exists' });
+    }
+
+    // Create a new address record in the database
+    const newAddress = new Address({ 
+      address_line_1,
+      address_line_2,
+      city,
+      state,
+      country,
+      pincode,
+      contact
+    });
+
+    await newAddress.save();
+
+    return res.status(201).json({ message: 'Address saved successfully' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;

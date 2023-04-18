@@ -15,6 +15,7 @@ export const Checkout = () => {
     const [country, setCountry] = useState('');
     const [state, setState] = useState('');
     const [city, setCity] = useState('');
+    const [isShippingDifferent, setIsShippingDifferent] = useState(false);
     const totalQty = useMemo(() => {
         return cartItems.reduce((total, item) => total + item.quantity, 0);
     }, [cartItems]);
@@ -99,7 +100,6 @@ export const Checkout = () => {
                         ) : (
                             <option value="">No saved addresses found</option>
                         )}
-                        <option value="new-address">New Address</option>
                     </select>
                 </div>
             <div className="row">
@@ -144,88 +144,174 @@ export const Checkout = () => {
                 </div>
                
                 <div className="col-md-8 order-md-1">
-                    <h4 className="mb-3">Billing address</h4>
                     <form className="needs-validation" noValidate="">
-                        <div className="mb-3">
-                            <label htmlFor="name">Name</label>
-                            <input type="text" className="form-control" id="name" placeholder="" onChange={(event) => setName(event.target.value)} value={currentUser ? currentUser.name : ""} required="" disabled={"disabled"}/>
-                            <div className="invalid-feedback"> Valid name is required. </div>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="address">Address Line 1</label>
-                            <input type="text" className="form-control" id="address" placeholder="1234 Main St" required=""/>
-                            <div className="invalid-feedback"> Please enter your address. </div>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="address2">Address Line 2 <span className="text-muted">(Optional)</span></label>
-                            <input type="text" className="form-control" id="address2" placeholder="Apartment or suite"/>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-4 mb-3">
-                                <label htmlFor="country">Country</label>
-                                <select className="custom-select d-block w-100" id="country" required="" value={selectedCountry || ''} onChange={handleCountryChange}>
-                                    {country && country.length > 0 ? (
-                                        <>
-                                            <option value="">Choose...</option>
-                                            {country.map((value,index) => (
-                                                <option key={index} value={value.isoCode}>
-                                                   {value.name}
-                                                </option>
-                                            ))}
-                                        </>
+                        <div className='billing-address' id="billing_address">
+                            <h4 className="mb-3">Billing address</h4>
+                            <div className="mb-3">
+                                <label htmlFor="name">Name</label>
+                                <input type="text" className="form-control" id="name" placeholder="" onChange={(event) => setName(event.target.value)} value={currentUser ? currentUser.name : ""} required="" disabled={"disabled"}/>
+                                <div className="invalid-feedback"> Valid name is required. </div>
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="address_1">Address Line 1</label>
+                                <input type="text" className="form-control" name="address_1" id="address_1" placeholder="1234 Main St" required=""/>
+                                <div className="invalid-feedback"> Please enter your address. </div>
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="address_2">Address Line 2 <span className="text-muted">(Optional)</span></label>
+                                <input type="text" className="form-control" name="address_2-2" id="address_2" placeholder="Apartment or suite"/>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-4 mb-3">
+                                    <label htmlFor="country">Country</label>
+                                    <select className="custom-select d-block w-100" name="country" id="country" required="" value={selectedCountry || ''} onChange={handleCountryChange}>
+                                        {country && country.length > 0 ? (
+                                            <>
+                                                <option value="">Choose...</option>
+                                                {country.map((value,index) => (
+                                                    <option key={index} value={value.isoCode}>
+                                                    {value.name}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        ) : (
+                                            <option value="">No countries</option>
+                                        )}
+                                    </select>
+                                    <div className="invalid-feedback"> Please provide a valid country. </div>
+                                </div>
+                                <div className="col-md-4 mb-3">
+                                    <label htmlFor="state">State</label>
+                                    <select
+                                    className="custom-select d-block w-100"
+                                    id="state" name="state"
+                                    required=""
+                                    onChange={handleStateChange}
+                                    value={selectedState || ''}
+                                    >
+                                    <option value="">Choose...</option>
+                                    {state && state.length > 0 ? (
+                                        state.map((value, index) => (
+                                        <option key={index} value={value.isoCode}>
+                                            {value.name}
+                                        </option>
+                                        ))
                                     ) : (
-                                        <option value="">No countries</option>
+                                        ""
                                     )}
-                                </select>
-                                <div className="invalid-feedback"> Please provide a valid country. </div>
+                                    </select>
+                                    <div className="invalid-feedback"> Please provide a valid state. </div>
+                                </div>
+                                <div className="col-md-4 mb-3">
+                                    <label htmlFor="city">City</label>
+                                    <select className="custom-select d-block w-100" id="city" name="city" required=""  onChange={handleCityChange} value={selectedCity || ''}>
+                                    <option value="">Choose...</option>
+                                    {city && city.length > 0 ? (
+                                        city.map((value, index) => (
+                                        <option key={index} value={value.name}>
+                                            {value.name}
+                                        </option>
+                                        ))
+                                    ) : (""
+                                    )}
+                                    </select>
+                                    <div className="invalid-feedback"> Please provide a valid city. </div>
+                                </div>
+                                <div className="col-md-3 mb-3">
+                                    <label htmlFor="pincode">Pincode</label>
+                                    <input type="text" className="form-control" name="pincode" id="pincode" placeholder="" required=""/>
+                                    <div className="invalid-feedback"> Pincode code required. </div>
+                                </div>
+                                <div className="col-md-3 mb-3">
+                                    <label htmlFor="contact_address">Contact(Optional)</label>
+                                    <input type="text" className="form-control" name="contact_address" id="contact_address" placeholder=""/>
+                                </div>
                             </div>
-                            <div className="col-md-4 mb-3">
-                                <label htmlFor="state">State</label>
-                                <select
-                                className="custom-select d-block w-100"
-                                id="state"
-                                required=""
-                                onChange={handleStateChange}
-                                value={selectedState || ''}
-                                >
-                                <option value="">Choose...</option>
-                                {state && state.length > 0 ? (
-                                    state.map((value, index) => (
-                                    <option key={index} value={value.isoCode}>
-                                        {value.name}
-                                    </option>
-                                    ))
-                                ) : (
-                                    ""
-                                )}
-                                </select>
-                                <div className="invalid-feedback"> Please provide a valid state. </div>
+                        </div>
+                        <div className='shipping-address' id="shipping_address" style={{ display: isShippingDifferent ? "block" : "none" }}>
+                        <h4 className="mb-3">Shipping address</h4>
+                            <div className="mb-3">
+                                <label htmlFor="address_1-2">Address Line 1</label>
+                                <input type="text" className="form-control" name="address_1-2" id="address_1-2" placeholder="1234 Main St" required=""/>
+                                <div className="invalid-feedback"> Please enter your address. </div>
                             </div>
-                            <div className="col-md-4 mb-3">
-                                <label htmlFor="city">City</label>
-                                <select className="custom-select d-block w-100" id="city" required=""  onChange={handleCityChange} value={selectedCity || ''}>
-                                <option value="">Choose...</option>
-                                {city && city.length > 0 ? (
-                                    city.map((value, index) => (
-                                    <option key={index} value={value.name}>
-                                        {value.name}
-                                    </option>
-                                    ))
-                                ) : (""
-                                )}
-                                </select>
-                                <div className="invalid-feedback"> Please provide a valid city. </div>
+                            <div className="mb-3">
+                                <label htmlFor="address_2-2">Address Line 2 <span className="text-muted">(Optional)</span></label>
+                                <input type="text" className="form-control" id="address_2-2" name="address_2-2" placeholder="Apartment or suite"/>
                             </div>
-                            <div className="col-md-3 mb-3">
-                                <label htmlFor="pincode">Pincode</label>
-                                <input type="text" className="form-control" id="pincode" placeholder="" required=""/>
-                                <div className="invalid-feedback"> Pincode code required. </div>
+                            <div className="row">
+                                <div className="col-md-4 mb-3">
+                                    <label htmlFor="country-2">Country</label>
+                                    <select className="custom-select d-block w-100" name="country-2" id="country-2" required="" value={selectedCountry || ''} onChange={handleCountryChange}>
+                                        {country && country.length > 0 ? (
+                                            <>
+                                                <option value="">Choose...</option>
+                                                {country.map((value,index) => (
+                                                    <option key={index} value={value.isoCode}>
+                                                    {value.name}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        ) : (
+                                            <option value="">No countries</option>
+                                        )}
+                                    </select>
+                                    <div className="invalid-feedback"> Please provide a valid country. </div>
+                                </div>
+                                <div className="col-md-4 mb-3">
+                                    <label htmlFor="state-2">State</label>
+                                    <select
+                                    className="custom-select d-block w-100"
+                                    id="state-2" name="state-2"
+                                    required=""
+                                    onChange={handleStateChange}
+                                    value={selectedState || ''}
+                                    >
+                                    <option value="">Choose...</option>
+                                    {state && state.length > 0 ? (
+                                        state.map((value, index) => (
+                                        <option key={index} value={value.isoCode}>
+                                            {value.name}
+                                        </option>
+                                        ))
+                                    ) : (
+                                        ""
+                                    )}
+                                    </select>
+                                    <div className="invalid-feedback"> Please provide a valid state. </div>
+                                </div>
+                                <div className="col-md-4 mb-3">
+                                    <label htmlFor="city-2">City</label>
+                                    <select className="custom-select d-block w-100" id="city-2" name="city-2" required=""  onChange={handleCityChange} value={selectedCity || ''}>
+                                    <option value="">Choose...</option>
+                                    {city && city.length > 0 ? (
+                                        city.map((value, index) => (
+                                        <option key={index} value={value.name}>
+                                            {value.name}
+                                        </option>
+                                        ))
+                                    ) : (""
+                                    )}
+                                    </select>
+                                    <div className="invalid-feedback"> Please provide a valid city. </div>
+                                </div>
+                                <div className="col-md-3 mb-3">
+                                    <label htmlFor="pincode-2">Pincode</label>
+                                    <input type="text" className="form-control" name="pincode-2" id="pincode-2" placeholder="" required=""/>
+                                    <div className="invalid-feedback"> Pincode code required. </div>
+                                </div>
+                                <div className="col-md-3 mb-3">
+                                    <label htmlFor="contact_address-2">Contact(Optional)</label>
+                                    <input type="text" className="form-control" name="contact_address-2" id="contact_address-2" placeholder=""/>
+                                </div>
                             </div>
                         </div>
                         <hr className="mb-4"/>
                         <div className="custom-control custom-checkbox">
-                            <input type="checkbox" className="custom-control-input" id="same-address"/>
-                            <label className="custom-control-label" htmlFor="same-address">Shipping address is the same as my billing address</label>
+                            <input type="checkbox" className="custom-control-input" id="is-ship-diff-address"
+                            checked={isShippingDifferent}
+                            onChange={(e) => setIsShippingDifferent(e.target.checked)}/>
+                            <label className="custom-control-label" htmlFor="is-ship-diff-address">Shipping address is different from my billing address</label>
                         </div>
                         <div className="custom-control custom-checkbox">
                             <input type="checkbox" className="custom-control-input" id="save-info"/>
