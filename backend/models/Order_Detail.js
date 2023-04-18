@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const orderDetailsSchema = new Schema({
+const orderDetailSchema = new Schema({
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -15,16 +15,19 @@ const orderDetailsSchema = new Schema({
   shipping_address: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Address',
-      required: true
   },
   billing_address: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Address',
-      required: true
   },
   shipping_method: {
-    type: String,
-    default: 'Standard'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Shipping_Methods',
+  },
+  shipping_charge: {
+    type: Number,
+    get: v => (v/100).toFixed(2),
+    set: v => v*100
   },
   order_status: {
       type: String,
@@ -50,4 +53,4 @@ const orderDetailsSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('Order_Details',orderDetailsSchema)
+module.exports = mongoose.model('Order_Detail',orderDetailSchema)

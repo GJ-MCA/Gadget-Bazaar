@@ -44,7 +44,6 @@ router.post('/createuser',[
               id: user.id
           }
       }
-      console.log(config.jwtSecret)
       const authtoken = jwt.sign(data, config.jwtSecret);
       res.json({authtoken});
     }
@@ -66,8 +65,6 @@ router.post('/login',[
     }
  
     const {email,password, isadminattempt} = req.body;
-    console.log(email)
-    console.log(password)
     //Check whether the user with this email exists already
 
     let user = await User.findOne({email});
@@ -75,8 +72,6 @@ router.post('/login',[
         if(!user){
             return res.status(400).json({error: "Email or Password is Not Correct, Please Check Your Details and Try Again!"})
         }
-        console.log(user)
-        console.log(user.password);
         const comparePassword = await bcrypt.compare(password, user.password);
         if(!comparePassword){
             return res.status(400).json({error: "Email or Password is Not Correct, Please Check Your Details and Try Again!"})
@@ -153,21 +148,15 @@ router.post('/forgotpassword', async (req, res) => {
 });
 //ROUTE: 5 - Check If User Is Logged In - POST "backend-gadgetbazaar/auth/checkuser" Login Required
 router.post('/checkuser', async (req, res) => {
-    console.log("checkuser is called");
     try {
         const token = req.headers.authorization?.split(' ')[1];
-        console.log(token);
         if (!token) {
-            console.log("token not found so not logged in");
             res.status(401).send('Unauthorized: No token provided');
         } else {
-          console.log("token found but need to verify");
           const loggedIn = isLoggedIn(token);
           if (loggedIn) {
-            console.log("token found and its verified");
             res.status(200).send('User is logged in');
         } else {
-            console.log("token found and its not valid");
           res.status(401).send('Unauthorized: Invalid token');
         }
       }

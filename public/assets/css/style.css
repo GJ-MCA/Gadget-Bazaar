@@ -1227,3 +1227,13 @@ select:focus {
 .admin-login-page{
   height: 100vh !important;
 }
+
+.gadgetbazaar-checkout-page header,
+.gadgetbazaar-checkout-page footer,
+.gadgetbazaar-checkout-page .cpy_{
+  display: none;
+}
+
+.gadgetbazaar-checkout-page .container{
+  margin-bottom: 40px;
+}

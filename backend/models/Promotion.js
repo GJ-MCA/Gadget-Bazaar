@@ -1,20 +1,19 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const categorySchema = new Schema({
-  name: {
+const promotionSchema = new Schema({
+  promotion_name: {
     type: String,
     required: true
   },
-  description: {
+  coupon_code: {
     type: String,
-    required: true,
-    maxlength: 500
+    unique: true,
+    required: true
   },
-  image: { type: String },
   status: {
-    type: Boolean,
-    required: true
+      type: String,
+      default: 'Active'
   },
 },
 { 
@@ -27,4 +26,4 @@ const categorySchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('Category',categorySchema)
+module.exports = mongoose.model('Promotion',promotionSchema)

@@ -178,7 +178,6 @@ paperDashboard = {
         }
       });
     } catch (e) {
-      console.log('Notify library is missing, please make sure you have the notifications library added.');
     }
 
   }

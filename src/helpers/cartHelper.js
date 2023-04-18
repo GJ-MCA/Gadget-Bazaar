@@ -14,8 +14,25 @@ const fetchCartItems = async (token) => {
       console.error(err.message);
     }
   };
+export const fetchSavedAddresses = async (token) => {
+    try {
+      const response = await fetch(`${config.orderAPIUrl}/address/getsaved`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': `Bearer ${token}`
+        },
+      });
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
   
-  export const updateCart = async (token, productId, newQuantity, setCartItems, setCartCount, totalQty) => {
+  
+  export const updateCart = async (token, productId, newQuantity, setCartItems, setCartCount, totalQty, shippingCharge = null, cartTotal = null, setCartFinalTotal) => {
     try {
       await fetch(`${config.orderAPIUrl}/updatecart`, {
         method: 'PATCH',
@@ -23,7 +40,7 @@ const fetchCartItems = async (token) => {
           'Content-Type': 'application/json',
           'auth-token': `Bearer ${token}`
         },
-        body: JSON.stringify({productId: productId, quantity: newQuantity })
+        body: JSON.stringify({productId: productId, quantity: newQuantity, shipping_charge: shippingCharge, cart_total: cartTotal })
       });
   
       const response = await fetch(`${config.orderAPIUrl}/getcart`, {
@@ -34,8 +51,9 @@ const fetchCartItems = async (token) => {
         },
       });
       const data = await response.json();
-      setCartItems(data);
+      setCartItems(data['cartItems']);
       setCartCount(totalQty);
+      setCartFinalTotal(data['cartTotalAmount']);
     } catch (err) {
       console.error(err.message);
     }
@@ -52,7 +70,7 @@ const fetchCartItems = async (token) => {
         body: JSON.stringify({ product_id: productId })
       });
       const data = await response.json();
-      console.log(data); // log the response data to the console
+      console.log(data)
     } catch (error) {
       console.error(error);
     }

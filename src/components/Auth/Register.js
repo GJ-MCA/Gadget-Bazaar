@@ -26,7 +26,6 @@ function Register() {
           });
           const data = await response.text();
           if (response.ok) {
-            console.log(data);
             navigate('/');
           } else {
             console.error(data);

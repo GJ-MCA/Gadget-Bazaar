@@ -1,6 +1,8 @@
-import React, { useState, useEffect  } from 'react';
+import React, { useState, useEffect, useContext  } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
+import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
+import { fetchCurrentUser } from '../../helpers/userHelper';
 const config = require('../../config/config');
 
 
@@ -9,18 +11,14 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const {setCurrentUser } = useContext(GadgetBazaarContext);
  
   useEffect(() => {
     // Checking if user is already logged in and then redirecting it to home if already logged in
     const checkUser = async () => {
-      console.log("Check user is called inside login component")
       const token = localStorage.getItem('auth-token');
-      console.log("Token in Login component");
-      console.log(token);
       if (token) {
-        console.log("token found");
         try {
-          console.log("calling checkuser api");
           const response = await fetch(`${config.authAPIUrl}/checkuser`, {
             method: 'POST',
             headers: {
@@ -29,19 +27,13 @@ const Login = () => {
             },
           });
           const data = await response.text();
-          console.log("Data: ");
-          console.log(data);
           if (response.ok) {
-            console.log("repsonse.ok is true, printing data: ")
-            console.log(data);
             navigate('/');
           } else {
-            console.log("repsonse.ok is false, printing data: ")
             // handle unauthorized or other errors
             console.error(data);
           }
         } catch (error) {
-          console.log("in catch found error:  ")
           console.error(error.message);
         }
       }
@@ -65,10 +57,16 @@ const Login = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        console.log(data.authtoken);
         localStorage.setItem('auth-token', data.authtoken);
-        // Redirect to protected page
-        window.location.href = '/';
+        fetchCurrentUser(data.authtoken)
+        .then(user => {
+          setCurrentUser(user);
+          window.location.href = '/';
+        })
+        .catch(error => {
+          console.error(JSON.stringify(error));
+          setErrorMessage(JSON.stringify(error));
+        });
       } else {
         setErrorMessage(data.error);
       }

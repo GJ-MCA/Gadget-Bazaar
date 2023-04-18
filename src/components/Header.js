@@ -1,6 +1,6 @@
 	import React, { useState, useEffect, useContext } from 'react'
 	import {
-		Link, useLocation
+		Link, useLocation, useNavigate 
 	} from "react-router-dom";
 	import { GadgetBazaarContext } from '../context/GadgetBazaarContext';
 	const config = require("../config/config")
@@ -10,6 +10,7 @@
 		const [user, setUser] = useState(null);
 		const { cartCount, setCartCount } = useContext(GadgetBazaarContext);
 		const location = useLocation();
+		const navigate = useNavigate();
 
 		useEffect(() => {
 			// Check if the user is logged in and set the user state accordingly
@@ -61,11 +62,8 @@
 				.then(data => {
 					var total_qty = 0;
 					if(data){
-						console.log(data)
-						data.forEach(element => {
-							console.log(element.quantity)	
+						data['cartItems'].forEach(element => {
 							total_qty += element.quantity;
-							console.log("Totla Qty: ", total_qty)
 						});
 					}
 					setCartCount(total_qty);
@@ -79,10 +77,10 @@
 		}, [user, setCartCount]);
 
 		const handleLogout = () => {
-		console.log('Logging out...');
-		// Remove the token from local storage to log the user out
-		setUser(null);
-		localStorage.removeItem('auth-token');
+			// Remove the token from local storage to log the user out
+			setUser(null);
+			localStorage.removeItem('auth-token');
+			navigate("/login");
 	 	};
 		return (
 			<>
@@ -90,7 +88,7 @@
 				<header className="header_section">
 					<div className="container">
 						<nav className="navbar navbar-expand-lg custom_nav-container ">
-							<Link className="navbar-brand" to="/"><img width="150" src="/assets/img/logo.png" alt="#" /></Link>
+							<Link className="navbar-brand" to="/"><img width="150" src="/assets/img/logo.png" alt="Gadgetbazaar" /></Link>
 							<button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 								<span className=""> </span>
 							</button>

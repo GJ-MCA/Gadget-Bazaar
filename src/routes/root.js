@@ -2,6 +2,7 @@ import { Outlet, useLocation  } from "react-router-dom";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 import React, { useEffect, useState } from "react";
+const config = require("../config/config");
 
 export default function Root() {
 
@@ -12,7 +13,7 @@ export default function Root() {
       const token = localStorage.getItem('auth-token');
       if(token)
       {
-        fetch("/getuser", {
+        fetch(`${config.authAPIUrl}/getuser`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

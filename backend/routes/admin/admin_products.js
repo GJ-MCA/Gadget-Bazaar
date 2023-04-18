@@ -39,13 +39,9 @@ router.post('/add', upload.single('image'),/* checkAdminUser, */[
   try{
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log("Found Validation Errors");
-      console.log(errors)
-      console.log(errors.array())
       if(req.file){
         return res.status(400).json({ errors: errors.array() });
       }else{
-        console.log("No File")
         return res.status(400).json({ errors: {error: errors.array(), "Image": "Please Upload Image"} });
       }
     }
@@ -58,14 +54,10 @@ router.post('/add', upload.single('image'),/* checkAdminUser, */[
     if (req.file) {
       product.image = req.file.path.replace('public', '');
     }
-    console.log("Product Saved")
     const savedProduct = await product.save();
-    console.log(savedProduct)
     res.json(savedProduct);
 
   }catch(error){
-    console.log(error.message);
-    console.log("Error While Saving Product")
     res.status(500).send("Internal Server Error");
   }
 })
@@ -82,13 +74,9 @@ router.put('/:id', upload.single('image'),checkAdminUser,[
   try{
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log("Found Validation Errors");
-      console.log(errors)
-      console.log(errors.array())
       if(req.file){
         return res.status(400).json({ errors: errors.array() });
       }else{
-        console.log("No File")
         return res.status(400).json({ errors: {error: errors.array(), "Image": "Please Upload Image"} });
       }
     }
@@ -122,8 +110,6 @@ router.put('/:id', upload.single('image'),checkAdminUser,[
     res.json(savedProduct);
 
   }catch(error){
-    console.log(error.message);
-    console.log("Error While Saving Product")
     res.status(500).send("Internal Server Error");
   }
 })
@@ -142,8 +128,6 @@ router.put('/:id/disable', checkAdminUser, async (req,res)=>{
     const savedProduct = await product.save();
     res.json(savedProduct);
   }catch(error){
-    console.log(error.message);
-    console.log("Error While Disabling Product")
     res.status(500).send("Internal Server Error");
   }
 })
@@ -162,8 +146,6 @@ router.put('/:id/enable', checkAdminUser, async (req,res)=>{
     const savedProduct = await product.save();
     res.json(savedProduct);
   }catch(error){
-    console.log(error.message);
-    console.log("Error While Enabling Product")
     res.status(500).send("Internal Server Error");
   }
 })
@@ -188,8 +170,6 @@ router.delete('/:id', checkAdminUser, async (req,res)=>{
     res.json({ message: 'Product deleted successfully' });
 
   }catch(error){
-    console.log(error.message);
-    console.log("Error While Deleting Product")
     res.status(500).send("Internal Server Error");
   }
 })

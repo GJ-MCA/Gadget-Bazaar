@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const paymentDetailsSchema = new Schema({
+const paymentDetailSchema = new Schema({
   payment_order_id: {
     type: Number,
     required: true
@@ -34,4 +34,4 @@ const paymentDetailsSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('Payment_Details',paymentDetailsSchema)
+module.exports = mongoose.model('Payment_Detail',paymentDetailSchema)

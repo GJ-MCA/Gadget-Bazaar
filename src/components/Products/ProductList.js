@@ -76,7 +76,7 @@ function ProductList() {
         .then(data => {
 					var total_qty = 0;
 					if(data){
-						data.forEach(element => {
+						data['cartItems'].forEach(element => {
 							total_qty += element.quantity;
 						});
 					}

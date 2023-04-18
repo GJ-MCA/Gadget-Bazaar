@@ -16,6 +16,16 @@ const cartItemSchema = new Schema({
     type: Number,
     default: 1
   },
+  shipping_charge: {
+    type: Number,
+    get: v => (v/100).toFixed(2),
+    set: v => v*100
+  },
+  item_total: {
+    type: Number,
+    get: v => (v/100).toFixed(2),
+    set: v => v*100
+  }
 },
 { 
     toJSON: { getters: true }
