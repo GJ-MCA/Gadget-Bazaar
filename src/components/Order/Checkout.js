@@ -12,10 +12,19 @@ export const Checkout = () => {
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
+    const [selectedShipAddressId, setShipSelectedAddressId] = useState(null);
+    const [selectedShipCountry, setShipSelectedCountry] = useState(null);
+    const [selectedShipState, setShipSelectedState] = useState(null);
+    const [selectedShipCity, setShipSelectedCity] = useState(null);
     const [country, setCountry] = useState('');
     const [state, setState] = useState('');
     const [city, setCity] = useState('');
+    const [shipCountry, setShipCountry] = useState('');
+    const [shipState, setShipState] = useState('');
+    const [shipCity, setShipCity] = useState('');
     const [isShippingDifferent, setIsShippingDifferent] = useState(false);
+    const [showSavedShippingAddressForm, setSavedShowShippingAddressForm] = useState(false);
+
     const totalQty = useMemo(() => {
         return cartItems.reduce((total, item) => total + item.quantity, 0);
     }, [cartItems]);
@@ -41,30 +50,53 @@ export const Checkout = () => {
           document.body.classList.remove("gadgetbazaar-checkout-page");
         };
       }, [setCartCount, setCartItems, totalQty]);
-      const handleCountryChange = (event) => {
+      const handleCountryChange = (event, ship=false) => {
         console.log("Country changed")
         let selectedcountry = event.target.value;
-        setSelectedCountry(selectedcountry);
+        if(ship)
+            setShipSelectedCountry(selectedcountry);
+        else
+            setSelectedCountry(selectedcountry);
         console.log(selectedcountry)
         getStates(selectedcountry).then((states)=>{
             console.log(states)
-            setState(states);
+            if(ship)
+                setShipState(states);
+            else
+                setState(states);
         });
       };
     
-      const handleStateChange = (event) => {
+      const handleStateChange = (event, ship=false) => {
         let selectedstate = event.target.value;
-        setSelectedState(selectedstate);
+        if(ship)
+            setShipSelectedState(selectedstate);
+        else
+            setSelectedState(selectedstate);
         console.log(selectedCountry)
         console.log(selectedState)
-        getCities(selectedCountry,selectedstate).then((cities)=>{
-            setCity(cities);
-        });
+        if(ship){
+            getCities(selectedShipCountry,selectedstate).then((cities)=>{
+                setShipCity(cities);
+            });
+        }
+        else{
+            getCities(selectedCountry,selectedstate).then((cities)=>{
+                setCity(cities);
+            });
+        }
       };
-      const handleCityChange = (event) => {
+      const handleCityChange = (event, ship=false) => {
         let selectedcity = event.target.value;
-        setSelectedCity(selectedcity);
+        if(ship)
+            setShipSelectedCity(selectedcity);
+        else
+            setSelectedCity(selectedcity);
       };
+      function handleSavedShipToDifferentAddressChange() {
+        setSavedShowShippingAddressForm(!showSavedShippingAddressForm);
+      }
+      
   return (
     <>
         <div className="container">
@@ -101,7 +133,25 @@ export const Checkout = () => {
                             <option value="">No saved addresses found</option>
                         )}
                     </select>
-                </div>
+                    {checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
+                        <>
+                            <input type="checkbox" id="saved-ship-to-different-address" onChange={handleSavedShipToDifferentAddressChange} />
+                            <label for="saved-ship-to-different-address">Ship to a different address</label>
+                        </>
+                        ):
+                        ("")
+                    }
+                    {showSavedShippingAddressForm && checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
+                            <>
+                                <option value="">Choose...</option>
+                                {checkoutSavedAddresses.map((address, index) => (
+                                    <option key={index} value={address.id}>
+                                        {address.address_line_1}, {address.address_line_2}, {address.city}, {address.state}, {address.pincode}, {address.country}
+                                    </option>
+                                ))}
+                            </>
+                    ): ("")}
+            </div>
             <div className="row">
                 <div className="col-md-4 order-md-2 mb-4">
                     <h4 className="d-flex justify-content-between align-items-center mb-3">
@@ -217,12 +267,12 @@ export const Checkout = () => {
                                     </select>
                                     <div className="invalid-feedback"> Please provide a valid city. </div>
                                 </div>
-                                <div className="col-md-3 mb-3">
+                                <div className="col-md-4 mb-3">
                                     <label htmlFor="pincode">Pincode</label>
                                     <input type="text" className="form-control" name="pincode" id="pincode" placeholder="" required=""/>
                                     <div className="invalid-feedback"> Pincode code required. </div>
                                 </div>
-                                <div className="col-md-3 mb-3">
+                                <div className="col-md-4 mb-3">
                                     <label htmlFor="contact_address">Contact(Optional)</label>
                                     <input type="text" className="form-control" name="contact_address" id="contact_address" placeholder=""/>
                                 </div>
@@ -242,7 +292,7 @@ export const Checkout = () => {
                             <div className="row">
                                 <div className="col-md-4 mb-3">
                                     <label htmlFor="country-2">Country</label>
-                                    <select className="custom-select d-block w-100" name="country-2" id="country-2" required="" value={selectedCountry || ''} onChange={handleCountryChange}>
+                                    <select className="custom-select d-block w-100" name="country-2" id="country-2" required="" value={selectedShipCountry || ''} onChange={event => handleCountryChange(event, true)}>
                                         {country && country.length > 0 ? (
                                             <>
                                                 <option value="">Choose...</option>
@@ -264,12 +314,12 @@ export const Checkout = () => {
                                     className="custom-select d-block w-100"
                                     id="state-2" name="state-2"
                                     required=""
-                                    onChange={handleStateChange}
-                                    value={selectedState || ''}
+                                    onChange={event => handleStateChange(event, true)}
+                                    value={selectedShipState || ''}
                                     >
                                     <option value="">Choose...</option>
-                                    {state && state.length > 0 ? (
-                                        state.map((value, index) => (
+                                    {shipState && shipState.length > 0 ? (
+                                        shipState.map((value, index) => (
                                         <option key={index} value={value.isoCode}>
                                             {value.name}
                                         </option>
@@ -282,10 +332,10 @@ export const Checkout = () => {
                                 </div>
                                 <div className="col-md-4 mb-3">
                                     <label htmlFor="city-2">City</label>
-                                    <select className="custom-select d-block w-100" id="city-2" name="city-2" required=""  onChange={handleCityChange} value={selectedCity || ''}>
+                                    <select className="custom-select d-block w-100" id="city-2" name="city-2" required=""  onChange={event => handleCityChange(event, true)} value={selectedShipCity || ''}>
                                     <option value="">Choose...</option>
-                                    {city && city.length > 0 ? (
-                                        city.map((value, index) => (
+                                    {shipCity && shipCity.length > 0 ? (
+                                        shipCity.map((value, index) => (
                                         <option key={index} value={value.name}>
                                             {value.name}
                                         </option>
@@ -295,12 +345,12 @@ export const Checkout = () => {
                                     </select>
                                     <div className="invalid-feedback"> Please provide a valid city. </div>
                                 </div>
-                                <div className="col-md-3 mb-3">
+                                <div className="col-md-4 mb-3">
                                     <label htmlFor="pincode-2">Pincode</label>
                                     <input type="text" className="form-control" name="pincode-2" id="pincode-2" placeholder="" required=""/>
                                     <div className="invalid-feedback"> Pincode code required. </div>
                                 </div>
-                                <div className="col-md-3 mb-3">
+                                <div className="col-md-4 mb-3">
                                     <label htmlFor="contact_address-2">Contact(Optional)</label>
                                     <input type="text" className="form-control" name="contact_address-2" id="contact_address-2" placeholder=""/>
                                 </div>
@@ -314,49 +364,8 @@ export const Checkout = () => {
                             <label className="custom-control-label" htmlFor="is-ship-diff-address">Shipping address is different from my billing address</label>
                         </div>
                         <div className="custom-control custom-checkbox">
-                            <input type="checkbox" className="custom-control-input" id="save-info"/>
-                            <label className="custom-control-label" htmlFor="save-info">Save this information for next time</label>
-                        </div>
-                        <hr className="mb-4"/>
-                        <h4 className="mb-3">Payment</h4>
-                        <div className="d-block my-3">
-                            <div className="custom-control custom-radio">
-                                <input id="credit" name="paymentMethod" type="radio" className="custom-control-input" required=""/>
-                                <label className="custom-control-label" htmlFor="credit">Credit card</label>
-                            </div>
-                            <div className="custom-control custom-radio">
-                                <input id="debit" name="paymentMethod" type="radio" className="custom-control-input" required=""/>
-                                <label className="custom-control-label" htmlFor="debit">Debit card</label>
-                            </div>
-                            <div className="custom-control custom-radio">
-                                <input id="paypal" name="paymentMethod" type="radio" className="custom-control-input" required=""/>
-                                <label className="custom-control-label" htmlFor="paypal">PayPal</label>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-6 mb-3">
-                                <label htmlFor="cc-name">Name on card</label>
-                                <input type="text" className="form-control" id="cc-name" placeholder="" required=""/>
-                                <small className="text-muted">Full name as displayed on card</small>
-                                <div className="invalid-feedback"> Name on card is required </div>
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label htmlFor="cc-number">Credit card number</label>
-                                <input type="text" className="form-control" id="cc-number" placeholder="" required=""/>
-                                <div className="invalid-feedback"> Credit card number is required </div>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-3 mb-3">
-                                <label htmlFor="cc-expiration">Expiration</label>
-                                <input type="text" className="form-control" id="cc-expiration" placeholder="" required=""/>
-                                <div className="invalid-feedback"> Expiration date required </div>
-                            </div>
-                            <div className="col-md-3 mb-3">
-                                <label htmlFor="cc-cvv">CVV</label>
-                                <input type="text" className="form-control" id="cc-cvv" placeholder="" required=""/>
-                                <div className="invalid-feedback"> Security code required </div>
-                            </div>
+                            <input type="checkbox" className="custom-control-input" name="save-address" id="save-address"/>
+                            <label className="custom-control-label" htmlFor="save-address">Save this information for next time</label>
                         </div>
                         <hr className="mb-4"/>
                         <button className="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
