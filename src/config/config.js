@@ -5,6 +5,7 @@ const clientUrl = "http://localhost:3000" //Frontend URL
 const baseUrl = 'http://localhost:5000/backend-gadgetbazaar'; //Backend URL
 const authAPIUrl = `${baseUrl}/auth`; //Auth API URL
 const orderAPIUrl = `${baseUrl}/order`; //Order API URL
+const checkoutUrl = `${orderAPIUrl}/checkout` //Shipping Methods URL
 const shippingMethodUrl = `${orderAPIUrl}/shipping/methods` //Shipping Methods URL
 const showShippingMethodUrl = `${shippingMethodUrl}/show` //Show Shipping Methods URL
 const addShippingMethodUrl = `${shippingMethodUrl}/add` //Add Shipping Methods URL
@@ -16,6 +17,7 @@ module.exports = {
     baseUrl,
     authAPIUrl,
     orderAPIUrl,
+    checkoutUrl,
     shippingMethodUrl,
     showShippingMethodUrl,
     addShippingMethodUrl,

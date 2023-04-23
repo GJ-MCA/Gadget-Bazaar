@@ -41,6 +41,10 @@ const orderDetailSchema = new Schema({
   order_time: {
     type: String,
     default: () => new Date().toLocaleTimeString()
+  },
+  coupon_code: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Promotion'
   }
 },
 { 

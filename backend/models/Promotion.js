@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+
 const promotionSchema = new Schema({
   promotion_name: {
     type: String,
@@ -11,19 +12,33 @@ const promotionSchema = new Schema({
     unique: true,
     required: true
   },
-  status: {
-      type: String,
-      default: 'Active'
+  discount: {
+    type: Number,
+    default: 0
   },
-},
-{ 
-    toJSON: { getters: true }
-},
-{
+  times_used: {
+    type: Number,
+    default: 0
+  },
+  times_remaining: {
+    type: Number,
+    default: null
+  },
+  status: {
+    type: String,
+    default: 'Active'
+  },
+  expiry_date: {
+    type: Date,
+    required: true
+  }
+}, { 
+  toJSON: { getters: true },
   timestamps: { 
     createdAt: 'created_at', 
     updatedAt: 'updated_at' 
   }
 });
+
 
 module.exports = mongoose.model('Promotion',promotionSchema)

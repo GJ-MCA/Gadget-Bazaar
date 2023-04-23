@@ -9,8 +9,15 @@ export const CartProvider = ({ children }) => {
   const [shippingMethods, setShippingMethods] = useState(null);
   const [cartFinalTotal, setCartFinalTotal] = useState(null);
   const [checkoutSavedAddresses, setCheckoutSavedAddresses] = useState([]);
+  const [couponCode, setCouponCode] = useState(''); //Coupon Code
+  const [couponCodeMessage, setCouponCodeMessage] = useState(''); //Validation Message
+  const [isCouponCodeApplied, setIsCouponCodeApplied] = useState(false); //Boolean Value to Check if Coupon Code is Applied or Not
+  const [couponDiscountPercentages, setCouponDiscountPercentages] = useState(0); //Discount Percentages
+  const [couponDiscount, setCouponDiscount] = useState(0); //Discount value with / 100, i.e., percentages/100 = 10 / 100 = 0.1
+  const [discountedPrice, setDiscountedPrice] = useState(0); //Final Price After Discount
+  const [discountAmount, setDiscountAmount] = useState(0)//Actual amount of discount which will be decreased from the final before discount
   return (
-    <GadgetBazaarContext.Provider value={{ cartCount, setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, shippingMethods, setShippingMethods, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses }}>
+    <GadgetBazaarContext.Provider value={{ cartCount, setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, shippingMethods, setShippingMethods, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses, couponCode, setCouponCode, couponCodeMessage, setCouponCodeMessage, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount }}>
       {children}
     </GadgetBazaarContext.Provider>
   );

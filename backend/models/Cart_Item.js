@@ -1,30 +1,32 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const cartItemSchema = new Schema({
-  product_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true
-  },
+const cartItemSchema = new mongoose.Schema({
   customer_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  quantity: {
-    type: Number,
-    default: 1
-  },
   shipping_charge: {
     type: Number,
+    default: 0,
     get: v => (v/100).toFixed(2),
     set: v => v*100
   },
-  item_total: {
+  total: {
     type: Number,
     get: v => (v/100).toFixed(2),
     set: v => v*100
+  },
+  coupon_code: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Promotion'
+  },
+  discounted_total:{
+    type: Number,
+    get: v => (v/100).toFixed(2),
+    set: v => v*100,
+    default: null
   }
 },
 { 

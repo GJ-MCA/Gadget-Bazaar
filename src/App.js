@@ -17,6 +17,7 @@ import Contact from './components/Contact';
 import AdminLogin from './components/Admin/Auth/AdminLogin';
 import { AdminDashboard } from './components/Admin/AdminDashboard';
 import { Checkout } from './components/Order/Checkout';
+import { OrderConfirmation } from './components/Order/OrderConfirmation';
 const AdminLayout = ({ children }) => {
   return (
     <>
@@ -213,6 +214,10 @@ const router = createBrowserRouter([
       {
         path: '/checkout',
         element: <Checkout />,
+      },
+      {
+        path: '/order-confirmation',
+        element: <OrderConfirmation />,
       },
       {
         path: '/contact',

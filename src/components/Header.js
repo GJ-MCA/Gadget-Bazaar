@@ -62,6 +62,7 @@
 				.then(data => {
 					var total_qty = 0;
 					if(data){
+						console.log(data)
 						data['cartItems'].forEach(element => {
 							total_qty += element.quantity;
 						});

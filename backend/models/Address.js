@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const addressSchema = new Schema({
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   address_line_1: {
     type: String,
     required: true
@@ -27,8 +32,7 @@ const addressSchema = new Schema({
     required: true
   },
   contact: {
-    type: String,
-    required: true
+    type: String
   },
 },
 { 

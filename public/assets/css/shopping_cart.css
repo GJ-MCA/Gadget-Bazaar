@@ -49,3 +49,28 @@
         background-color: transparent !important;
         padding: 0;
     }
+
+    .notification {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    z-index: 1;
+    transition: top 0.5s ease;
+    }
+    
+    .notification.show {
+    top: 50px;
+    }
+    
+    .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    }

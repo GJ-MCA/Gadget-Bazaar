@@ -26,7 +26,16 @@ function ProductList() {
         console.error('There was a problem with the fetch operation:', error);
       });
   },[getAllProductsUrl]);
+  const showNotification = () =>{
+    console.log("Show notification called")
+    var x = document.getElementById("snackbar");
 
+    // Add the "show" class to DIV
+    x.className = "show";
+  
+    // After 3 seconds, remove the show class from DIV
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+  }
   const handleAddToCart = async (product) => {
     const item = {
       product_id: product._id,
@@ -79,6 +88,7 @@ function ProductList() {
 						data['cartItems'].forEach(element => {
 							total_qty += element.quantity;
 						});
+            showNotification();
 					}
 					setCartCount(total_qty);
 				})
@@ -136,53 +146,58 @@ function ProductList() {
           {products.length === 0 ? (
             <div className="text-center lead">No products available</div>
           ) : (
-          <div className="row">
-            {products.slice(0, productsToDisplay).map(product => (
-              <div className="col-sm-6 col-md-4 col-lg-4" key={product._id}>
-                <div className="box">
-                <div className="option_container">
-                {product.quantity <= 0 ? (
-                 <div className="alert alert-danger bg-light" role="alert">
-                 <i className="fa fa-exclamation-circle me-2"></i> Sorry, this item is currently out of stock. Please check back later.
-               </div>
-               
-                
-                ) : (
-                    <div className="options">
-                      <button className="option1" onClick={() => handleAddToCart(product)}>
-                        Add to Cart
-                      </button>
-                      <button className="option2" onClick={() => handleBuyNow(product)}>
-                        Buy Now
-                      </button>
+              <>
+                <div id="snackbar" className="alert alert-success">
+                  Product added to cart!
+                </div>
+                <div className="row">
+                  {products.slice(0, productsToDisplay).map(product => (
+                    <div className="col-sm-6 col-md-4 col-lg-4" key={product._id}>
+                      <div className="box">
+                      <div className="option_container">
+                      {product.quantity <= 0 ? (
+                      <div className="alert alert-danger bg-light" role="alert">
+                      <i className="fa fa-exclamation-circle me-2"></i> Sorry, this item is currently out of stock. Please check back later.
                     </div>
-                )}
-                </div>
-
-                  <div className="img-box">
-                    <img src={product.image} alt={product.name} />
-                  </div>
-                  <div className="detail-box">
                     
-                    <h5>{product.name}</h5>
-                    <h6>&#8377;{product.price}</h6>
-                  </div>
-                  {product.quantity <= 0 ? (
-                    <span className="badge badge-danger text-uppercase">Out of stock</span>
-                  ) : (
-                    <span className="badge badge-success text-uppercase">In Stock</span>
-                  )}
-                  
-                  
+                      
+                      ) : (
+                          <div className="options">
+                            <button className="option1" onClick={() => handleAddToCart(product)}>
+                              Add to Cart
+                            </button>
+                            <button className="option2" onClick={() => handleBuyNow(product)}>
+                              Buy Now
+                            </button>
+                          </div>
+                      )}
+                      </div>
 
-                  <div className="description">
-                    <span>SKU: {product.sku}</span> <br />
-                    {product.description}
-                  </div>
+                        <div className="img-box">
+                          <img src={product.image} alt={product.name} />
+                        </div>
+                        <div className="detail-box">
+                          
+                          <h5>{product.name}</h5>
+                          <h6>&#8377;{product.price}</h6>
+                        </div>
+                        {product.quantity <= 0 ? (
+                          <span className="badge badge-danger text-uppercase">Out of stock</span>
+                        ) : (
+                          <span className="badge badge-success text-uppercase">In Stock</span>
+                        )}
+                        
+                        
+
+                        <div className="description">
+                          <span>SKU: {product.sku}</span> <br />
+                          {product.description}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
+              </>
           )}
         </div>
       </section>
