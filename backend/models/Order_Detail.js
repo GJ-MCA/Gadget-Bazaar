@@ -23,11 +23,13 @@ const orderDetailSchema = new Schema({
   shipping_method: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Shipping_Methods',
+    default: 'Standard'
   },
   shipping_charge: {
     type: Number,
     get: v => (v/100).toFixed(2),
-    set: v => v*100
+    set: v => v*100,
+    default: 40
   },
   order_status: {
       type: String,

@@ -58,7 +58,7 @@ const Login = () => {
       const data = await response.json();
       if (response.ok) {
         localStorage.setItem('auth-token', data.authtoken);
-        fetchCurrentUser(data.authtoken)
+        await fetchCurrentUser(data.authtoken)
         .then(user => {
           setCurrentUser(user);
           window.location.href = '/';

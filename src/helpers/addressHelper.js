@@ -43,8 +43,10 @@ export const addAddress = async (addressData, token) => {
       const data = await response.json();
   
       if (response.ok) {
+        data["ok"] = true;
         return data;
-      } else {
+    } else {
+        data["ok"] = false;
         return data.error;
       }
     } catch (err) {

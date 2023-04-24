@@ -1,10 +1,9 @@
-import React, {useEffect, useMemo, useContext, useState} from 'react';
+import React, {useEffect, useMemo, useContext} from 'react';
 import Swal from 'sweetalert2';
-import fetchCartItems, {updateCart, deleteCartItem, updateCouponCart, applyCouponCode} from '../../helpers/cartHelper';
+import fetchCartItems, {updateCart, deleteCartItem, updateCouponCart, applyCouponCode, fetchCouponFromId, removeCouponFromCartUsingCouponCode} from '../../helpers/cartHelper';
 import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginMiddleware } from '../../helpers/userHelper';
-const config = require("../../config/config")
 /* const config = require("../../config/config"); */
 const PUBLIC_CSS_DIR = `${process.env.PUBLIC_URL}/assets/css`;
 export const ShoppingCart = () => {
@@ -31,6 +30,30 @@ export const ShoppingCart = () => {
           setCartItems(data['cartItems']);
           setCartFinalTotal(data['cartTotalAmount'])
           console.log(data['cartItems'])
+          if(data['cart']){
+            let current_cart = data['cart'][0];
+            if(current_cart.coupon_code){
+                fetchCouponFromId(token, current_cart.coupon_code).then((data)=>{
+                    if(data.coupon_code_found){
+                        setCouponCodeMessage('Coupon code applied successfully!');
+                        setIsCouponCodeApplied(true);
+                        console.log("coupon data: ");
+                        console.log(data.coupon_code);
+                        let coupon_code_obj = data.coupon_code;
+                        setCouponCode(coupon_code_obj.coupon_code); 
+                        setCouponDiscountPercentages(coupon_code_obj.discount);
+                        const discount = parseFloat(coupon_code_obj.discount) / 100;
+                        setCouponDiscount(discount);
+                        setDiscountAmount((cartFinalTotal * couponDiscount).toFixed(2));
+                        const discountedamount = (cartFinalTotal - (cartFinalTotal * couponDiscount)).toFixed(2);
+                        setDiscountedPrice(discountedamount);
+                    }else{
+                        setCouponCodeMessage(data.message);
+                        setIsCouponCodeApplied(false);
+                    }
+                });
+            }
+          }
         });
         setCartCount(totalQty);
         setDiscountAmount((cartFinalTotal * couponDiscount).toFixed(2));
@@ -64,7 +87,7 @@ export const ShoppingCart = () => {
             text: 'The item has been removed from your cart.',
             icon: 'success'
           });
-          fetchCartItems(token).then((data) => {
+          await fetchCartItems(token).then((data) => {
             setCartItems(data['cartItems']);
           });
           setCartCount(totalQty);
@@ -94,7 +117,7 @@ export const ShoppingCart = () => {
             setCouponCodeMessage('Please enter a coupon code');
             return;
         }
-        applyCouponCode(token, couponCode)
+        await applyCouponCode(token, couponCode)
         .then((data) => {
             if (data.status === 200) {
                 setCouponCodeMessage('Coupon code applied successfully!');
@@ -132,7 +155,17 @@ export const ShoppingCart = () => {
           return '';
         }
       };
-      const handleRemoveCoupon = () => {
+      const handleRemoveCoupon = async() => {
+        const token = localStorage.getItem('auth-token');
+        await removeCouponFromCartUsingCouponCode(token, couponCode).then(async(data)=> {
+            if(data.ok){
+                await fetchCartItems(token).then((data) => {
+                    setCartItems(data['cartItems']);
+                    setCartFinalTotal(data['cartTotalAmount'])
+                    console.log(data['cartItems'])
+                });
+            }
+        });
         setIsCouponCodeApplied(false);
         setCouponCode('');
         setDiscountAmount(0);

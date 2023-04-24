@@ -66,7 +66,6 @@ router.post('/cart/add', fetchuser, async (req, res) => {
   }
 });
 
-
 //ROUTE: 2 - Buy Now the Product - POST "backend-gadgetbazaar/order/buy-now"
 router.post('/buy-now', fetchuser, async (req, res) => {
   try {
@@ -81,22 +80,22 @@ router.post('/buy-now', fetchuser, async (req, res) => {
   }
 });
 
-
 //ROUTE: 3 - Checkout Multiple Products - POST "backend-gadgetbazaar/order/checkout"
 router.post('/checkout', fetchuser, async (req, res) => {
   try {
     let shipping_charge = 0;
+    let current_shipping_method = null;
     const { shipping_address, billing_address,shipping_method, items, total } = req.body;
-
+    
     const user_id = req.user.id;
     if (!user_id || !items || !total || !shipping_address || !billing_address || !shipping_method) {
       return res.status(400).json({ success: false, error: 'Missing required fields.' });
     }
     if(shipping_method === "Default"){
-      shipping_method = ShippingMethod.findOne({ shipping_method: "Standard" });
+      current_shipping_method = ShippingMethod.findOne({ shipping_method: "Standard" });
       shipping_charge = 40.00;
     }
-    const orderDetails = new OrderDetails({ user_id, shipping_address, billing_address, shipping_method, shipping_charge });
+    const orderDetails = new OrderDetails({ user_id, shipping_address, billing_address, current_shipping_method, shipping_charge, total });
     const orderItems = items.map(item => new OrderItems({ order_id: orderDetails._id, product_id: item.product_id, quantity: item.quantity }));
 
     await Promise.all([orderDetails.save(), ...orderItems.map(item => item.save())]);
@@ -108,7 +107,7 @@ router.post('/checkout', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 4 - Get cart items for the authenticated user - POST "backend-gadgetbazaar/order/getcart"
+//ROUTE: 4 - Get cart items for the authenticated user - GET "backend-gadgetbazaar/order/getcart"
 router.get('/getcart', fetchuser, async (req, res) => {
   const userId = req.user.id;
 
@@ -427,16 +426,18 @@ router.get('/validate-coupon', fetchuser, async (req, res) => {
 router.get('/coupon/get', fetchuser, async (req, res) => {
   try {
     const coupon_id = req.query.code;
-    const coupon_obj = mongoose.Types.ObjectId(coupon_id);
-    try{
-      const promotion = await Promotion.findOne({_id: coupon_obj}).exec();
-      if(promotion)
-        res.json({ message: 'Coupon code found', coupon_code: promotion, coupon_code_found: true }); 
-      else  
-        res.json({ message: 'Coupon code not found', coupon_code_found: false }); 
-    }catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
+    if(coupon_id !== null && coupon_id !== "" && coupon_id !== "null"){
+      const coupon_obj = mongoose.Types.ObjectId(coupon_id);
+      try{
+        const promotion = await Promotion.findOne({_id: coupon_obj}).exec();
+        if(promotion)
+          res.json({ message: 'Coupon code found', coupon_code: promotion, coupon_code_found: true }); 
+        else  
+          res.json({ message: 'Coupon code not found', coupon_code_found: false }); 
+      }catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+      }
     }
   } catch (error) {
     console.error(error);
@@ -444,5 +445,60 @@ router.get('/coupon/get', fetchuser, async (req, res) => {
   }
 });
 
+//ROUTE: 16 - Remove coupon from cart - PATCH "backend-gadgetbazaar/order/cart/coupon/remove"
+router.patch('/cart/coupon/remove', fetchuser, async (req, res) => {
+  try {
+    const { coupon_code } = req.body;
+    console.log(coupon_code)
+    // Assuming you have a cart object that contains the coupon code and total price
+    const coupon = await Promotion.findOne({coupon_code: coupon_code}).exec();
+    console.log(coupon);
+    console.log(coupon._id);
+    const cart = await CartItem.findOne({customer_id: req.user.id, coupon_code: coupon._id});
+    console.log(cart)
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+  
+    if (!cart.coupon_code) {
+      return res.status(400).json({ error: 'Coupon code not found in cart' });
+    }
+  
+    // Remove the coupon code from the cart object
+    cart.coupon_code = null;
+    cart.discounted_total = null;
 
+    await cart.save();
+    // Return the updated cart object
+    return res.json({ cart });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+//ROUTE: 17 - Get order using order_id for the authenticated user - POST "backend-gadgetbazaar/order/getorder"
+router.post('/getorder', fetchuser, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const { order_id} = req.body;
+    const order_obj = mongoose.Types.ObjectId(order_id);
+    const order_details = await OrderDetails.find({_id: order_obj, user_id: userId});
+    if(order_details){
+      const order_items = await OrderItems.find({ order_id: order_details }).exec();
+      if(order_items){
+        return res.json({message: "Order found successfully", order_details: order_details, order_items, success: true});
+      }
+      else{
+        return res.json({message: "Order items not found!", success: false});
+      }
+    }
+    else{
+      return res.json({message: "Order not found!", success: false});
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error', success: false});
+  }
+});
 module.exports = router;

@@ -10,11 +10,11 @@ export const Checkout = () => {
     
 	const {setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses, couponCode, setCouponCode, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount } = useContext(GadgetBazaarContext);
     const [setName] = useState(null);
-    const [selectedAddressId, setSelectedAddressId] = useState(null);
-    const [selectedCountry, setSelectedCountry] = useState();
+    const [selectedAddressId, setSelectedAddressId] = useState("");
+    const [selectedCountry, setSelectedCountry] = useState("");
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
-    const [selectedShipCountry, setShipSelectedCountry] = useState();
+    const [selectedShipCountry, setShipSelectedCountry] = useState("");
     const [selectedShipState, setShipSelectedState] = useState(null);
     const [selectedShipCity, setShipSelectedCity] = useState(null);
     const [country, setCountry] = useState('');
@@ -36,23 +36,27 @@ export const Checkout = () => {
             setCartItems(data['cartItems']);
             setCartFinalTotal(data['cartTotalAmount'])
             console.log(data['cart'][0].coupon_code);
-            fetchCouponFromId(token, data['cart'][0].coupon_code).then((data)=>{
-                if(data.coupon_code_found){
-                    setIsCouponCodeApplied(true);
-                    console.log("coupon data: ");
-                    console.log(data.coupon_code);
-                    let coupon_code_obj = data.coupon_code;
-                    setCouponCode(coupon_code_obj.coupon_code); 
-                    setCouponDiscountPercentages(coupon_code_obj.discount);
-                    const discount = parseFloat(coupon_code_obj.discount) / 100;
-                    setCouponDiscount(discount);
-                    setDiscountAmount((cartFinalTotal * couponDiscount).toFixed(2));
-                    const discountedamount = (cartFinalTotal - (cartFinalTotal * couponDiscount)).toFixed(2);
-                    setDiscountedPrice(discountedamount);
-                }else{
-                    setIsCouponCodeApplied(false);
+            if(data['cart']){
+                if(data['cart'][0].coupon_code){
+                    fetchCouponFromId(token, data['cart'][0].coupon_code).then((data)=>{
+                        if(data.coupon_code_found){
+                            setIsCouponCodeApplied(true);
+                            console.log("coupon data: ");
+                            console.log(data.coupon_code);
+                            let coupon_code_obj = data.coupon_code;
+                            setCouponCode(coupon_code_obj.coupon_code); 
+                            setCouponDiscountPercentages(coupon_code_obj.discount);
+                            const discount = parseFloat(coupon_code_obj.discount) / 100;
+                            setCouponDiscount(discount);
+                            setDiscountAmount((cartFinalTotal * couponDiscount).toFixed(2));
+                            const discountedamount = (cartFinalTotal - (cartFinalTotal * couponDiscount)).toFixed(2);
+                            setDiscountedPrice(discountedamount);
+                        }else{
+                            setIsCouponCodeApplied(false);
+                        }
+                    });
                 }
-            });
+            }
         });
         try{
             fetchSavedAddresses(token).then((data) => {
@@ -171,6 +175,8 @@ export const Checkout = () => {
             return;
         }
         // if address is selected from saved addresses
+        console.log("selected billing addressid")
+        console.log(selectedBillingAddressId)
         if(selectedBillingAddressId && selectedBillingAddressId !== "addNewAddress"){
             // set billingaddressid as selectedbillingaddressid
             dataBillingAddressId = selectedBillingAddressId;
@@ -196,16 +202,18 @@ export const Checkout = () => {
                 contact: formData.get('contact_address'),
             };
             //call addAddress api to save the address
-            addAddress(dataBillingAddress, token)
-            .then(response => {
-				if (response.ok) {
-					return response.json();
-				}
-				throw new Error('Network response was not ok');
-			})
+            await addAddress(dataBillingAddress, token)
 			.then(data => {
-				if(data.address_id){
-                    dataBillingAddressId = data.address_id;
+                console.log(data);
+                if(data.ok){
+                    console.log("data is ok");
+                    if(data.address_id){
+                        console.log("data found address");
+                        dataBillingAddressId = data.address_id;
+                    }
+                }else{
+                    alert("Something went wrong while adding billing address, please check entered data and try again!")
+                    return false;
                 }
 			})
 			.catch(error => {
@@ -222,16 +230,17 @@ export const Checkout = () => {
                     pincode: formData.get('pincode-2'),
                     contact: formData.get('contact_address-2'),
                 };
-                addAddress(dataShippingAddress, token)
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error('Network response was not ok');
-                })
+                await addAddress(dataShippingAddress, token)
                 .then(data => {
-                    if(data.address_id){
-                        dataShippingAddressId = data.address_id;
+                    if(data.ok){
+                        console.log("data is ok");
+                        if(data.address_id){
+                            console.log("data found address");
+                            dataShippingAddressId = data.address_id;
+                        }
+                    }else{
+                        alert("Something went wrong while adding shipping address, please check entered data and try again!")
+                        return false;
                     }
                 })
                 .catch(error => {
@@ -246,6 +255,9 @@ export const Checkout = () => {
         }
         // calling checkout api
         try {
+            let dataTotal = cartFinalTotal;
+            if(isCouponCodeApplied)
+                dataTotal = discountedPrice;
             const response = await fetch(`${config.checkoutUrl}`, {
                 method: 'POST',
                 headers: {
@@ -257,16 +269,22 @@ export const Checkout = () => {
                     billing_address: dataBillingAddressId,
                     shipping_method: 'Default',
                     items: cartItems,
-                    total: cartFinalTotal
+                    total: dataTotal
                 }),
             });
             if (!response.ok) {
                 throw new Error('Something went wrong in checkout api call');
             }
+            const data = await response.json();
+            console.log(data);
             // redirect to the order confirmation page
-            navigate('/order-confirmation', {
-                state: { cartItems, dataShippingAddressId,dataBillingAddressId , shipping_method: 'Standard', cartFinalTotal },
-            });
+            if(data["orderDetails"]){
+                sessionStorage.setItem('user_order', JSON.stringify({ orderId: data["orderDetails"]._id }));
+                /* navigate('/order-confirmation'); */
+            }else{
+                alert("Something went wrong, Please try again");
+                return false;
+            }
         } catch (err) {
             console.error(err.message);
         }
@@ -286,75 +304,6 @@ export const Checkout = () => {
                         Back to Cart
                     </Link>
                 </h6>
-            </div>
-            <div className="mb-3">
-                    <label htmlFor="saved-address">Saved Addresses</label>
-                    <select
-                        className="custom-select d-block w-100"
-                        id="saved-address-billing"
-                        name="saved-address-billing"
-                        value={selectedAddressId || ''}
-                        onChange={(event) => setSelectedAddressId(event.target.value)}
-                        data-label="saved address or add new address"
-                    >
-                        {checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
-                            <>
-                                <option value="">Choose...</option>
-                                {checkoutSavedAddresses.map((address, index) => (
-                                    <option key={index} value={address.id}>
-                                        {address.address_line_1}, {address.address_line_2}, {address.city}, {address.state}, {address.pincode}, {address.country}
-                                    </option>
-                                ))}
-                                <option value="addNewAddress">Add New Address</option>
-                            </>
-                        ) : (
-                            <>
-                            <option value="">No saved addresses found</option>
-                            <option value="addNewAddress">Add New Address</option>
-                            </>
-                            
-                        )}
-                    </select>
-                    <div className='error-label'></div>
-                    {checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
-                        <>
-                            <div className='mt-2 mb-1'>
-                                <input type="checkbox" id="saved-ship-to-different-address" name="saved-ship-to-different-address" onChange={handleSavedShipToDifferentAddressChange} />
-                                <label htmlFor="saved-ship-to-different-address" className='ml-2'>Ship to a different address</label>
-                            </div>
-                        </>
-                        ):
-                        ("")
-                    }
-                    {showSavedShippingAddressForm &&  (
-                        <>
-                            <select
-                            className="custom-select d-block w-100"
-                            id="saved-address-shipping"
-                            name="saved-address-shipping"
-                            value={selectedAddressId || ''}
-                            onChange={(event) => setSelectedAddressId(event.target.value)}
-                            data-label="Saved address"
-                            >
-                                {checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
-                                    <>
-                                <option value="">Choose...</option>
-                                {checkoutSavedAddresses.map((address, index) => (
-                                    <option key={index} value={address.id}>
-                                        {address.address_line_1}, {address.address_line_2}, {address.city}, {address.state}, {address.pincode}, {address.country}
-                                    </option>
-                                ))}
-                                <option value="addNewAddress">Add New Address</option>
-                                </>
-                                ): (
-                                    <>
-                                    <option value="">No saved addresses found</option>
-                                    <option value="addNewAddress">Add New Address</option>
-                                    </>
-                                )}
-                            </select>
-                        </>
-                    )}
             </div>
             <div className="row">
                 <div className="col-md-4 order-md-2 mb-4">
@@ -403,6 +352,75 @@ export const Checkout = () => {
                
                 <div className="col-md-8 order-md-1">
                     <form id="checkout_form" className="needs-validation" noValidate="">
+                    <div className="mb-3">
+                        <label htmlFor="saved-address">Saved Addresses</label>
+                        <select
+                            className="custom-select d-block w-100"
+                            id="saved-address-billing"
+                            name="saved-address-billing"
+                            value={selectedAddressId || ''}
+                            onChange={(event) => setSelectedAddressId(event.target.value)}
+                            data-label="saved address or add new address"
+                        >
+                            {checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
+                                <>
+                                    <option value="">Choose...</option>
+                                    {checkoutSavedAddresses.map((address, index) => (
+                                        <option key={index} value={address.id}>
+                                            {address.address_line_1}, {address.address_line_2}, {address.city}, {address.state}, {address.pincode}, {address.country}
+                                        </option>
+                                    ))}
+                                    <option value="addNewAddress">Add New Address</option>
+                                </>
+                            ) : (
+                                <>
+                                <option value="">No saved addresses found</option>
+                                <option value="addNewAddress">Add New Address</option>
+                                </>
+                                
+                            )}
+                        </select>
+                        <div className='error-label'></div>
+                        {checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
+                            <>
+                                <div className='mt-2 mb-1 d-flex align-items-center'>
+                                    <input type="checkbox" id="saved-ship-to-different-address" name="saved-ship-to-different-address" onChange={handleSavedShipToDifferentAddressChange} style={{width: "20px"}}/>
+                                    <label htmlFor="saved-ship-to-different-address" className='ml-2'>Ship to a different address</label>
+                                </div>
+                            </>
+                            ):
+                            ("")
+                        }
+                        {showSavedShippingAddressForm &&  (
+                            <>
+                                <select
+                                className="custom-select d-block w-100"
+                                id="saved-address-shipping"
+                                name="saved-address-shipping"
+                                value={selectedAddressId || ''}
+                                onChange={(event) => setSelectedAddressId(event.target.value)}
+                                data-label="Saved address"
+                                >
+                                    {checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
+                                        <>
+                                    <option value="">Choose...</option>
+                                    {checkoutSavedAddresses.map((address, index) => (
+                                        <option key={index} value={address.id}>
+                                            {address.address_line_1}, {address.address_line_2}, {address.city}, {address.state}, {address.pincode}, {address.country}
+                                        </option>
+                                    ))}
+                                    <option value="addNewAddress">Add New Address</option>
+                                    </>
+                                    ): (
+                                        <>
+                                        <option value="">No saved addresses found</option>
+                                        <option value="addNewAddress">Add New Address</option>
+                                        </>
+                                    )}
+                                </select>
+                            </>
+                        )}
+                    </div>
                         {selectedAddressId === 'addNewAddress' && (
                         <>
                             <div className='billing-address' id="billing_address">
@@ -427,7 +445,7 @@ export const Checkout = () => {
                                     <select className="custom-select d-block w-100" name="country" id="country" required="" value={selectedCountry || ''} onChange={handleCountryChange} data-label="country">
                                         {country && country.length > 0 ? (
                                             <>
-                                                <option value="" selected>Select Country</option>
+                                                <option value="">Select Country</option>
                                                 <option value="IN">India</option>
                                                 {country.map((value,index) => (
                                                      value.isoCode !== "IN" && <option key={index} value={value.isoCode} disabled>
@@ -507,7 +525,7 @@ export const Checkout = () => {
                                         <select className="custom-select d-block w-100" name="country-2" id="country-2" required="" value={selectedShipCountry || ''} onChange={event => handleCountryChange(event, true)} data-label="country">
                                             {country && country.length > 0 ? (
                                                 <>
-                                                    <option value="" selected>Select Country</option>
+                                                    <option value="">Select Country</option>
                                                     <option value="IN">India</option>
                                                     {country.map((value,index) => (
                                                         value.isoCode !== "IN" && <option key={index} value={value.isoCode} disabled>

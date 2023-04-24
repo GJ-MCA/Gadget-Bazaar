@@ -1,5 +1,5 @@
 const config = require("../config/config");
-const fetchCartItems = async (token) => {
+  const fetchCartItems = async (token) => {
     try {
       const response = await fetch(`${config.orderAPIUrl}/getcart`, {
         method: 'GET',
@@ -14,7 +14,7 @@ const fetchCartItems = async (token) => {
       console.error(err.message);
     }
   };
-export const fetchSavedAddresses = async (token) => {
+  export const fetchSavedAddresses = async (token) => {
     try {
       const response = await fetch(`${config.orderAPIUrl}/address/getsaved`, {
         method: 'GET',
@@ -135,6 +135,30 @@ export const fetchSavedAddresses = async (token) => {
           'Content-Type': 'application/json',
           'auth-token': `Bearer ${token}`
         },
+      });
+      if(response.ok){
+        const data = await response.json();
+        data["ok"] = true;
+        return data;
+      }else{
+        const data = await response.json();
+        data["ok"] = false;
+        return data;
+      }
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+  export const removeCouponFromCartUsingCouponCode = async (token, coupon_code) => {
+    console.log("couponcode: "+coupon_code)
+    try {
+      const response = await fetch(`${config.orderAPIUrl}/cart/coupon/remove`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': `Bearer ${token}`
+        },
+        body: JSON.stringify({coupon_code: coupon_code })
       });
       const data = await response.json();
       return data;

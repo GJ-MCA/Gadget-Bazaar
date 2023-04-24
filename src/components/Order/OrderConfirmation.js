@@ -1,14 +1,31 @@
 import React, {useState, useEffect} from 'react'
 import { getAddressById } from '../../helpers/addressHelper';
-
-export const OrderConfirmation = ({ location }) => {
+import fetchOrderById from '../../helpers/orderHelper';
+export const OrderConfirmation = () => {
     
-    const { cartItems, dataShippingAddressId,dataBillingAddressId , shipping_method, cartFinalTotal } = location.state;
+    
     const [billingAddress, setBillingAddress] = useState(null);
     const [shippingAddress, setShippingAddress] = useState(null);
+    const [shipping_method, setShippingMethod] = useState(null);
+    const [dataBillingAddressId, setDataBillingAddressId] = useState(null);
+    const [dataShippingAddressId, setDataShippingAddressId] = useState(null);
 
     useEffect(() => {
         try{
+            const userOrder = JSON.parse(sessionStorage.getItem('user_order'));
+            if(userOrder){
+                const orderId = userOrder.orderId;
+                const token = localStorage.getItem('auth-token');
+                if(token){
+                    fetchOrderById(token,orderId).then((data)=>{
+                        if(data.success){
+                            setDataBillingAddressId(data["order_details"].billing_address);
+                            setDataShippingAddressId(data["order_details"].shipping_address);
+                            setShippingMethod(data["order_details"].shipping_method);
+                        }
+                    })
+                }
+            }
             getAddressById(dataBillingAddressId)
             .then(response => {
                 if (response.ok) {
