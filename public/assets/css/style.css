@@ -114,7 +114,9 @@ a:focus {
       -ms-flex-direction: column;
           flex-direction: column;
 }
-
+header + .hero_area{
+  margin-top: 104px !important;
+}
 .sub_page .hero_area {
   min-height: auto;
   -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25);
@@ -1320,4 +1322,18 @@ header{
 
 header + section{
   margin-top: 104px;
+}
+
+.custom-secondary-btn{
+  background-color: #fff !important;
+  color: #ff0037 !important;
+}
+.custom-secondary-btn:hover{
+  background-color: #fff !important;
+  color: #ff0037 !important;
+  opacity: .8;
+}
+
+header.page-loading{
+  z-index: 1;
 }

@@ -1,101 +1,221 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
+import { useNavigate } from 'react-router-dom';
 import { getAddressById } from '../../helpers/addressHelper';
 import fetchOrderById from '../../helpers/orderHelper';
+import {GadgetBazaarContext} from '../../context/GadgetBazaarContext';
+import fetchCartItems, { fetchCouponFromId, getShippingMethodById } from '../../helpers/cartHelper';
+import Stripe from 'stripe';
+import { updateLoader } from '../../helpers/generalHelper';
+
 export const OrderConfirmation = () => {
-    
-    
+    const {cartItems, setCartItems, cartFinalTotal, setCartFinalTotal, couponCode, setCouponCode, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount, cartFinalWithoutShipping, setCartFinalWithoutShipping, discountedPriceWithoutShipping, setDiscountedPriceWithoutShipping } = useContext(GadgetBazaarContext);
+
     const [billingAddress, setBillingAddress] = useState(null);
     const [shippingAddress, setShippingAddress] = useState(null);
-    const [shipping_method, setShippingMethod] = useState(null);
+    const [shippingMethod, setShippingMethod] = useState(null);
     const [dataBillingAddressId, setDataBillingAddressId] = useState(null);
     const [dataShippingAddressId, setDataShippingAddressId] = useState(null);
-
+    const [shipping_method_id, setShippingMethodId] = useState(null);
+    const payment_config = require("../../config/payment");
+    const navigate = useNavigate();
+    const stripe = Stripe(payment_config.stripe_secret_key);
+    const config = require("../../config/config");
     useEffect(() => {
-        try{
-            const userOrder = JSON.parse(sessionStorage.getItem('user_order'));
-            if(userOrder){
-                const orderId = userOrder.orderId;
-                const token = localStorage.getItem('auth-token');
-                if(token){
-                    fetchOrderById(token,orderId).then((data)=>{
-                        if(data.success){
-                            setDataBillingAddressId(data["order_details"].billing_address);
-                            setDataShippingAddressId(data["order_details"].shipping_address);
-                            setShippingMethod(data["order_details"].shipping_method);
-                        }
-                    })
+        const fetchData = async () => {
+          try {
+            const userOrder = JSON.parse(localStorage.getItem('user_order'));
+            if (userOrder) {
+              const orderId = userOrder.orderId;
+              const token = localStorage.getItem('auth-token');
+              if (token) {
+                const orderDetailsResponse = await fetchOrderById(token, orderId);
+                if (orderDetailsResponse.success) {
+                  setDataBillingAddressId(orderDetailsResponse.order_details[0].billing_address);
+                  setDataShippingAddressId(orderDetailsResponse.order_details[0].shipping_address);
+                  setShippingMethodId(orderDetailsResponse.order_details[0].shipping_method);
                 }
+                if (dataBillingAddressId) {
+                  const billingAddressResponse = await getAddressById(dataBillingAddressId, token);
+                  setBillingAddress(billingAddressResponse);
+                }
+                if (dataShippingAddressId) {
+                  const shippingAddressResponse = await getAddressById(dataShippingAddressId, token);
+                  setShippingAddress(shippingAddressResponse);
+                }
+                if (shipping_method_id) {
+                  const shippingMethodResponse = await getShippingMethodById(shipping_method_id, token);
+                  setShippingMethod(shippingMethodResponse);
+                }
+                const cartItemsResponse = await fetchCartItems(token);
+                setCartItems(cartItemsResponse.cartItems);
+                setCartFinalTotal(cartItemsResponse.cartTotalAmount);
+                setCartFinalWithoutShipping(Number(cartItemsResponse.cartTotalAmount) - 40)
+                if (cartItemsResponse.cart && cartItemsResponse.cart[0].coupon_code) {
+                  const couponResponse = await fetchCouponFromId(token, cartItemsResponse.cart[0].coupon_code);
+                  if (couponResponse.coupon_code_found) {
+                    setIsCouponCodeApplied(true);
+                    const couponCodeObj = couponResponse.coupon_code;
+                    setCouponCode(couponCodeObj.coupon_code);
+                    setCouponDiscountPercentages(couponCodeObj.discount);
+                    const discount = parseFloat(couponCodeObj.discount) / 100;
+                    setCouponDiscount(discount);
+                    setDiscountAmount((cartFinalWithoutShipping * couponDiscount).toFixed(2));
+                    const discountedAmount = (cartFinalWithoutShipping - (cartFinalWithoutShipping * couponDiscount)).toFixed(2);
+                    setDiscountedPriceWithoutShipping(discountedAmount);
+                    setDiscountedPrice((Number(discountedAmount) + 40).toFixed(2));
+                  } else {
+                    setIsCouponCodeApplied(false);
+                  }
+                }
+              }
             }
-            getAddressById(dataBillingAddressId)
-            .then(response => {
-                if (response.ok) {
+          } catch (error) {
+            console.error(error);
+          }
+        };
+        fetchData();
+      }, [dataBillingAddressId, dataShippingAddressId, setCartItems, cartFinalTotal, couponDiscount]);
+      
+      // Initialize the Stripe object with your API key
+   
+    // Handler function for "Confirm and Pay" button click event
+    const handleConfirmPay = ()=>{
+        const userOrder = JSON.parse(localStorage.getItem('user_order'));
+        const token = localStorage.getItem('auth-token');
+        if(userOrder){
+            try{
+                updateLoader(true); //Show Gadgetbazaar Loader
+                fetch(`${config.paymentAPIUrl}/create-payment-session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'auth-token': `Bearer ${token}`,
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    body: JSON.stringify({
+                        order_id: userOrder.orderId
+                    })
+                })
+                .then(function(response) {
                     return response.json();
-                }
-                throw new Error('Network response was not ok');
-            })
-            .then(data => {
-                setBillingAddress(data);
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
-            getAddressById(dataShippingAddressId)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Network response was not ok');
-            })
-            .then(data => {
-                setShippingAddress(data);
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
+                })
+                .then(function(session) {
+                    // Redirect the user to the Stripe Checkout page
+                    console.log("Got the payment session")
+                    console.log(session.session)
+                    console.log(session.session.url)
+                    console.log("Printing stripe object")
+                    console.log(stripe)
+                    window.location.href = session.session.url;
+                    updateLoader(false); //Hide Gadgetbazaar Loader
+                })
+            }catch(err){
+                updateLoader(false); //Hide Gadgetbazaar Loader
+                console.log("Error while calling calling payment")
+            }
         }
-        catch(err){
-            console.error(err);
-        }
-    }, [dataBillingAddressId, dataShippingAddressId]);
+    }
     return (
         <div className="container my-5">
             <div className="row">
-                <div className="col-md-8 order-md-1">
-                <h4 className="mb-3">Order Summary</h4>
-                <div className="mb-3">
-                    <h6>Shipping Address:</h6>
-                    <p>{shippingAddress.address_line_1}</p>
-                    <p>{shippingAddress.address_line_2}</p>
-                    <p>{shippingAddress.city}, {dataShippingAddressId.state} {dataShippingAddressId.pincode}</p>
-                    <p>{shippingAddress.country}</p>
-                </div>
-                <div className="mb-3">
-                    <h6>Billing Address:</h6>
-                    <p>{billingAddress.address_line_1}</p>
-                    <p>{billingAddress.address_line_2}</p>
-                    <p>{billingAddress.city}, {dataBillingAddressId.state} {dataBillingAddressId.pincode}</p>
-                    <p>{billingAddress.country}</p>
-                </div>
-                <div className="mb-3">
-                    <h6>Shipping Method:</h6>
-                    <p>{shipping_method}</p>
-                </div>
-                <div className="mb-3">
-                    <h6>Order Total:</h6>
-                    <p>{cartFinalTotal}</p>
-                </div>
-                <h4 className="mb-3">Order Items</h4>
-                <ul className="list-group mb-3">
-                    {cartItems.map((item) => (
-                    <li className="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                        <h6 className="my-0">{item.product_id.name}</h6>
-                        <small className="text-muted">{item.product_id.description}</small>
+                <div className="col w-100">
+                    <h1 style={{ textAlign: 'center',fontSize: '2rem',fontWeight: 'bold',margin: '2rem 0', fontFamily: '-apple-system, BlinkMacSystemFont,Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif'}}>Confirm Your Order <br/> 
+                    <span className='d-inline-block' style={{fontSize: '1.6rem', borderTop: "2px dashed grey", marginTop: "5px", paddingTop: "5px"}}>Please Review Your Order Details</span></h1>
+                    <h4 className="mb-3">Order Summary</h4>
+                    <div className='d-flex w-100 justify-content-between'>
+                        {shippingAddress && (
+                        <div className="mb-3 w-50">
+                            <h6>Shipping Address:</h6>
+                            <p>
+                                {shippingAddress.address_line_1}
+                                {shippingAddress.address_line_2 && ","+shippingAddress.address_line_2} 
+                                {shippingAddress.city && ","+shippingAddress.city}
+                                {shippingAddress.state && ","+shippingAddress.state}
+                                {shippingAddress.pincode && ","+shippingAddress.pincode}
+                                {shippingAddress.country && ","+shippingAddress.country}
+                            </p>
                         </div>
-                        <span className="text-muted">${item.item_total}</span>
-                    </li>
-                    ))}
-                </ul>
+                        )}
+                        {billingAddress && (
+                        <div className="mb-3 w-50">
+                            <h6>Billing Address:</h6>
+                            <p>
+                                {billingAddress.address_line_1}
+                                {billingAddress.address_line_2 && ","+billingAddress.address_line_2} 
+                                {billingAddress.city && ","+billingAddress.city}
+                                {billingAddress.state && ","+billingAddress.state}
+                                {billingAddress.pincode && ","+billingAddress.pincode}
+                                {billingAddress.country && ","+billingAddress.country}
+                            </p>
+                        </div>
+                        )}
+                    </div>
+                    <div className='d-flex w-100 justify-content-between'> 
+                        {shippingMethod && (
+                            <div className='d-flex w-100 justify-content-between'>
+                                <div className="mb-3 w-50">
+                                    <h6>Shipping Method:</h6>
+                                    <p>{shippingMethod.shipping_method}</p>
+                                </div>
+                                <div className="mb-3 w-50">
+                                    <h6>Shipping Charges:</h6>
+                                    <p> &#8377;{shippingMethod.shipping_charge}</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <div className="col order-md-2 mb-4 p-0">
+                        <h4 className="d-flex justify-content-between align-items-center mb-3">
+                            <span className="text-muted">Your Order Items</span>
+                            <span className="badge badge-secondary badge-pill">{cartItems.length}</span>
+                        </h4>
+                        {cartItems.length === 0 ? (
+                            <p>No items in cart</p>
+                        ) : (
+                            <ul className="list-group mb-3 sticky-top checkout-items-container" style={{ maxHeight: '865px', overflowY: 'auto' }}>
+                                {cartItems.map((cartItem) => (
+                                <li key={cartItem.product_id.id} className="list-group-item d-flex justify-content-between lh-condensed">
+                                    <div>
+                                        <h6 className="my-0">{cartItem.product_id.name}</h6>
+                                        <small className="text-muted">{cartItem.product_id.description}</small>
+                                    </div>
+                                    <span className="text-muted">&#8377;{cartItem.product_id.price * cartItem.quantity}</span>
+                                </li>
+                                ))}
+                                <li className="list-group-item d-flex justify-content-between bg-light">
+                                    <div className="text-muted">
+                                        <h6 className="my-0">Delivery Charges</h6>
+                                        <small>Standard</small>
+                                    </div>
+                                    <span className="text-muted">+ &#8377;40.00</span>
+                                </li>
+                                {isCouponCodeApplied && (
+                                <>
+                                    <li className="list-group-item d-flex justify-content-between bg-light">
+                                        <div className="text-success">
+                                            <h6 className="my-0">Promo code</h6>
+                                            <small>{`${couponCode} (${couponDiscountPercentages}% Off)`}</small>
+                                        </div>
+                                        <span className="text-success">- &#8377;{discountAmount}</span>
+                                    </li>
+                                </>
+                                )}
+                                <li className="list-group-item d-flex justify-content-between">
+                                    <span>Total</span>
+                                    <strong>&#8377;{isCouponCodeApplied ? discountedPrice : cartFinalTotal}</strong>
+                                </li>
+                            </ul>
+                        )}
+                    </div>
+
+                    <div className="d-flex justify-content-center my-5">
+                    <button className="btn btn-primary mx-2" id='confirm_payment_btn' onClick={handleConfirmPay}>
+                        Confirm and Pay
+                    </button>
+                    <button className="btn btn-secondary custom-secondary-btn mx-2" onClick={() => navigate('/cart')}>
+                        &lt; Back to Cart
+                    </button>
+                    </div>
                 </div>
             </div>
         </div>

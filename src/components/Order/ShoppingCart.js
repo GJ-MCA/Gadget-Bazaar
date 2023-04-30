@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useContext} from 'react';
+import React, {useEffect, useMemo, useContext, useState} from 'react';
 import Swal from 'sweetalert2';
 import fetchCartItems, {updateCart, deleteCartItem, updateCouponCart, applyCouponCode, fetchCouponFromId, removeCouponFromCartUsingCouponCode} from '../../helpers/cartHelper';
 import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
@@ -8,8 +8,7 @@ import { useLoginMiddleware } from '../../helpers/userHelper';
 const PUBLIC_CSS_DIR = `${process.env.PUBLIC_URL}/assets/css`;
 export const ShoppingCart = () => {
     const loginMiddleware = useLoginMiddleware(); //used to check if user is logged in, if not then redirect to login page
-	  const {setCartCount, cartItems, setCartItems, cartFinalTotal, setCartFinalTotal, couponCode, setCouponCode, couponCodeMessage, setCouponCodeMessage, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount } = useContext(GadgetBazaarContext);
-
+	  const {setCartCount, cartItems, setCartItems, cartFinalTotal, setCartFinalTotal, couponCode, setCouponCode, couponCodeMessage, setCouponCodeMessage, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount, cartFinalWithoutShipping, setCartFinalWithoutShipping, discountedPriceWithoutShipping, setDiscountedPriceWithoutShipping } = useContext(GadgetBazaarContext);
       const cartTotal = useMemo(
         () =>
           cartItems.reduce(
@@ -27,47 +26,70 @@ export const ShoppingCart = () => {
         loginMiddleware();
         const token = localStorage.getItem('auth-token');
         fetchCartItems(token).then((data) => {
+            console.log("Cartitems in useeffect of shopping cart: \n\n")
+            console.log(data['cartItems'])
           setCartItems(data['cartItems']);
           setCartFinalTotal(data['cartTotalAmount'])
+          setCartFinalWithoutShipping((data['cartTotalAmount'] - 40))
           console.log(data['cartItems'])
           if(data['cart']){
             let current_cart = data['cart'][0];
-            if(current_cart.coupon_code){
-                fetchCouponFromId(token, current_cart.coupon_code).then((data)=>{
-                    if(data.coupon_code_found){
-                        setCouponCodeMessage('Coupon code applied successfully!');
-                        setIsCouponCodeApplied(true);
-                        console.log("coupon data: ");
-                        console.log(data.coupon_code);
-                        let coupon_code_obj = data.coupon_code;
-                        setCouponCode(coupon_code_obj.coupon_code); 
-                        setCouponDiscountPercentages(coupon_code_obj.discount);
-                        const discount = parseFloat(coupon_code_obj.discount) / 100;
-                        setCouponDiscount(discount);
-                        setDiscountAmount((cartFinalTotal * couponDiscount).toFixed(2));
-                        const discountedamount = (cartFinalTotal - (cartFinalTotal * couponDiscount)).toFixed(2);
-                        setDiscountedPrice(discountedamount);
-                    }else{
-                        setCouponCodeMessage(data.message);
-                        setIsCouponCodeApplied(false);
-                    }
-                });
+            if(current_cart){
+                if(current_cart.coupon_code){
+                    fetchCouponFromId(token, current_cart.coupon_code).then((data)=>{
+                        if(data.coupon_code_found){
+                            setCouponCodeMessage('Coupon code applied successfully!');
+                            setIsCouponCodeApplied(true);
+                            console.log("coupon data: ");
+                            console.log(data.coupon_code);
+                            let coupon_code_obj = data.coupon_code;
+                            setCouponCode(coupon_code_obj.coupon_code); 
+                            setCouponDiscountPercentages(coupon_code_obj.discount);
+                            const discount = parseFloat(coupon_code_obj.discount) / 100;
+                            setCouponDiscount(discount);
+                            setDiscountAmount((cartFinalWithoutShipping * couponDiscount).toFixed(2));
+                            const discountedamount = (cartFinalWithoutShipping - (cartFinalWithoutShipping * couponDiscount)).toFixed(2);
+                            setDiscountedPriceWithoutShipping(discountedamount)
+                            setDiscountedPrice((Number(discountedamount) + 40).toFixed(2));
+                        }else{
+                            setCouponCodeMessage(data.message);
+                            setIsCouponCodeApplied(false);
+                        }
+                    });
+                }
             }
           }
         });
         setCartCount(totalQty);
-        setDiscountAmount((cartFinalTotal * couponDiscount).toFixed(2));
-        const discountedamount = (cartFinalTotal - (cartFinalTotal * couponDiscount)).toFixed(2);
-        setDiscountedPrice(discountedamount);
-      }, [totalQty, setCartCount, couponDiscount, cartFinalTotal]);
+        setDiscountAmount((cartFinalWithoutShipping * couponDiscount).toFixed(2));
+        const discountedamount = (cartFinalWithoutShipping - (cartFinalWithoutShipping * couponDiscount)).toFixed(2);
+        setDiscountedPrice((Number(discountedamount) + 40).toFixed(2));
+      }, [totalQty, setCartCount, couponDiscount, cartFinalTotal, cartFinalWithoutShipping]);
         const handleUpdateCartItemQuantity = async (productId, newQuantity) => {
         // Check if new quantity is less than 1
         if (newQuantity < 1) {
             newQuantity = 1;
         }
         const token = localStorage.getItem('auth-token');
-        await updateCart(token, productId, newQuantity, setCartItems, setCartCount, totalQty, setCartFinalTotal)
+        let updateCartResult = await updateCart(token, productId, newQuantity, setCartItems, setCartCount, totalQty, setCartFinalTotal);
+        console.log(updateCartResult)
+        if(updateCartResult && !updateCartResult.success === true){
+            console.log("In updatecartresult")
+            if(updateCartResult.errcode){
+                if(updateCartResult.errcode === "OUTOFSTOCK"){
+                    alert("Item is out of stock")
+                }
+            }
+        }
       };
+      const handleQuantityChange = (event, productId) => {
+        const newQuantity = parseInt(event.target.value);
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            event.target.value = 1;
+            return;
+        }
+        handleUpdateCartItemQuantity(productId, newQuantity);
+    };
       const handleDeleteClick = async (productId) => {
         const confirmed = await Swal.fire({
           title: 'Are you sure?',
@@ -162,6 +184,7 @@ export const ShoppingCart = () => {
                 await fetchCartItems(token).then((data) => {
                     setCartItems(data['cartItems']);
                     setCartFinalTotal(data['cartTotalAmount'])
+                    setCartFinalWithoutShipping((data["cartTotalAmount"] - 40))
                     console.log(data['cartItems'])
                 });
             }
@@ -171,6 +194,7 @@ export const ShoppingCart = () => {
         setDiscountAmount(0);
         setCouponDiscountPercentages(0);
         setDiscountedPrice(0);
+        setDiscountedPriceWithoutShipping(0);
         setCouponDiscount(0);
         setCouponCodeMessage('');
       };
@@ -229,7 +253,7 @@ export const ShoppingCart = () => {
                                                   <button className="btn px-2" onClick={() => handleUpdateCartItemQuantity(cartItem.product_id, cartItem.quantity - 1)}>
                                                       <i className="fa fa-minus"></i>
                                                   </button>
-                                                  <input id="cart_product_qty" min="0" name="quantity" value={cartItem.quantity} type="text" onChange={(e) => handleUpdateCartItemQuantity(cartItem.product_id, e.target.value)} pattern="[0-9]*" className="form-control form-control-sm input-qty"/>
+                                                  <input id="cart_product_qty" min="0" name="quantity" value={cartItem.quantity} type="text" onChange={(e) => handleQuantityChange(e, cartItem.product_id)} pattern="[0-9]*" className="form-control form-control-sm input-qty"/>
                                                   <button className="btn px-2" onClick={() => handleUpdateCartItemQuantity(cartItem.product_id, cartItem.quantity + 1)}>
                                                       <i className="fa fa-plus"></i>
                                                   </button>
@@ -305,7 +329,7 @@ export const ShoppingCart = () => {
                                     <>
                                         <div className="d-flex justify-content-between mb-2">
                                         <h5 className="text-uppercase">Price Before Discount</h5>
-                                        <h5 className="text-muted">&#8377;{cartFinalTotal}</h5>
+                                        <h5 className="text-muted">&#8377;{cartFinalWithoutShipping.toFixed(2)}</h5>
                                         </div>
                                         <div className="d-flex justify-content-between mb-2">
                                         <div className="text-success">
@@ -316,6 +340,10 @@ export const ShoppingCart = () => {
                                         <h5 className="text-success">- &#8377;{discountAmount}</h5>
                                         </div>
                                         <div className="d-flex justify-content-between mb-2">
+                                        <h5 className="text-uppercase">Shipping Charge</h5>
+                                        <h5>+ &#8377;40.00</h5>
+                                        </div>
+                                        <div className="d-flex justify-content-between mb-2">
                                         <h5 className="text-uppercase">Price After Discount</h5>
                                         <h5 className="text-success">&#8377;{discountedPrice}</h5>
                                         </div>
@@ -323,6 +351,14 @@ export const ShoppingCart = () => {
                                 )}
                                 {!isCouponCodeApplied && (
                                     <>
+                                    <div className="d-flex justify-content-between mb-2">
+                                        <h5 className="text-uppercase">Price</h5>
+                                        <h5>&#8377;{cartFinalWithoutShipping.toFixed(2)}</h5>
+                                    </div>
+                                    <div className="d-flex justify-content-between mb-2">
+                                        <h5 className="text-uppercase">Shipping Charges</h5>
+                                        <h5>+ &#8377;40.00</h5>
+                                    </div>
                                     <div className="d-flex justify-content-between mb-2">
                                         <h5 className="text-uppercase">Total price</h5>
                                         <h5>&#8377;{cartFinalTotal}</h5>

@@ -39,7 +39,7 @@ const productSchema = new Schema({
     type: Number,
     default: 1
   },
-  image: { type: String, default: null },
+  images: [{ type: String, default: null }],
   status: {
     type: Boolean,
     default: true

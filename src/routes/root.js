@@ -28,6 +28,16 @@ export default function Root() {
     const isAdminPage = location.pathname.startsWith("/gadgetbazaar/admin");
     return (
       <>
+         {isAdminPage || (user && user.role) === 'admin' ? null : (
+        <div className="loader-outer" id="gadgetbazaar_loader">
+          <div className="gadgetbazaar-loader-container">
+          <div className="gadgetbazaar-loader">
+            <img src="/assets/img/loader.gif" alt="Loader"/>
+            <p> Gadgetbazaar Loading </p>
+          </div>
+        </div> 
+        </div>    
+        )}
         {isAdminPage || (user && user.role) === 'admin' ? null : <Header />}
           <Outlet />
         {isAdminPage || (user && user.role) === 'admin' ? null : <Footer />}

@@ -18,6 +18,8 @@ import AdminLogin from './components/Admin/Auth/AdminLogin';
 import { AdminDashboard } from './components/Admin/AdminDashboard';
 import { Checkout } from './components/Order/Checkout';
 import { OrderConfirmation } from './components/Order/OrderConfirmation';
+import { PaymentSuccess } from './components/Payment/PaymentSuccess';
+import { PaymentFailed } from './components/Payment/PaymentFailed';
 const AdminLayout = ({ children }) => {
   return (
     <>
@@ -218,6 +220,14 @@ const router = createBrowserRouter([
       {
         path: '/order-confirmation',
         element: <OrderConfirmation />,
+      },
+      {
+        path: '/payment-success',
+        element: <PaymentSuccess />,
+      },
+      {
+        path: '/payment-failed',
+        element: <PaymentFailed />,
       },
       {
         path: '/contact',

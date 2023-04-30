@@ -86,7 +86,7 @@
 		return (
 			<>
 				{/*  <!-- header section starts --> */}
-				<header className="header_section">
+				<header className="header_section page-loading">
 					<div className="container">
 						<nav className="navbar navbar-expand-lg custom_nav-container ">
 							<Link className="navbar-brand" to="/"><img width="150" src="/assets/img/logo.png" alt="Gadgetbazaar" /></Link>

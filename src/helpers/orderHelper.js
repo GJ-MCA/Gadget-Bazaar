@@ -2,7 +2,7 @@ const config = require("../config/config");
   const fetchOrderById = async (token, order_id) => {
     try {
       const response = await fetch(`${config.orderAPIUrl}/getorder`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'auth-token': `Bearer ${token}`

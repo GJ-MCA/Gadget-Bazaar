@@ -20,8 +20,7 @@ const orderItemSchema = new Schema({
       type: String,
       enum: ['pending', 'processing', 'shipped', 'delivered'],
       default: 'pending'
-  },
-
+  }
 },
 { 
     toJSON: { getters: true }

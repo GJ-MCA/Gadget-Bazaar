@@ -55,13 +55,24 @@ export const addAddress = async (addressData, token) => {
     }
 };
 export const getAddressById = async (addressId, token) => {
-    const response = await fetch(`/api/address/${addressId}`,{
+    try {
+        console.log("token: "+token)
+      const response = await fetch(`${config.orderAPIUrl}/address/get/${addressId}`,{
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'auth-token': `Bearer ${token}`
         },
-    });
-    const data = await response.json();
-    return data;
-};
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+  

@@ -21,7 +21,7 @@ router.post('/cart/add', fetchuser, async (req, res) => {
       return res.status(200).json({ success: false, error: 'Product not available', errcode:"OUTOFSTOCK"});
     }
 
-    // Find or create a cart item for the product and user
+    // Find cart item for the product and user
     let cartItem = await CartItem.findOne({ customer_id: req.user.id, coupon_code: null });
     if (!cartItem) {
       // Create a new cart item
@@ -31,11 +31,12 @@ router.post('/cart/add', fetchuser, async (req, res) => {
       });
       await cartItem.save();
     }
-
+    console.log(cartItem)
     // Create or update cart item details
     let cartItemDetail = await Cart_Item_Details.findOne({ product_id, cart_item_id: cartItem._id });
     if (!cartItemDetail) {
       // Create a new cart item detail
+      console.log("Not found cartitemdetail so creating")
       cartItemDetail = new Cart_Item_Details({
         product_id,
         cart_item_id: cartItem._id,
@@ -44,6 +45,7 @@ router.post('/cart/add', fetchuser, async (req, res) => {
       });
     } else {
       // Update the cart item detail quantity and item total
+      console.log("found cartitemdetail so updating")
       cartItemDetail.quantity += 1;
       cartItemDetail.item_total = cartItemDetail.quantity * product.price;
     }
@@ -92,10 +94,11 @@ router.post('/checkout', fetchuser, async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing required fields.' });
     }
     if(shipping_method === "Default"){
-      current_shipping_method = ShippingMethod.findOne({ shipping_method: "Standard" });
+      current_shipping_method = await ShippingMethod.findOne({ shipping_method: "Standard" }).exec();
+      console.log(current_shipping_method)
       shipping_charge = 40.00;
     }
-    const orderDetails = new OrderDetails({ user_id, shipping_address, billing_address, current_shipping_method, shipping_charge, total });
+    const orderDetails = new OrderDetails({ user_id, shipping_address, billing_address, shipping_method: current_shipping_method , shipping_charge, total });
     const orderItems = items.map(item => new OrderItems({ order_id: orderDetails._id, product_id: item.product_id, quantity: item.quantity }));
 
     await Promise.all([orderDetails.save(), ...orderItems.map(item => item.save())]);
@@ -110,7 +113,7 @@ router.post('/checkout', fetchuser, async (req, res) => {
 //ROUTE: 4 - Get cart items for the authenticated user - GET "backend-gadgetbazaar/order/getcart"
 router.get('/getcart', fetchuser, async (req, res) => {
   const userId = req.user.id;
-
+  console.log("------------Get Cart Called------------")
   try {
     const cartItems = await CartItem.find({customer_id: userId});
 
@@ -123,6 +126,10 @@ router.get('/getcart', fetchuser, async (req, res) => {
     });
     cartTotalAmount += 40;
     cartTotalAmount = cartTotalAmount.toFixed(2);
+    console.log("Cartitems: ")
+    console.log(cartItems)
+    console.log("Cartitem details: ")
+    console.log(cartItemDetails)
     res.json({cartItems: cartItemDetails, cartTotalAmount, cart: cartItems});
   } catch (err) {
     console.error(err);
@@ -134,7 +141,7 @@ router.get('/getcart', fetchuser, async (req, res) => {
 router.patch('/updatecart', fetchuser, async (req, res) => {
   const { productId, quantity, shipping_charge } = req.body;
   const userId = req.user.id; // the user ID is stored in the JWT
-  
+  console.log("-------------WE ARE UPDATING CART-------------")
   try {
     // Check if the product exists
     const product = await Product.findById(productId);
@@ -148,19 +155,42 @@ router.patch('/updatecart', fetchuser, async (req, res) => {
     });
     let cartItemDetails = null;
     if (cartItem) {
-      cartItemDetails = await Cart_Item_Details.findOne({
-        cart_item_id: cartItem._id,
-        product_id: productId
-      });
+      console.log("Cart item found: ")
+      const requiredQuantity = quantity || 1;
+      var remainingQuantity = null;
+      cartItemDetails = await Cart_Item_Details.findOne(
+        {
+          cart_item_id: cartItem._id,
+          product_id: productId
+        }
+      );
+      if(cartItemDetails){
+        existingQuantity = cartItemDetails.quantity || 0;
+        remainingQuantity = product.quantity - requiredQuantity;
+      }else{
+        remainingQuantity = product.quantity - requiredQuantity;
+      }
+      if (remainingQuantity < 0) {
+        return res.status(200).json({ success: false, error: 'Product not available', errcode:"OUTOFSTOCK"});
+      }
+      if(!cartItemDetails){
+        console.log("Cart itemdetails no found so creating new")
+        cartItemDetails = await new Cart_Item_Details({
+          cart_item_id: cartItem._id,
+          product_id: productId,
+          quantity: quantity
+        })
+      }
+      console.log("Cartitemdetails: ")
+      console.log(cartItemDetails)
       // Update the quantity of the existing cart item
       if(shipping_charge)
         cartItem.shipping_charge = shipping_charge;
       if(quantity)
         cartItemDetails.quantity = quantity;
-
-      const product = await Product.findById(cartItemDetails.product_id).exec();
       cartItemDetails.item_total = (parseFloat(product.price) * quantity).toFixed(2);
     } else {
+      console.log("Cart item not found so creating it")
       // Create a new cart item
       let qty = 0;
       let ship_charge = 0;
@@ -184,7 +214,6 @@ router.patch('/updatecart', fetchuser, async (req, res) => {
       });
 
     }
-    await cartItem.save();
     await cartItemDetails.save();
     console.log(userId)
     const cartTotalAmount = await Cart_Item_Details.aggregate([
@@ -202,12 +231,12 @@ router.patch('/updatecart', fetchuser, async (req, res) => {
     if (cartTotalAmount && cartTotalAmount.length > 0 && cartTotalAmount[0].totalPrice) {
       cartTotalAmountValue = parseFloat(cartTotalAmount[0].totalPrice).toFixed(2);
       cartItem.total = cartTotalAmountValue;
-      await cartItem.save();
     }
-    return res.json({ message: 'Cart updated successfully', cartTotalAmountValue });
+    await cartItem.save();
+    return res.json({success: true, message: 'Cart updated successfully', cartTotalAmountValue });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({success: false, message: 'Internal server error' });
   }
 });
 //ROUTE: 6 - Update coupon code related details in cart for authenticated user - PATCH "backend-gadgetbazaar/order/cart/update-coupon"
@@ -240,21 +269,33 @@ router.patch('/cart/update-coupon', fetchuser, async (req, res) => {
 });
 
 //ROUTE: 7 - Delete product from cart for authenticated user - DELETE "backend-gadgetbazaar/order/cart/removeproduct"
-router.delete('/cart/removeproduct', fetchuser ,async (req, res) => {
+router.delete('/cart/removeproduct', fetchuser, async (req, res) => {
   try {
     const currentUser = req.user; // assuming the user is authenticated and their information is stored in req.user
     const productId = req.body.product_id;
     const cartItems = await CartItem.find({ customer_id: currentUser.id });
-    const cartItemsDetails = await Cart_Item_Details.deleteMany({ product_id: productId, cart_item_id: cartItems });
+
+    // Delete the cart item details for the given product
+    const cartItemsDetails = await Cart_Item_Details.deleteMany({ product_id: productId, cart_item_id: { $in: cartItems } });
+
     if (cartItemsDetails.deletedCount === 0) {
       return res.status(404).json({ message: 'No cart items found containing this product' });
     }
+
+    // Check if the cart item has any more products, if not delete the cart item as well
+    const remainingItems = await Cart_Item_Details.find({ cart_item_id: { $in: cartItems } }).countDocuments();
+    if (remainingItems === 0) {
+      const deletedCartItems = await CartItem.deleteMany({ customer_id: currentUser.id });
+      console.log(`Deleted cart items for user: ${currentUser.id} count: ${deletedCartItems.deletedCount}`);
+    }
+
     res.json({ message: 'Cart items removed successfully', deletedCount: cartItemsDetails.deletedCount });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 //ROUTE: 8 - Clear the cart for authenticated user - DELETE "backend-gadgetbazaar/order/cart/clear"
 router.delete('/cart/clear', fetchuser, async (req, res) => {
@@ -308,7 +349,23 @@ router.post('/shipping/methods/add', async (req, res) => {
   }
 });
 
-//ROUTE: 11 - Get Saved Addresses - GET "backend-gadgetbazaar/order/address/getsaved"
+//ROUTE: 11 - Get Shipping Method From Id - GET "backend-gadgetbazaar/order/shipping/get/:id"
+router.get('/shipping/get/:id', fetchuser, async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const shipping_method = await ShippingMethod.findById(id).exec();
+    if (!shipping_method) {
+      return res.status(404).json({ message: 'shipping_method not found' });
+    }
+    return res.json(shipping_method);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+//ROUTE: 12 - Get Saved Addresses - GET "backend-gadgetbazaar/order/address/getsaved"
 router.get('/address/getsaved', fetchuser, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -322,7 +379,7 @@ router.get('/address/getsaved', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 12 - Get Address From Id - GET "backend-gadgetbazaar/order/address/get/:id"
+//ROUTE: 13 - Get Address From Id - GET "backend-gadgetbazaar/order/address/get/:id"
 router.get('/address/get/:id', fetchuser, async (req, res) => {
   const { id } = req.params;
   
@@ -338,7 +395,7 @@ router.get('/address/get/:id', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 13 - Save New Address - POST "backend-gadgetbazaar/order/address/add"
+//ROUTE: 14 - Save New Address - POST "backend-gadgetbazaar/order/address/add"
 router.post('/address/add', fetchuser, async (req, res) => {
   try {
     const user_id = req.user.id;
@@ -381,7 +438,7 @@ router.post('/address/add', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 14 - Validate coupon code - GET "backend-gadgetbazaar/order/validate-coupon"
+//ROUTE: 15 - Validate coupon code - GET "backend-gadgetbazaar/order/validate-coupon"
 router.get('/validate-coupon', fetchuser, async (req, res) => {
   try {
     const couponCode = req.query.code;
@@ -422,7 +479,7 @@ router.get('/validate-coupon', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 15 - Get coupon code - GET "backend-gadgetbazaar/order/coupon/get"
+//ROUTE: 16 - Get coupon code - GET "backend-gadgetbazaar/order/coupon/get"
 router.get('/coupon/get', fetchuser, async (req, res) => {
   try {
     const coupon_id = req.query.code;
@@ -445,7 +502,7 @@ router.get('/coupon/get', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 16 - Remove coupon from cart - PATCH "backend-gadgetbazaar/order/cart/coupon/remove"
+//ROUTE: 17 - Remove coupon from cart - PATCH "backend-gadgetbazaar/order/cart/coupon/remove"
 router.patch('/cart/coupon/remove', fetchuser, async (req, res) => {
   try {
     const { coupon_code } = req.body;
@@ -477,7 +534,7 @@ router.patch('/cart/coupon/remove', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 17 - Get order using order_id for the authenticated user - POST "backend-gadgetbazaar/order/getorder"
+//ROUTE: 18 - Get order using order_id for the authenticated user - POST "backend-gadgetbazaar/order/getorder"
 router.post('/getorder', fetchuser, async (req, res) => {
   const userId = req.user.id;
   try {

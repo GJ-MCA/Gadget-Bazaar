@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 //ROUTE: 1 - Add a Product - Admin - POST "backend-gadgetbazaar/admin/products/add"
-router.post('/add', upload.single('image'),/* checkAdminUser, */[
+router.post('/add', upload.array('images'),/* checkAdminUser, */[
   body('name','Enter at least 5 characters').custom(value => {
     if(value.length < 5){
         throw new Error('Name must be at least 5 characters long');
@@ -39,20 +39,22 @@ router.post('/add', upload.single('image'),/* checkAdminUser, */[
   try{
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      if(req.file){
+      if(req.files){
         return res.status(400).json({ errors: errors.array() });
       }else{
-        return res.status(400).json({ errors: {error: errors.array(), "Image": "Please Upload Image"} });
+        return res.status(400).json({ errors: {error: errors.array(), "Images": "Please Upload Images"} });
       }
     }
     const {name, description, sku, price} = req.body;
 
     const product = new Product({
-      name, description, sku, price
+      name, description, sku, price, images: []
     });
-    // Set the image URL if an image was uploaded
-    if (req.file) {
-      product.image = req.file.path.replace('public', '');
+    // Set the image URLs if images were uploaded
+    if (req.files) {
+      req.files.forEach(file => {
+        product.images.push(file.path.replace('public', ''));
+      });
     }
     const savedProduct = await product.save();
     res.json(savedProduct);
@@ -60,7 +62,8 @@ router.post('/add', upload.single('image'),/* checkAdminUser, */[
   }catch(error){
     res.status(500).send("Internal Server Error");
   }
-})
+});
+
 
 //ROUTE: 2 - Update a Product - Admin - PUT "backend-gadgetbazaar/admin/products/update/:id"
 router.put('/:id', upload.single('image'),checkAdminUser,[

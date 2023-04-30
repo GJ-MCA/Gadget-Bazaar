@@ -8,7 +8,7 @@ import $ from 'jquery';
 const config = require("../../config/config");
 export const Checkout = () => {
     
-	const {setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses, couponCode, setCouponCode, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount } = useContext(GadgetBazaarContext);
+	const {setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses, couponCode, setCouponCode, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount, cartFinalWithoutShipping, setCartFinalWithoutShipping, setDiscountedPriceWithoutShipping } = useContext(GadgetBazaarContext);
     const [setName] = useState(null);
     const [selectedAddressId, setSelectedAddressId] = useState("");
     const [selectedCountry, setSelectedCountry] = useState("");
@@ -35,6 +35,8 @@ export const Checkout = () => {
         fetchCartItems(token).then((data) => {
             setCartItems(data['cartItems']);
             setCartFinalTotal(data['cartTotalAmount'])
+            setCartFinalWithoutShipping((data['cartTotalAmount']) - 40)
+
             console.log(data['cart'][0].coupon_code);
             if(data['cart']){
                 if(data['cart'][0].coupon_code){
@@ -48,9 +50,10 @@ export const Checkout = () => {
                             setCouponDiscountPercentages(coupon_code_obj.discount);
                             const discount = parseFloat(coupon_code_obj.discount) / 100;
                             setCouponDiscount(discount);
-                            setDiscountAmount((cartFinalTotal * couponDiscount).toFixed(2));
-                            const discountedamount = (cartFinalTotal - (cartFinalTotal * couponDiscount)).toFixed(2);
-                            setDiscountedPrice(discountedamount);
+                            setDiscountAmount((cartFinalWithoutShipping * couponDiscount).toFixed(2));
+                            const discountedamount = (cartFinalWithoutShipping - (cartFinalWithoutShipping * couponDiscount)).toFixed(2);
+                            setDiscountedPriceWithoutShipping(discountedamount);
+                            setDiscountedPrice((Number(discountedamount) + 40).toFixed(2));
                         }else{
                             setIsCouponCodeApplied(false);
                         }
@@ -279,8 +282,8 @@ export const Checkout = () => {
             console.log(data);
             // redirect to the order confirmation page
             if(data["orderDetails"]){
-                sessionStorage.setItem('user_order', JSON.stringify({ orderId: data["orderDetails"]._id }));
-                /* navigate('/order-confirmation'); */
+                localStorage.setItem('user_order', JSON.stringify({ orderId: data["orderDetails"]._id }));
+                navigate('/order-confirmation');
             }else{
                 alert("Something went wrong, Please try again");
                 return false;
@@ -324,13 +327,6 @@ export const Checkout = () => {
                                 <span className="text-muted">&#8377;{cartItem.product_id.price * cartItem.quantity}</span>
                             </li>
                              ))}
-                            <li className="list-group-item d-flex justify-content-between bg-light">
-                                <div className="text-muted">
-                                    <h6 className="my-0">Delivery Charges</h6>
-                                    <small>Standard</small>
-                                </div>
-                                <span className="text-muted">+ &#8377;40.00</span>
-                            </li>
                             {isCouponCodeApplied && (
                             <>
                                 <li className="list-group-item d-flex justify-content-between bg-light">
@@ -342,6 +338,13 @@ export const Checkout = () => {
                                 </li>
                             </>
                             )}
+                            <li className="list-group-item d-flex justify-content-between bg-light">
+                                <div className="text-muted">
+                                    <h6 className="my-0">Delivery Charges</h6>
+                                    <small>Standard</small>
+                                </div>
+                                <span className="text-muted">+ &#8377;40.00</span>
+                            </li>
                             <li className="list-group-item d-flex justify-content-between">
                                 <span>Total</span>
                                 <strong>&#8377;{isCouponCodeApplied ? discountedPrice : cartFinalTotal}</strong>

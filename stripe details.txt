@@ -1,0 +1,14 @@
+If stripe cli is not listening then the payment webhook can not be catched, so to listen it we need to perform these steps.
+After enabling, it will be available for 90 minutes.
+
+Go to https://dashboard.stripe.com/test/webhooks
+
+Steps:
+./stripe login --interactive
+enter stripe secret key
+
+./stripe listen --forward-to http://localhost:5000/backend-gadgetbazaar/payment/stripe-webhook
+
+
+Can also trigger it for testing directly:
+./stripe trigger payment_intent.succeeded

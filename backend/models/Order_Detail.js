@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const ShippingMethod = require("./ShippingMethod");
 const { Schema } = mongoose;
 
 const orderDetailSchema = new Schema({
@@ -23,7 +24,10 @@ const orderDetailSchema = new Schema({
   shipping_method: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Shipping_Methods',
-    default: 'Standard'
+    default: async function() {
+      const defaultShippingMethod = await ShippingMethod.findOne({shipping_method: 'Standard'});
+      return defaultShippingMethod ? defaultShippingMethod._id : null;
+    }
   },
   shipping_charge: {
     type: Number,
@@ -47,6 +51,12 @@ const orderDetailSchema = new Schema({
   coupon_code: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Promotion'
+  },
+  payment_status:
+  {
+    type: String,
+    enum: ['N/A','pending','paid'],
+    default: 'pending'
   }
 },
 { 

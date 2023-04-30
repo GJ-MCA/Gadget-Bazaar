@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const paymentDetailSchema = new Schema({
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   payment_order_id: {
-    type: Number,
+    type: String,
+    unique: true,
     required: true
   },
   order_id: {
@@ -11,13 +17,9 @@ const paymentDetailSchema = new Schema({
     ref: 'Order_Details',
     required: true
   },
-  amount: {
-      type: Number,
-      get: v => (v/100).toFixed(2),
-      set: v => v*100
-  },
   payment_method: {
-      type: String
+      type: String,
+      default: 'Card'
   },
   status: {
       type: String,

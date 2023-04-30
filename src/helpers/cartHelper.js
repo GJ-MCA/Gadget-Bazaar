@@ -31,7 +31,7 @@ const config = require("../config/config");
   };
   export const updateCart = async (token, productId, newQuantity, setCartItems, setCartCount, totalQty, shippingCharge = null, cartTotal = null, setCartFinalTotal) => {
     try {
-      await fetch(`${config.orderAPIUrl}/updatecart`, {
+      const updateCartResponse = await fetch(`${config.orderAPIUrl}/updatecart`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +39,16 @@ const config = require("../config/config");
         },
         body: JSON.stringify({productId: productId, quantity: newQuantity, shipping_charge: shippingCharge, cart_total: cartTotal })
       });
-  
+      const updateCartData = await updateCartResponse.json();
+      if(updateCartData){
+        console.log(updateCartData)
+        if(updateCartData.errcode){
+          if(updateCartData.errcode === "OUTOFSTOCK"){
+            console.log("Outofstock")
+            return updateCartData;
+          }
+        }
+      }
       const response = await fetch(`${config.orderAPIUrl}/getcart`, {
         method: 'GET',
         headers: {
@@ -51,6 +60,7 @@ const config = require("../config/config");
       setCartItems(data['cartItems']);
       setCartCount(totalQty);
       setCartFinalTotal(data['cartTotalAmount']);
+      return true;
     } catch (err) {
       console.error(err.message);
     }
@@ -115,10 +125,12 @@ const config = require("../config/config");
         },
       });
       const data = await response.json();
-
+      console.log(response)
+      console.log(data)
       if(!response.ok){
         data["status"] = 500;
-        return data.error;
+        console.log(data)
+        return data;
       }
       data["status"] = 200;
       console.log(data);
@@ -164,6 +176,26 @@ const config = require("../config/config");
       return data;
     } catch (err) {
       console.error(err.message);
+    }
+  };
+  export const getShippingMethodById = async (shipping_method_id, token) => {
+    try {
+      const response = await fetch(`${config.orderAPIUrl}/shipping/get/${shipping_method_id}`,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': `Bearer ${token}`
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(error);
+      return null;
     }
   };
   export default fetchCartItems;
