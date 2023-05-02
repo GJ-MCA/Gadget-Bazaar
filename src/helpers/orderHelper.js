@@ -15,5 +15,20 @@ const config = require("../config/config");
       console.error(err.message);
     }
   };
+  export const fetchAllOrdersForCurrentUser = async (token) => {
+    try {
+      const response = await fetch(`${config.orderAPIUrl}/getallorders`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': `Bearer ${token}`
+        },
+      });
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
 
   export default fetchOrderById;

@@ -3,6 +3,10 @@ const ShippingMethod = require("./ShippingMethod");
 const { Schema } = mongoose;
 
 const orderDetailSchema = new Schema({
+  order_reference_code: {
+    type: String,
+    default: null
+  },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

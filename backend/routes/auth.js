@@ -165,4 +165,50 @@ router.post('/checkuser', async (req, res) => {
       res.status(500).send('Internal Server Error');
     }
   });
+
+// ROUTE: 6 - Get User Profile - GET "/backend-gadgetbazaar/auth/getuserprofile" Login Required
+router.get('/getuserprofile', fetchuser, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).select('-password');
+    if (!user) {
+      res.status(404).send('User not found');
+    } else {
+      res.status(200).json(user);
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// ROUTE: 7 - Update User Profile - PUT "/backend-gadgetbazaar/auth/updateuserprofile" Login Required
+router.put('/updateuserprofile', fetchuser, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { name, email, password, contact } = req.body;
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).send('User not found');
+    } else {
+      user.name = name || user.name;
+      user.email = email || user.email;
+      if (password) {
+        user.password = password;
+      }
+      user.contact = contact || user.contact;
+      const updatedUser = await user.save();
+      res.status(200).json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        contact: updatedUser.contact,
+      });
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 module.exports = router;

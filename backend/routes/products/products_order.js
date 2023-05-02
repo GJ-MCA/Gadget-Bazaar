@@ -10,6 +10,10 @@ const Address = require("../../models/Address");
 const Promotion = require('../../models/Promotion');
 const Cart_Item_Details = require('../../models/Cart_Item_Details');
 const mongoose = require('mongoose');
+const { checkIfOrderRefIDExists } = require('../../services/orderService');
+const moment = require('moment');
+const shortid = require('shortid');
+
 //ROUTE: 1 - Add to Cart the Product - POST "backend-gadgetbazaar/order/cart/add"
 router.post('/cart/add', fetchuser, async (req, res) => {
   try {
@@ -98,7 +102,16 @@ router.post('/checkout', fetchuser, async (req, res) => {
       console.log(current_shipping_method)
       shipping_charge = 40.00;
     }
-    const orderDetails = new OrderDetails({ user_id, shipping_address, billing_address, shipping_method: current_shipping_method , shipping_charge, total });
+    let orderReferenceCode = null;
+    let orderIDExists = true;
+    while (orderIDExists) {
+      const dateTime = moment().format("YYYYMMDDhhmmss");
+      const randomString = shortid.generate();
+      orderReferenceCode = `GB_ORD${dateTime}_${randomString}`;
+      orderIDExists = await checkIfOrderRefIDExists(orderReferenceCode);
+    }
+
+    const orderDetails = new OrderDetails({ order_reference_code: orderReferenceCode,user_id, shipping_address, billing_address, shipping_method: current_shipping_method , shipping_charge, total });
     const orderItems = items.map(item => new OrderItems({ order_id: orderDetails._id, product_id: item.product_id, quantity: item.quantity }));
 
     await Promise.all([orderDetails.save(), ...orderItems.map(item => item.save())]);
@@ -558,4 +571,19 @@ router.post('/getorder', fetchuser, async (req, res) => {
     res.status(500).json({ message: 'Internal server error', success: false});
   }
 });
+// ROUTE 19 - Get all orders for the authenticated user - GET "backend-gadgetbazaar/order/getallorders"
+router.get('/getallorders', fetchuser, async (req, res) => {
+  const userId = req.user.id;
+  try {
+  const orders = await OrderDetails.find({ user_id: userId }).sort({ createdAt: -1 }).exec();
+  if (orders) {
+  return res.json({ message: "Orders found successfully", orders, success: true });
+  } else {
+  return res.json({ message: "No orders found!", success: false });
+  }
+  } catch (err) {
+  console.error(err);
+  res.status(500).json({ message: 'Internal server error', success: false });
+  }
+  });
 module.exports = router;

@@ -29,3 +29,35 @@ export function useLoginMiddleware() {
   
     return loginMiddleware;
 }
+export const getUserProfile = async (token) => {
+    try {
+        const response = await fetch(`${config.authAPIUrl}/getuserprofile`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': `Bearer ${token}`
+            },
+        });
+        const data = await response.json();
+        return data;
+    } catch (err) {
+        console.error(err.message);
+    }
+};
+
+export const updateUserProfile = async (token, userData) => {
+    try {
+        const response = await fetch(`${config.authAPIUrl}/updateuserprofile`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': `Bearer ${token}`
+            },
+            body: JSON.stringify(userData)
+        });
+        const data = await response.json();
+        return data;
+    } catch (err) {
+        console.error(err.message);
+    }
+};

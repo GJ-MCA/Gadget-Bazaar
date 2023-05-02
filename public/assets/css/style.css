@@ -1337,3 +1337,22 @@ header + section{
 header.page-loading{
   z-index: 1;
 }
+
+/* Payment Success */
+.payment-success-container{
+  margin-top: 100px;
+  margin-bottom: 50px;
+}
+.payment-success-container .payment-success-image-container{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 40px;
+}
+.payment-success-container .payment-success-image-container img{
+  display: block;
+  width: 60%;
+}
+.payment-success-container .payment-success-message-container{
+  text-align: center;
+}

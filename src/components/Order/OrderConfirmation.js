@@ -105,7 +105,7 @@ export const OrderConfirmation = () => {
                     console.log(session.session)
                     console.log(session.session.url)
                     console.log("Printing stripe object")
-                    console.log(stripe)
+                    console.log(session)
                     window.location.href = session.session.url;
                     updateLoader(false); //Hide Gadgetbazaar Loader
                 })
