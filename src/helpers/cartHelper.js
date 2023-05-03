@@ -65,6 +65,24 @@ const config = require("../config/config");
       console.error(err.message);
     }
   }
+  export const updateCartPrice = async (token, items) => {
+    try {
+      const updateCartPriceResponse = await fetch(`${config.orderAPIUrl}/updatecartprice`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': `Bearer ${token}`
+        },
+        body: JSON.stringify({items})
+      });
+      if(!updateCartPriceResponse.ok){
+        throw new Error('Network response was not ok in update cart price');
+      }
+      return true;
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
   export const updateCouponCart = async (token, coupon_code, discounted_total) => {
     console.log("dtotal"+discounted_total)
     try {
@@ -98,12 +116,13 @@ const config = require("../config/config");
     }
   };
 
-  export const clearCart = async () => {
+  export const clearCart = async (token) => {
     try {
       const response = await fetch(`${config.orderAPIUrl}/cart/clear`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'auth-token': `Bearer ${token}`
         }
       });
       const data = await response.json();

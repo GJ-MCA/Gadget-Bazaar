@@ -179,7 +179,7 @@ export const OrderConfirmation = () => {
                                         <h6 className="my-0">{cartItem.product_id.name}</h6>
                                         <small className="text-muted">{cartItem.product_id.description}</small>
                                     </div>
-                                    <span className="text-muted">&#8377;{cartItem.product_id.price * cartItem.quantity}</span>
+                                    <span className="text-muted">&#8377;{cartItem.price * cartItem.quantity}</span>
                                 </li>
                                 ))}
                                 <li className="list-group-item d-flex justify-content-between bg-light">

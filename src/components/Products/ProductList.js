@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
+import { useNavigate } from 'react-router-dom';
 const config = require("../../config/config")
 
-function ProductList() {
+export const ProductList = () => {
   const [products, setProducts] = useState([]);
   const { setCartCount } = useContext(GadgetBazaarContext);
   const getAllProductsUrl = `${config.baseUrl}/products/showall`;
   const cartAddUrl = `${config.orderAPIUrl}/cart/add`;
-  const buyNowUrl = `${config.orderAPIUrl}/buy-now`;
   const productsToDisplay = 8;
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetch(getAllProductsUrl)
       .then(response => {
@@ -36,7 +36,7 @@ function ProductList() {
     // After 3 seconds, remove the show class from DIV
     setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
   }
-  const handleAddToCart = async (product) => {
+  const handleAddToCart = async (product, single_product=false) => {
     const item = {
       product_id: product._id,
       name: product.name,
@@ -67,6 +67,9 @@ function ProductList() {
               alert("Item is out of stock")
             }
           });
+        }
+        if(single_product){
+          navigate("/cart");
         }
 				const getCartUrl = `${config.orderAPIUrl}/getcart`;
 				fetch(`${getCartUrl}`, {
@@ -103,37 +106,6 @@ function ProductList() {
 
   };
 
-  const handleBuyNow = async (product) => {
-    const item = {
-      productId: product._id,
-      name: product.name,
-      image: product.image,
-      price: product.price,
-      quantity: 1
-    };
-    try {
-      // Check if the user is logged in and set the user state accordingly
-			const token = localStorage.getItem('auth-token');
-      if(token){
-        const response = await fetch(buyNowUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'auth-token': `Bearer ${token}`
-          },
-          body: JSON.stringify(item)
-        });
-        if (!response.ok) {
-          throw new Error('Unable to add item to cart');
-        }
-        window.location.href = "/order/checkout";
-      }
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <>
       <section className="product_section layout_padding">
@@ -154,27 +126,30 @@ function ProductList() {
                   {products.slice(0, productsToDisplay).map(product => (
                     <div className="col-sm-6 col-md-4 col-lg-4" key={product._id}>
                       <div className="box">
-                      <div className="option_container">
-                      {product.quantity <= 0 ? (
-                      <div className="alert alert-danger bg-light" role="alert">
-                      <i className="fa fa-exclamation-circle me-2"></i> Sorry, this item is currently out of stock. Please check back later.
-                    </div>
-                    
-                      
-                      ) : (
-                          <div className="options">
-                            <button className="option1" onClick={() => handleAddToCart(product)}>
-                              Add to Cart
-                            </button>
-                            <button className="option2" onClick={() => handleBuyNow(product)}>
-                              Buy Now
-                            </button>
-                          </div>
-                      )}
+                        <div className="option_container">
+                        {product.quantity <= 0 ? (
+                        <div className="alert alert-danger bg-light" role="alert">
+                        <i className="fa fa-exclamation-circle me-2"></i> Sorry, this item is currently out of stock. Please check back later.
                       </div>
+                      
+                        
+                        ) : (
+                            <div className="options">
+                              <button className="option1" onClick={() => handleAddToCart(product)}>
+                                Add to Cart
+                              </button>
+                              <button className="option2" onClick={() => handleAddToCart(product, true)}>
+                                Buy Now
+                              </button>
+                              <a href={config.pdpPagePreUrl+product.sku} className='option3 pdp-page-btn'>
+                                View Product
+                              </a>
+                            </div>
+                        )}
+                        </div>
 
                         <div className="img-box">
-                          <img src={product.image} alt={product.name} />
+                          <img src={product.images.length > 0 ? product.images[0]: "/assets/img/logo.png"} alt={product.name} />
                         </div>
                         <div className="detail-box">
                           
@@ -186,13 +161,6 @@ function ProductList() {
                         ) : (
                           <span className="badge badge-success text-uppercase">In Stock</span>
                         )}
-                        
-                        
-
-                        <div className="description">
-                          <span>SKU: {product.sku}</span> <br />
-                          {product.description}
-                        </div>
                       </div>
                     </div>
                   ))}
@@ -204,5 +172,3 @@ function ProductList() {
     </>
   );
 }
-
-export default ProductList;

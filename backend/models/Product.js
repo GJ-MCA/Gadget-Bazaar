@@ -26,6 +26,16 @@ const productSchema = new Schema({
     ref: 'Category',
     default: null
   },
+  brand: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Brand',
+    default: null
+  },
+  specification: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Specification',
+    default: null
+  },
   price: {
     type: Number,
     get: function(value) {

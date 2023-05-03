@@ -10,7 +10,8 @@ export const Checkout = () => {
     
 	const {setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses, couponCode, setCouponCode, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount, cartFinalWithoutShipping, setCartFinalWithoutShipping, setDiscountedPriceWithoutShipping } = useContext(GadgetBazaarContext);
     const [setName] = useState(null);
-    const [selectedAddressId, setSelectedAddressId] = useState("");
+    const [selectedBillAddressId, setSelectedBillAddressId] = useState("");
+    const [selectedShipAddressId, setSelectedShipAddressId] = useState("");
     const [selectedCountry, setSelectedCountry] = useState("");
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
@@ -145,7 +146,7 @@ export const Checkout = () => {
         let dataShippingAddressId = null;
 
         // validations
-        const elementsToValidate = [  "saved-address-billing",  "address_1",  "country",  "state",  "city",  "pincode",  ...(is_manual_ship_diff ? ["address_1-2", "country-2", "state-2", "city-2", "pincode-2"] : [])
+        const elementsToValidate = [  "saved-address-billing",  "address_1",  "country",  "state",  "city",  "pincode",  ...(is_manual_ship_diff || (showSavedShippingAddressForm && selectedShipAddressId==="addNewAddress") ? ["address_1-2", "country-2", "state-2", "city-2", "pincode-2"] : [])
         ];
         let hasError = false;
         
@@ -223,7 +224,7 @@ export const Checkout = () => {
 				console.error('There was a problem with the fetch operation while adding billing address:', error);
 			});
             //do same process if shipping address is different and is added manually
-            if(is_manual_ship_diff){
+            if(is_manual_ship_diff || (showSavedShippingAddressForm && selectedShipAddressId==="addNewAddress")){
                 dataShippingAddress = {
                     address_line_1: formData.get('address_1-2'),
                     address_line_2: formData.get('address_2-2'),
@@ -324,7 +325,7 @@ export const Checkout = () => {
                                     <h6 className="my-0">{cartItem.product_id.name}</h6>
                                     <small className="text-muted">{cartItem.product_id.description}</small>
                                 </div>
-                                <span className="text-muted">&#8377;{cartItem.product_id.price * cartItem.quantity}</span>
+                                <span className="text-muted">&#8377;{cartItem.price * cartItem.quantity}</span>
                             </li>
                              ))}
                             {isCouponCodeApplied && (
@@ -361,8 +362,8 @@ export const Checkout = () => {
                             className="custom-select d-block w-100"
                             id="saved-address-billing"
                             name="saved-address-billing"
-                            value={selectedAddressId || ''}
-                            onChange={(event) => setSelectedAddressId(event.target.value)}
+                            value={selectedBillAddressId || ''}
+                            onChange={(event) => setSelectedBillAddressId(event.target.value)}
                             data-label="saved address or add new address"
                         >
                             {checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
@@ -400,8 +401,8 @@ export const Checkout = () => {
                                 className="custom-select d-block w-100"
                                 id="saved-address-shipping"
                                 name="saved-address-shipping"
-                                value={selectedAddressId || ''}
-                                onChange={(event) => setSelectedAddressId(event.target.value)}
+                                value={selectedShipAddressId || ''}
+                                onChange={(event) => setSelectedShipAddressId(event.target.value)}
                                 data-label="Saved address"
                                 >
                                     {checkoutSavedAddresses && checkoutSavedAddresses.length > 0 ? (
@@ -424,7 +425,7 @@ export const Checkout = () => {
                             </>
                         )}
                     </div>
-                        {selectedAddressId === 'addNewAddress' && (
+                        {selectedBillAddressId === 'addNewAddress' && (
                         <>
                             <div className='billing-address' id="billing_address">
                             <h4 className="mb-3">Billing address</h4>
@@ -511,7 +512,7 @@ export const Checkout = () => {
                                 </div>
                             </div>
                             </div>
-                            <div className='shipping-address' id="shipping_address" style={{ display: isShippingDifferent ? "block" : "none" }}>
+                            <div className='shipping-address' id="shipping_address" style={{ display: isShippingDifferent || (showSavedShippingAddressForm && selectedShipAddressId==="addNewAddress") ? "block" : "none" }}>
                             <h4 className="mb-3">Shipping address</h4>
                                 <div className="mb-3">
                                     <label htmlFor="address_1-2">Address Line 1</label>

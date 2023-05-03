@@ -16,9 +16,19 @@ const orderItemSchema = new Schema({
     type: Number,
     default: 1
   },
+  price: {
+    type: Number,
+    default: 0,
+    get: function(value) {
+      return value.toFixed(2);
+    },
+    set: function(value) {
+      return parseFloat(value);
+    }
+  },
   order_details_status: {
       type: String,
-      enum: ['pending', 'processing', 'shipped', 'delivered'],
+      enum: ['pending', 'shipped', 'outfordelivery', 'delivered'],
       default: 'pending'
   }
 },

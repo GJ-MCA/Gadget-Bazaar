@@ -1,14 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import fetchOrderById from '../../helpers/orderHelper';
+import { clearCart } from '../../helpers/cartHelper';
+import { myOrdersPreUrl } from '../../config/config';
 export const PaymentSuccess = () => {
   const [referenceCode, setReferenceCode] = useState('');
   const token = localStorage.getItem('auth-token');
   const userOrder = JSON.parse(localStorage.getItem('user_order'));
   useEffect(() => {
-    if(userOrder){
-      fetchOrderById(token, userOrder.orderId).then(data => setReferenceCode(data.order_reference_code));
-      
+    const fetchData = async () => {
+      try {
+        if(userOrder){
+          const data = await fetchOrderById(token, userOrder.orderId);
+          console.log(data.order_details[0].order_reference_code)
+          setReferenceCode(data.order_details[0].order_reference_code);
+          await clearCart(token);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
+    fetchData();
   }, [userOrder]);
 
   return (
@@ -19,7 +30,7 @@ export const PaymentSuccess = () => {
       <div className='payment-success-message-container'>
         <h2>Payment Successful!</h2>
         <p>Your order has been placed successfully.</p>
-        {referenceCode && <p>Your order id is: {referenceCode}</p>}
+        {referenceCode && <p>Your order id is: <a href={myOrdersPreUrl + referenceCode}>{referenceCode}</a></p>}
       </div>
     </div>
   );

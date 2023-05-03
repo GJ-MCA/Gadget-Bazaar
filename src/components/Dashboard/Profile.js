@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getUserProfile, updateUserProfile } from '../../helpers/userHelper';
 
 const Profile = () => {
@@ -8,7 +8,7 @@ const Profile = () => {
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const token = localStorage.getItem('auth-token');
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const Profile = () => {
 
   const handleLogoutClick = () => {
     localStorage.removeItem('auth-token');
-    history.push('/login');
+    navigate('/login');
   };
 
   return (

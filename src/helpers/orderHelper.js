@@ -30,5 +30,20 @@ const config = require("../config/config");
       console.error(err.message);
     }
   };
-
+ export const fetchOrderByReferenceCode = async (token, order_reference_code) => {
+    try {
+      const response = await fetch(`${config.orderAPIUrl}/getorderbyreferencecode`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': `Bearer ${token}`
+        },
+        body: JSON.stringify({order_reference_code: order_reference_code })
+      });
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
   export default fetchOrderById;

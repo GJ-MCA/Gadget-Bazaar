@@ -1,5 +1,5 @@
 import React from 'react'
-import ProductList from './Products/ProductList'
+import {ProductList} from './Products/ProductList'
 import { Link } from 'react-router-dom'
 const config = require("../config/config");
 

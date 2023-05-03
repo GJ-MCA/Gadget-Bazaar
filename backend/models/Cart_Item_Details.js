@@ -10,6 +10,16 @@ const cartItemDetailsSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Cart_Item_Details',
     },
+    price: {
+        type: Number,
+        default: 0,
+        get: function(value) {
+          return value.toFixed(2);
+        },
+        set: function(value) {
+          return parseFloat(value);
+        },
+    },    
     quantity: {
         type: Number,
         required: true

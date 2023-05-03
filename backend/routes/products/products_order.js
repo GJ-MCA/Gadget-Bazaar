@@ -35,12 +35,10 @@ router.post('/cart/add', fetchuser, async (req, res) => {
       });
       await cartItem.save();
     }
-    console.log(cartItem)
     // Create or update cart item details
     let cartItemDetail = await Cart_Item_Details.findOne({ product_id, cart_item_id: cartItem._id });
     if (!cartItemDetail) {
       // Create a new cart item detail
-      console.log("Not found cartitemdetail so creating")
       cartItemDetail = new Cart_Item_Details({
         product_id,
         cart_item_id: cartItem._id,
@@ -49,7 +47,6 @@ router.post('/cart/add', fetchuser, async (req, res) => {
       });
     } else {
       // Update the cart item detail quantity and item total
-      console.log("found cartitemdetail so updating")
       cartItemDetail.quantity += 1;
       cartItemDetail.item_total = cartItemDetail.quantity * product.price;
     }
@@ -73,18 +70,23 @@ router.post('/cart/add', fetchuser, async (req, res) => {
 });
 
 //ROUTE: 2 - Buy Now the Product - POST "backend-gadgetbazaar/order/buy-now"
-router.post('/buy-now', fetchuser, async (req, res) => {
+/* router.post('/buy-now', fetchuser, async (req, res) => {
   try {
-    const { product_id, total, payment_id } = req.body;
-    const orderDetails = new OrderDetails({ user_id: req.user.id, total, payment_id });
-    const orderItem = new OrderItems({ order_id: orderDetails._id, product_id, quantity:1 });
-    await Promise.all([orderDetails.save(), orderItem.save()]);
-    res.json({ success: true, orderDetails, orderItem });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: error.message });
+  const { product_id, quantity } = req.body;
+  const product = await Product.findById(product_id);
+  if (!product) {
+  return res.status(404).json({ success: false, error: 'Product not found.' });
   }
-});
+  const total = product.price * quantity;
+  const orderDetails = new OrderDetails({ user_id: req.user.id, total });
+  const orderItem = new OrderItems({ order_id: orderDetails._id, product_id, quantity });
+  await Promise.all([orderDetails.save(), orderItem.save()]);
+  res.json({ success: true, orderDetails, orderItem });
+  } catch (error) {
+  console.error(error);
+  res.status(500).json({ success: false, error: error.message });
+  }
+}); */
 
 //ROUTE: 3 - Checkout Multiple Products - POST "backend-gadgetbazaar/order/checkout"
 router.post('/checkout', fetchuser, async (req, res) => {
@@ -99,7 +101,6 @@ router.post('/checkout', fetchuser, async (req, res) => {
     }
     if(shipping_method === "Default"){
       current_shipping_method = await ShippingMethod.findOne({ shipping_method: "Standard" }).exec();
-      console.log(current_shipping_method)
       shipping_charge = 40.00;
     }
     let orderReferenceCode = null;
@@ -112,7 +113,7 @@ router.post('/checkout', fetchuser, async (req, res) => {
     }
 
     const orderDetails = new OrderDetails({ order_reference_code: orderReferenceCode,user_id, shipping_address, billing_address, shipping_method: current_shipping_method , shipping_charge, total });
-    const orderItems = items.map(item => new OrderItems({ order_id: orderDetails._id, product_id: item.product_id, quantity: item.quantity }));
+    const orderItems = items.map(item => new OrderItems({ order_id: orderDetails._id, product_id: item.product_id, price:item.price, quantity: item.quantity }));
 
     await Promise.all([orderDetails.save(), ...orderItems.map(item => item.save())]);
 
@@ -126,7 +127,6 @@ router.post('/checkout', fetchuser, async (req, res) => {
 //ROUTE: 4 - Get cart items for the authenticated user - GET "backend-gadgetbazaar/order/getcart"
 router.get('/getcart', fetchuser, async (req, res) => {
   const userId = req.user.id;
-  console.log("------------Get Cart Called------------")
   try {
     const cartItems = await CartItem.find({customer_id: userId});
 
@@ -139,10 +139,6 @@ router.get('/getcart', fetchuser, async (req, res) => {
     });
     cartTotalAmount += 40;
     cartTotalAmount = cartTotalAmount.toFixed(2);
-    console.log("Cartitems: ")
-    console.log(cartItems)
-    console.log("Cartitem details: ")
-    console.log(cartItemDetails)
     res.json({cartItems: cartItemDetails, cartTotalAmount, cart: cartItems});
   } catch (err) {
     console.error(err);
@@ -154,7 +150,6 @@ router.get('/getcart', fetchuser, async (req, res) => {
 router.patch('/updatecart', fetchuser, async (req, res) => {
   const { productId, quantity, shipping_charge } = req.body;
   const userId = req.user.id; // the user ID is stored in the JWT
-  console.log("-------------WE ARE UPDATING CART-------------")
   try {
     // Check if the product exists
     const product = await Product.findById(productId);
@@ -168,7 +163,6 @@ router.patch('/updatecart', fetchuser, async (req, res) => {
     });
     let cartItemDetails = null;
     if (cartItem) {
-      console.log("Cart item found: ")
       const requiredQuantity = quantity || 1;
       var remainingQuantity = null;
       cartItemDetails = await Cart_Item_Details.findOne(
@@ -187,15 +181,12 @@ router.patch('/updatecart', fetchuser, async (req, res) => {
         return res.status(200).json({ success: false, error: 'Product not available', errcode:"OUTOFSTOCK"});
       }
       if(!cartItemDetails){
-        console.log("Cart itemdetails no found so creating new")
         cartItemDetails = await new Cart_Item_Details({
           cart_item_id: cartItem._id,
           product_id: productId,
           quantity: quantity
         })
       }
-      console.log("Cartitemdetails: ")
-      console.log(cartItemDetails)
       // Update the quantity of the existing cart item
       if(shipping_charge)
         cartItem.shipping_charge = shipping_charge;
@@ -203,7 +194,6 @@ router.patch('/updatecart', fetchuser, async (req, res) => {
         cartItemDetails.quantity = quantity;
       cartItemDetails.item_total = (parseFloat(product.price) * quantity).toFixed(2);
     } else {
-      console.log("Cart item not found so creating it")
       // Create a new cart item
       let qty = 0;
       let ship_charge = 0;
@@ -228,7 +218,6 @@ router.patch('/updatecart', fetchuser, async (req, res) => {
 
     }
     await cartItemDetails.save();
-    console.log(userId)
     const cartTotalAmount = await Cart_Item_Details.aggregate([
       {
         $match: { cart_item_id: cartItem._id }
@@ -252,7 +241,47 @@ router.patch('/updatecart', fetchuser, async (req, res) => {
     return res.status(500).json({success: false, message: 'Internal server error' });
   }
 });
-//ROUTE: 6 - Update coupon code related details in cart for authenticated user - PATCH "backend-gadgetbazaar/order/cart/update-coupon"
+//ROUTE: 6 - Update cart item price when checking out for authenticated user - PATCH "backend-gadgetbazaar/order/updatecartprice"
+router.patch('/updatecartprice', fetchuser, async (req, res) => {
+  const { items } = req.body;
+  const userId = req.user.id; // the user ID is stored in the JWT
+  var product = null;
+  try {
+
+    // Check if the cart item already exists
+    let cartItem = await CartItem.findOne({
+      customer_id: userId
+    });
+    let cartItemDetails = null;
+    if (cartItem) {
+      console.log("Items")
+      console.log(items)
+      for (const item of items) {
+        try {
+          const product = await Product.findById(item.product_id);
+          const cartItemDetails = await Cart_Item_Details.findOne({
+            cart_item_id: cartItem._id,
+            product_id: product._id
+          });
+          console.log("CartItemDetails Before Updating: ");
+          console.log(cartItemDetails);
+          cartItemDetails.price = product.price;
+          await cartItemDetails.save();
+          console.log("CartItemDetails After Updating: ");
+          console.log(cartItemDetails);
+        } catch (err) {
+          console.error(err);
+          return res.status(500).json({ success: false, message: "Internal server error" });
+        }
+      }
+    }
+    return res.json({success: true, message: 'Cart updated successfully' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({success: false, message: 'Internal server error' });
+  }
+});
+//ROUTE: 7 - Update coupon code related details in cart for authenticated user - PATCH "backend-gadgetbazaar/order/cart/update-coupon"
 router.patch('/cart/update-coupon', fetchuser, async (req, res) => {
   const { coupon_code, discounted_total } = req.body;
   const userId = req.user.id;
@@ -266,7 +295,6 @@ router.patch('/cart/update-coupon', fetchuser, async (req, res) => {
         const promotion = await Promotion.findOne({
           coupon_code: { $regex: new RegExp(coupon_code, "i") }
         });
-        console.log(promotion);
         if (promotion) {
           cartItem.coupon_code = promotion._id;
           cartItem.discounted_total = discounted_total;
@@ -281,7 +309,7 @@ router.patch('/cart/update-coupon', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 7 - Delete product from cart for authenticated user - DELETE "backend-gadgetbazaar/order/cart/removeproduct"
+//ROUTE: 8 - Delete product from cart for authenticated user - DELETE "backend-gadgetbazaar/order/cart/removeproduct"
 router.delete('/cart/removeproduct', fetchuser, async (req, res) => {
   try {
     const currentUser = req.user; // assuming the user is authenticated and their information is stored in req.user
@@ -299,7 +327,6 @@ router.delete('/cart/removeproduct', fetchuser, async (req, res) => {
     const remainingItems = await Cart_Item_Details.find({ cart_item_id: { $in: cartItems } }).countDocuments();
     if (remainingItems === 0) {
       const deletedCartItems = await CartItem.deleteMany({ customer_id: currentUser.id });
-      console.log(`Deleted cart items for user: ${currentUser.id} count: ${deletedCartItems.deletedCount}`);
     }
 
     res.json({ message: 'Cart items removed successfully', deletedCount: cartItemsDetails.deletedCount });
@@ -310,17 +337,14 @@ router.delete('/cart/removeproduct', fetchuser, async (req, res) => {
 });
 
 
-//ROUTE: 8 - Clear the cart for authenticated user - DELETE "backend-gadgetbazaar/order/cart/clear"
+//ROUTE: 9 - Clear the cart for authenticated user - DELETE "backend-gadgetbazaar/order/cart/clear"
 router.delete('/cart/clear', fetchuser, async (req, res) => {
   try {
     const customer_id = req.user.id;
 
     // Delete all cart items for the given customer
-    const cartItem = await CartItem.find({ customer_id });
-    const cartItemDetails = await Cart_Item_Details.find({ cart_item_id: cartItem });
-
-    await cartItemDetails.deleteMany({cart_item_id: cartItem});
-    await cartItem.deleteMany({customer_id});
+    await Cart_Item_Details.deleteMany({ cart_item_id: { $in: await CartItem.find({ customer_id }) } });
+    await CartItem.deleteMany({ customer_id });
 
     return res.status(200).json({ message: 'Cart cleared successfully' });
   } catch (err) {
@@ -329,7 +353,8 @@ router.delete('/cart/clear', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 9 - Get Shipping Methods - GET "backend-gadgetbazaar/order/shipping/methods/show"
+
+//ROUTE: 10 - Get Shipping Methods - GET "backend-gadgetbazaar/order/shipping/methods/show"
 router.get('/shipping/methods/show', async (req, res) => {
   try {
     const shippingMethod = await ShippingMethod.find();
@@ -340,7 +365,7 @@ router.get('/shipping/methods/show', async (req, res) => {
   }
 });
 
-//ROUTE: 10 - Add Shipping Methods - POST "backend-gadgetbazaar/order/shipping/methods/add"
+//ROUTE: 11 - Add Shipping Methods - POST "backend-gadgetbazaar/order/shipping/methods/add"
 router.post('/shipping/methods/add', async (req, res) => {
   try {
     const { shipping_method, status } = req.body;
@@ -362,7 +387,7 @@ router.post('/shipping/methods/add', async (req, res) => {
   }
 });
 
-//ROUTE: 11 - Get Shipping Method From Id - GET "backend-gadgetbazaar/order/shipping/get/:id"
+//ROUTE: 12 - Get Shipping Method From Id - GET "backend-gadgetbazaar/order/shipping/get/:id"
 router.get('/shipping/get/:id', fetchuser, async (req, res) => {
   const { id } = req.params;
   
@@ -378,7 +403,7 @@ router.get('/shipping/get/:id', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 12 - Get Saved Addresses - GET "backend-gadgetbazaar/order/address/getsaved"
+//ROUTE: 13 - Get Saved Addresses - GET "backend-gadgetbazaar/order/address/getsaved"
 router.get('/address/getsaved', fetchuser, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -392,7 +417,7 @@ router.get('/address/getsaved', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 13 - Get Address From Id - GET "backend-gadgetbazaar/order/address/get/:id"
+//ROUTE: 14 - Get Address From Id - GET "backend-gadgetbazaar/order/address/get/:id"
 router.get('/address/get/:id', fetchuser, async (req, res) => {
   const { id } = req.params;
   
@@ -408,7 +433,7 @@ router.get('/address/get/:id', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 14 - Save New Address - POST "backend-gadgetbazaar/order/address/add"
+//ROUTE: 15 - Save New Address - POST "backend-gadgetbazaar/order/address/add"
 router.post('/address/add', fetchuser, async (req, res) => {
   try {
     const user_id = req.user.id;
@@ -451,7 +476,7 @@ router.post('/address/add', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 15 - Validate coupon code - GET "backend-gadgetbazaar/order/validate-coupon"
+//ROUTE: 16 - Validate coupon code - GET "backend-gadgetbazaar/order/validate-coupon"
 router.get('/validate-coupon', fetchuser, async (req, res) => {
   try {
     const couponCode = req.query.code;
@@ -492,7 +517,7 @@ router.get('/validate-coupon', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 16 - Get coupon code - GET "backend-gadgetbazaar/order/coupon/get"
+//ROUTE: 17 - Get coupon code - GET "backend-gadgetbazaar/order/coupon/get"
 router.get('/coupon/get', fetchuser, async (req, res) => {
   try {
     const coupon_id = req.query.code;
@@ -515,17 +540,13 @@ router.get('/coupon/get', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 17 - Remove coupon from cart - PATCH "backend-gadgetbazaar/order/cart/coupon/remove"
+//ROUTE: 18 - Remove coupon from cart - PATCH "backend-gadgetbazaar/order/cart/coupon/remove"
 router.patch('/cart/coupon/remove', fetchuser, async (req, res) => {
   try {
     const { coupon_code } = req.body;
-    console.log(coupon_code)
     // Assuming you have a cart object that contains the coupon code and total price
     const coupon = await Promotion.findOne({coupon_code: coupon_code}).exec();
-    console.log(coupon);
-    console.log(coupon._id);
     const cart = await CartItem.findOne({customer_id: req.user.id, coupon_code: coupon._id});
-    console.log(cart)
     if (!cart) {
       return res.status(404).json({ error: 'Cart not found' });
     }
@@ -547,7 +568,7 @@ router.patch('/cart/coupon/remove', fetchuser, async (req, res) => {
   }
 });
 
-//ROUTE: 18 - Get order using order_id for the authenticated user - POST "backend-gadgetbazaar/order/getorder"
+//ROUTE: 19 - Get order using order_id for the authenticated user - POST "backend-gadgetbazaar/order/getorder"
 router.post('/getorder', fetchuser, async (req, res) => {
   const userId = req.user.id;
   try {
@@ -571,19 +592,60 @@ router.post('/getorder', fetchuser, async (req, res) => {
     res.status(500).json({ message: 'Internal server error', success: false});
   }
 });
-// ROUTE 19 - Get all orders for the authenticated user - GET "backend-gadgetbazaar/order/getallorders"
+//ROUTE: 20 - Get order using order_reference_code for the authenticated user - POST "backend-gadgetbazaar/order/getorderbyreferencecode"
+router.post('/getorderbyreferencecode', fetchuser, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const { order_reference_code } = req.body;
+    const order_details = await OrderDetails.findOne({ order_reference_code: order_reference_code, user_id: userId });
+    if (order_details) {
+      const order_items = await OrderItems.find({ order_detail_id: order_details._id }).populate('product_id').exec();
+      const itemsWithProduct = order_items.map(item => ({
+        ...item.toObject(),
+        product: item.product_id.toObject()
+      }));
+      const orderWithItems = {
+        ...order_details.toObject(),
+        items: itemsWithProduct
+      };
+      return res.json({ message: "Order found successfully", order: orderWithItems, success: true });
+    }
+    else {
+      return res.json({ message: "Order not found!", success: false });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error', success: false });
+  }
+});
+
+// ROUTE 21 - Get all orders with order items for the authenticated user - GET "backend-gadgetbazaar/order/getallorders"
 router.get('/getallorders', fetchuser, async (req, res) => {
   const userId = req.user.id;
   try {
-  const orders = await OrderDetails.find({ user_id: userId }).sort({ createdAt: -1 }).exec();
-  if (orders) {
-  return res.json({ message: "Orders found successfully", orders, success: true });
-  } else {
-  return res.json({ message: "No orders found!", success: false });
-  }
+    const orders = await OrderDetails.find({ user_id: userId }).sort({ createdAt: -1 }).exec();
+    if (orders) {
+      // Join order_items table with orders table
+      const ordersWithItems = await Promise.all(orders.map(async (order) => {
+        const items = await OrderItems.find({ order_id: order.id }).populate('product_id').exec();
+        const itemsWithProduct = items.map(item => ({
+          ...item.toObject(),
+          product: item.product_id.toObject()
+        }));
+        return {
+          ...order.toObject(),
+          items: itemsWithProduct
+        };
+      }));
+
+      return res.json({ message: "Orders found successfully", orders: ordersWithItems, success: true });
+    } else {
+      return res.json({ message: "No orders found!", success: false });
+    }
   } catch (err) {
-  console.error(err);
-  res.status(500).json({ message: 'Internal server error', success: false });
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error', success: false });
   }
-  });
+});
+
 module.exports = router;

@@ -13,17 +13,17 @@ router.get('/showall', async (req, res) => {
   }
 });
 
-//ROUTE: 2 - Get a Single Product - GET "backend-gadgetbazaar/products/show/:id"
-router.get('/show/:id', async (req, res) => {
+//ROUTE: 2 - Get a Single Product - GET "backend-gadgetbazaar/products/show/:sku"
+router.get('/show/:sku', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.find({sku: req.params.sku}).exec();
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
     res.json(product);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Unable to fetch product by id' });
+    res.status(500).json({ message: 'Unable to fetch product by sku' });
   }
 });
 

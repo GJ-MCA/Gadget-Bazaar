@@ -12,6 +12,8 @@ const showShippingMethodUrl = `${shippingMethodUrl}/show` //Show Shipping Method
 const addShippingMethodUrl = `${shippingMethodUrl}/add` //Add Shipping Methods URL
 const jwtSecret = "G@dgetB^z@^r_$ecured"; //JWT Token For Auth
 const adminBaseUrl = `${clientUrl}/gadgetbazaar/admin` //Admin Base URL
+const pdpPagePreUrl = `${clientUrl}/product/`; //PDP Prefix URL
+const myOrdersPreUrl = `${clientUrl}/my-orders/`; //My Orders Prefix URL
 module.exports = {
     gadgetBazaarTitle,
     clientUrl,
@@ -24,5 +26,7 @@ module.exports = {
     showShippingMethodUrl,
     addShippingMethodUrl,
     jwtSecret,
-    adminBaseUrl
+    adminBaseUrl,
+    pdpPagePreUrl,
+    myOrdersPreUrl
 };

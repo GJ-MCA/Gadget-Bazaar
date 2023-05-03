@@ -9,7 +9,7 @@ import {About} from './components/About'
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ForgotPassword from './components/Auth/ForgotPassword';
-import ProductList from './components/Products/ProductList';
+import {ProductList} from './components/Products/ProductList';
 import { CartProvider } from './context/GadgetBazaarContext';
 import { ShoppingCart } from './components/Order/ShoppingCart';
 import NotFound from './components/NotFound';
@@ -20,6 +20,10 @@ import { Checkout } from './components/Order/Checkout';
 import { OrderConfirmation } from './components/Order/OrderConfirmation';
 import { PaymentSuccess } from './components/Payment/PaymentSuccess';
 import { PaymentFailed } from './components/Payment/PaymentFailed';
+import MyOrders from './components/Dashboard/MyOrders';
+import Profile from './components/Dashboard/Profile';
+import {ProductDetail} from './components/Products/ProductDetail';
+import MyOrderItems from './components/Dashboard/MyOrderItems';
 const AdminLayout = ({ children }) => {
   return (
     <>
@@ -209,9 +213,12 @@ const router = createBrowserRouter([
         element: <ProductList />,
       },
       {
+        path: '/product/:sku',
+        element: <ProductDetail />,
+      },
+      {
         path: '/cart',
         element: <ShoppingCart />,
-        // Check if user is logged in before rendering the component
       },
       {
         path: '/checkout',
@@ -228,6 +235,18 @@ const router = createBrowserRouter([
       {
         path: '/payment-failed',
         element: <PaymentFailed />,
+      },
+      {
+        path: '/my-orders',
+        element: <MyOrders/>,
+      },
+      {
+        path: '/my-orders/:order_reference_code',
+        element: <MyOrderItems />,
+      },
+      {
+        path: '/profile',
+        element: <Profile/>,
       },
       {
         path: '/contact',

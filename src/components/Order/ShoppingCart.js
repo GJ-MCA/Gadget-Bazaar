@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useContext, useState} from 'react';
 import Swal from 'sweetalert2';
-import fetchCartItems, {updateCart, deleteCartItem, updateCouponCart, applyCouponCode, fetchCouponFromId, removeCouponFromCartUsingCouponCode} from '../../helpers/cartHelper';
+import fetchCartItems, {updateCart, deleteCartItem, updateCouponCart, applyCouponCode, fetchCouponFromId, removeCouponFromCartUsingCouponCode, updateCartPrice} from '../../helpers/cartHelper';
 import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginMiddleware } from '../../helpers/userHelper';
@@ -65,7 +65,7 @@ export const ShoppingCart = () => {
         const discountedamount = (cartFinalWithoutShipping - (cartFinalWithoutShipping * couponDiscount)).toFixed(2);
         setDiscountedPrice((Number(discountedamount) + 40).toFixed(2));
       }, [totalQty, setCartCount, couponDiscount, cartFinalTotal, cartFinalWithoutShipping]);
-        const handleUpdateCartItemQuantity = async (productId, newQuantity) => {
+      const handleUpdateCartItemQuantity = async (productId, newQuantity) => {
         // Check if new quantity is less than 1
         if (newQuantity < 1) {
             newQuantity = 1;
@@ -131,6 +131,8 @@ export const ShoppingCart = () => {
                 console.log(err);
             }
         }
+        const token = localStorage.getItem('auth-token');
+        await updateCartPrice(token,cartItems);
         navigate('/checkout');
       };
       const handleApplyCode = async () => {
