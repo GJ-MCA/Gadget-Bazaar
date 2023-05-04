@@ -123,8 +123,8 @@
 									</form>
 									{user ? (
 										<>
-											<li className={`nav-item ${location.pathname === '/profile' ? 'active' : ''}`}>
-											<Link className="nav-link" to="/profile">
+											<li className={`nav-item ${location.pathname === '/my-account' ? 'active' : ''}`}>
+											<Link className="nav-link" to="/my-account">
 												{user.name}
 											</Link>
 											</li>

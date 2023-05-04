@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { updateLoader } from '../../helpers/generalHelper';
-const config = require("../../config/config");
-
-const ForgotPassword = () => {
+import { updateLoader } from '../../../helpers/generalHelper';
+const config = require("../../../config/config");
+const AdminForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const handleSubmit = (e) => {
@@ -15,7 +14,7 @@ const ForgotPassword = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, isadminattempt: false }),
+        body: JSON.stringify({ email, isadminattempt: true }),
       })
         .then((response) => response.json())
         .then((data) => {
@@ -43,13 +42,11 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="container ">
-
+    <div className="container">
       <div className="row justify-content-center">
-        <div className="col-md-6 mt-5 mb-5">
-        {message && <p className={`alert ${message.includes("not") || message.includes("Please") ? "alert-danger":"alert-success"}`}>{message}</p>}
+        <div className="col-md-6">
           <div className="card">
-            <div className="card-header">Reset Your Password</div>
+            <div className="card-header">Forgot Password</div>
             <div className="card-body">
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
@@ -76,4 +73,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default AdminForgotPassword;

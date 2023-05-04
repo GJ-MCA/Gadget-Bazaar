@@ -24,6 +24,10 @@ import MyOrders from './components/Dashboard/MyOrders';
 import Profile from './components/Dashboard/Profile';
 import {ProductDetail} from './components/Products/ProductDetail';
 import MyOrderItems from './components/Dashboard/MyOrderItems';
+import { MyAccount } from './components/Dashboard/MyAccount';
+import AdminForgotPassword from './components/Admin/Auth/AdminForgotPassword';
+import AdminResetPassword from './components/Admin/Auth/AdminResetPassword';
+import ResetPassword from './components/Auth/ResetPassword';
 const AdminLayout = ({ children }) => {
   return (
     <>
@@ -205,8 +209,12 @@ const router = createBrowserRouter([
         element: <Register />,
       },
       {
-        path: '/forgotpassword',
+        path: '/forgot-password',
         element: <ForgotPassword />,
+      },
+      {
+        path: '/resetpassword/:token',
+        element: <ResetPassword />,
       },
       {
         path: '/products',
@@ -245,6 +253,10 @@ const router = createBrowserRouter([
         element: <MyOrderItems />,
       },
       {
+        path: '/my-account',
+        element: <MyAccount/>,
+      },
+      {
         path: '/profile',
         element: <Profile/>,
       },
@@ -253,8 +265,16 @@ const router = createBrowserRouter([
         element: <Contact />,
       },
       {
-        path: '/gadgetbazaar/admin/auth',
+        path: '/gadgetbazaar/admin/auth/login',
         element: <AdminLogin />,
+      },
+      {
+        path: '/gadgetbazaar/admin/auth/forgotpassword',
+        element: <AdminForgotPassword />,
+      },
+      {
+        path: '/gadgetbazaar/admin/auth/resetpassword/:token',
+        element: <AdminResetPassword />,
       },
       {
         path: '/gadgetbazaar/admin/dashboard',

@@ -114,14 +114,19 @@ router.post('/getuser', fetchuser, async (req,res)=> {
 //ROUTE: 4 - Forgot Password - POST "backend-gadgetbazaar/auth/forgotpassword"
 router.post('/forgotpassword', async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, isadminattempt } = req.body;
 
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(200).json({ error: 'User not found', nouser: true });
     }
-
+    if(isadminattempt && user.role != 'admin'){
+      return res.status(200).json({error_message: "You are not authorized to reset admin password"})
+    }
+    if(!isadminattempt && user.role === 'admin'){
+      return res.status(200).json({error_message: "Please use admin url to reset admin password!"})
+    }
     // Create token
     const token = crypto.randomBytes(20).toString('hex');
     const forgotPasswordToken = new ForgotPasswordToken({
@@ -130,14 +135,25 @@ router.post('/forgotpassword', async (req, res) => {
     });
     await forgotPasswordToken.save();
 
-    // Send email with token
-    const subject = 'New Reset Password';
-    const html = `
+    let subject = 'New Reset Password';
+    let html = `
     <p>You are receiving this email because you (or someone else) have requested to reset your password.</p>
     <p>Please click on the following link, or paste this into your browser to complete the process:</p>
     <p><a href="${config.clientUrl}/resetpassword/${token}">${config.clientUrl}/resetpassword/${token}</a></p>
     <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
   `;
+    // Send email with token
+    if(isadminattempt)
+    {
+      subject = 'New Reset Password | Admin';
+      html = `
+        <p>You are receiving this email because you (or someone else) have requested to reset your password.</p>
+        <p>Please click on the following link, or paste this into your browser to complete the process:</p>
+        <p><a href="${config.adminBaseUrl}/auth/resetpassword/${token}">${config.adminBaseUrl}/auth/resetpassword/${token}</a></p>
+        <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+      `;
+    }
+
     await emailService.sendEmail(user.name, user.email, subject, html);
 
     return res.status(200).json({ success: 'An email with reset password link has been sent to your email' });
@@ -146,6 +162,45 @@ router.post('/forgotpassword', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+//ROUTE: 5 - Reset Password - POST "backend-gadgetbazaar/auth/resetpassword/:token"
+router.post('/resetpassword/:token',[
+  body('password').isLength({ min: 6 }).withMessage('Password must have at least 6 characters')	
+  .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$/)	
+  .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
+], async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    // Check if token is valid
+    const forgotPasswordToken = await ForgotPasswordToken.findOne({ token }).populate('user');
+    if (!forgotPasswordToken || !forgotPasswordToken.user) {
+      return res.status(200).json({ error_message: 'Invalid or expired token' });
+    }
+
+    // Update user password
+    const user = forgotPasswordToken.user;
+    user.password = password;
+    await user.save();
+
+    // Remove token from database
+    await forgotPasswordToken.remove();
+    
+    const subject = 'Your password has been reset';
+    const html = `
+      <p>Your password has been reset successfully.</p>
+      <p>If you did not reset your password, please contact us immediately.</p>
+    `;
+    await emailService.sendEmail(user.name, user.email, subject, html);
+
+    return res.status(200).json({ success: 'Password reset successful, you will now be redirected to the login page in 5 seconds' });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 //ROUTE: 5 - Check If User Is Logged In - POST "backend-gadgetbazaar/auth/checkuser" Login Required
 router.post('/checkuser', async (req, res) => {
     try {

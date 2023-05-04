@@ -115,6 +115,8 @@ style={{backgroundImage: "url('https://mdbcdn.b-cdn.net/img/Photos/new-templates
                   required
                 />
               </div>
+              <p className="text-muted mt-4 mb-2"><Link to="/forgot-password"
+                    className="fw-bold text-body"><u>Forgot Password?</u></Link></p>
               <button type="submit" className="btn btn-primary btn-block">
                 Login
               </button>
