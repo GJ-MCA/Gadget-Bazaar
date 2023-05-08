@@ -12,6 +12,10 @@ const paymentDetailSchema = new Schema({
     unique: true,
     required: true
   },
+  payment_date_time:{
+    type: Date,
+    default: Date.now(),
+  },
   order_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Order_Details',

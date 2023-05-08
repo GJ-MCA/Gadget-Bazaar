@@ -42,34 +42,40 @@ const AdminForgotPassword = () => {
   };
 
   return (
-    <div className="container">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-header">Forgot Password</div>
-            <div className="card-body">
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label htmlFor="email">Email address</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    placeholder="Enter email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+    <section className="bg-image"
+    style={{backgroundImage: "url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp')"}}>
+      <div className="mask d-flex align-items-center gradient-custom-3 admin-login-page">
+        <div className="container mb-5" style={{marginTop: "104px"}}>
+          <div className="row justify-content-center">
+            <div className="col-md-6 mt-5 mb-5">
+            {message && <p className={`alert ${message.includes("not") || message.includes("No") || message.includes("Please") ? "alert-danger":"alert-success"}`}>{message}</p>}
+              <div className="card">
+                <div className="card-header">Forgot Password</div>
+                <div className="card-body">
+                  <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                      <label htmlFor="email">Email address</label>
+                      <input
+                        type="email"
+                        className="form-control"
+                        id="email"
+                        placeholder="Enter email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <button type="submit" className="btn btn-primary">
+                      Reset Password
+                    </button>
+                  </form>
                 </div>
-                <button type="submit" className="btn btn-primary">
-                  Reset Password
-                </button>
-              </form>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

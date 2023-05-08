@@ -10,6 +10,7 @@ const crypto = require('crypto');
 const config = require("../../src/config/config");
 const isLoggedIn = require('../middleware/isLoggedIn');
 const emailService = require('../services/emailService');
+const checkAdminUser = require('../middleware/checkAdminUser');
 
 
 
@@ -28,10 +29,10 @@ router.post('/createuser',[
     try{
       //Check whether the user with this email exists already
       let user = await User.findOne({email: req.body.email});
-      /*        
+             
       if(user){
         return res.status(400).json({error: "Email already registered"})
-      } */
+      }
       const salt = await bcrypt.genSalt(10);
       const securedPass = await bcrypt.hash(req.body.password, salt);
       user = await User.create({
@@ -115,14 +116,13 @@ router.post('/getuser', fetchuser, async (req,res)=> {
 router.post('/forgotpassword', async (req, res) => {
   try {
     const { email, isadminattempt } = req.body;
-
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(200).json({ error: 'User not found', nouser: true });
     }
     if(isadminattempt && user.role != 'admin'){
-      return res.status(200).json({error_message: "You are not authorized to reset admin password"})
+      return res.status(200).json({error_message: "No Admin User Found with Entered Email!"})
     }
     if(!isadminattempt && user.role === 'admin'){
       return res.status(200).json({error_message: "Please use admin url to reset admin password!"})
@@ -172,16 +172,24 @@ router.post('/resetpassword/:token',[
   try {
     const { token } = req.params;
     const { password } = req.body;
-
-    // Check if token is valid
     const forgotPasswordToken = await ForgotPasswordToken.findOne({ token }).populate('user');
     if (!forgotPasswordToken || !forgotPasswordToken.user) {
-      return res.status(200).json({ error_message: 'Invalid or expired token' });
+      return res.status(200).json({ error_message: 'Invalid or expired token, Please get a new reset link from forgot password page!' });
     }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Check if token is valid
+
 
     // Update user password
     const user = forgotPasswordToken.user;
-    user.password = password;
+    const salt = await bcrypt.genSalt(10);
+    const securedPass = await bcrypt.hash(password, salt);
+    user.password = securedPass;
+    console.log(user.password)
     await user.save();
 
     // Remove token from database
@@ -201,7 +209,7 @@ router.post('/resetpassword/:token',[
   }
 });
 
-//ROUTE: 5 - Check If User Is Logged In - POST "backend-gadgetbazaar/auth/checkuser" Login Required
+//ROUTE: 6 - Check If User Is Logged In - POST "backend-gadgetbazaar/auth/checkuser" Login Required
 router.post('/checkuser', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
@@ -221,7 +229,7 @@ router.post('/checkuser', async (req, res) => {
     }
   });
 
-// ROUTE: 6 - Get User Profile - GET "/backend-gadgetbazaar/auth/getuserprofile" Login Required
+// ROUTE: 7 - Get User Profile - GET "/backend-gadgetbazaar/auth/getuserprofile" Login Required
 router.get('/getuserprofile', fetchuser, async (req, res) => {
   try {
     const userId = req.user._id;
@@ -237,7 +245,7 @@ router.get('/getuserprofile', fetchuser, async (req, res) => {
   }
 });
 
-// ROUTE: 7 - Update User Profile - PUT "/backend-gadgetbazaar/auth/updateuserprofile" Login Required
+// ROUTE: 8 - Update User Profile - PUT "/backend-gadgetbazaar/auth/updateuserprofile" Login Required
 router.put('/updateuserprofile', fetchuser, async (req, res) => {
   try {
     const userId = req.user._id;
@@ -258,6 +266,42 @@ router.put('/updateuserprofile', fetchuser, async (req, res) => {
         name: updatedUser.name,
         email: updatedUser.email,
         contact: updatedUser.contact,
+      });
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// ROUTE: 9 - Check if User is admin - GET "/backend-gadgetbazaar/auth/isadmin" Login Required
+router.get('/isadmin', fetchuser, async (req, res) => {
+  try {
+  let userId = null;
+    if(req.user)
+      userId = req.user.id;
+    if(userId){
+      const user = await User.findById(userId);
+      if (!user) {
+        res.status(404).send('User not found');
+      } else {
+          // Check if user is an admin
+        if (user.role === 'admin') {
+          res.json({
+            status: 'success',
+            is_admin: true
+          });
+        } else {
+          res.json({
+            status: 'failed',
+            is_admin: false
+          });
+        }
+      }
+    }else{
+      res.json({
+        status: 'failed',
+        is_admin: false
       });
     }
   } catch (error) {

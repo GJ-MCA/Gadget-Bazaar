@@ -116,7 +116,7 @@ export const OrderConfirmation = () => {
         }
     }
     return (
-        <div className="container my-5">
+        <div className="container" style={{marginTop: "104px"}}>
             <div className="row">
                 <div className="col w-100">
                     <h1 style={{ textAlign: 'center',fontSize: '2rem',fontWeight: 'bold',margin: '2rem 0', fontFamily: '-apple-system, BlinkMacSystemFont,Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif'}}>Confirm Your Order <br/> 
@@ -176,10 +176,13 @@ export const OrderConfirmation = () => {
                                 {cartItems.map((cartItem) => (
                                 <li key={cartItem.product_id.id} className="list-group-item d-flex justify-content-between lh-condensed">
                                     <div>
-                                        <h6 className="my-0">{cartItem.product_id.name}</h6>
-                                        <small className="text-muted">{cartItem.product_id.description}</small>
+                                        <h6 className="my-0 text-left">{cartItem.product_id.name} x {cartItem.quantity}</h6>
+                                        <small className="text-muted text-left">{cartItem.product_id.description}</small>
                                     </div>
-                                    <span className="text-muted">&#8377;{cartItem.price * cartItem.quantity}</span>
+                                    <div>
+                                        <div className="text-muted text-right">&#8377;{cartItem.price}/Item</div>
+                                        <div className="text-muted text-right">Item Total: &#8377;{cartItem.price * cartItem.quantity}</div>
+                                    </div>
                                 </li>
                                 ))}
                                 <li className="list-group-item d-flex justify-content-between bg-light">

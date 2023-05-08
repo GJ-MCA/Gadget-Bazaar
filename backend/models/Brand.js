@@ -11,6 +11,10 @@ const brandSchema = new mongoose.Schema({
   },
   description: {
     type: String
+  },
+  is_active: {
+    type: Boolean,
+    default: true
   }
 });
 

@@ -4,6 +4,7 @@ import fetchCartItems, {updateCart, deleteCartItem, updateCouponCart, applyCoupo
 import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginMiddleware } from '../../helpers/userHelper';
+import { updateLoader } from '../../helpers/generalHelper';
 /* const config = require("../../config/config"); */
 const PUBLIC_CSS_DIR = `${process.env.PUBLIC_URL}/assets/css`;
 export const ShoppingCart = () => {
@@ -24,6 +25,7 @@ export const ShoppingCart = () => {
       }, [cartItems]);
       useEffect(() => {
         loginMiddleware();
+        updateLoader(true)
         const token = localStorage.getItem('auth-token');
         fetchCartItems(token).then((data) => {
             console.log("Cartitems in useeffect of shopping cart: \n\n")
@@ -64,6 +66,7 @@ export const ShoppingCart = () => {
         setDiscountAmount((cartFinalWithoutShipping * couponDiscount).toFixed(2));
         const discountedamount = (cartFinalWithoutShipping - (cartFinalWithoutShipping * couponDiscount)).toFixed(2);
         setDiscountedPrice((Number(discountedamount) + 40).toFixed(2));
+        updateLoader(false)
       }, [totalQty, setCartCount, couponDiscount, cartFinalTotal, cartFinalWithoutShipping]);
       const handleUpdateCartItemQuantity = async (productId, newQuantity) => {
         // Check if new quantity is less than 1

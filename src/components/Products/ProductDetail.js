@@ -160,17 +160,7 @@ export const ProductDetail = () => {
                 {product.name}
               </h4>
               <div className="d-flex flex-row my-3">
-                <div className="text-warning mb-1 me-2">
-                  <i className="fa fa-star"></i>
-                  <i className="fa fa-star"></i>
-                  <i className="fa fa-star"></i>
-                  <i className="fa fa-star"></i>
-                  <i className="fas fa-star-half-alt"></i>
-                  <span className="ms-1">
-                    4.5
-                  </span>
-                </div>
-                <span className="text-muted"><i className="fas fa-shopping-basket fa-sm mx-1"></i>154 orders</span>
+            
                 {product.quantity <= 0 ? (
                   <span className="badge badge-danger text-uppercase ml-2" style={{lineHeight: "20px"}}>Out of stock</span>
                 ) : (

@@ -4216,3 +4216,110 @@ License - nucleoapp.com/license/
     padding: 15px; } }
 
 /*# sourceMappingURL=paper-dashboard.css.map */
+
+
+/* Custom */
+.stats-btn{
+  text-align: right;
+  padding-bottom: 5px;
+}
+.stats-btn button{
+  background: transparent;
+  background-color: transparent !important;
+  color: #66615B !important;
+}
+.stats-btn button:hover{
+  opacity: .7 !important;
+}
+.stats-btn button i{
+  color: #66615B;
+  padding-right: 5px;
+}
+
+.card-stats .card-body{
+  padding-bottom: 15px !important;
+}
+
+/* Reports */
+.main-table-container table {
+  border: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+.main-table-container table thead {
+  background: #F0F0F0;
+  height: 60px !important;
+}
+.main-table-container table thead tr th:first-child {
+  padding-left: 45px;
+}
+.main-table-container table thead tr th {
+  text-transform: uppercase;
+  line-height: 60px !important;
+  text-align: left;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.main-table-container table tbody {
+  background: #fff;
+}
+.main-table-container table tbody tr {
+  border-top: 1px solid #e5e5e5;
+  height: 60px;
+}
+.main-table-container table tbody tr td:first-child {
+  padding-left: 45px;
+}
+.main-table-container table tbody tr td {
+  height: 60px;
+  text-align: left;
+  padding: 0 10px;
+}
+.admin-form{
+  background-color: white;
+  padding: 20px;
+}
+.admin-form .form-inner-container{
+  max-width: 400px;
+}
+.admin-form .checkbox-container{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+.admin-form .checkbox-container label{
+  margin: 0;
+}
+.admin-form .checkbox-container input{
+  width: auto;
+  margin: 0;
+}
+.gadgetbazaar-admin-panel form button{
+  padding: 8px 15px;
+}
+.gadgetbazaar-admin-panel table td{
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+}
+.admin-form div{
+  margin-bottom: 10px;
+}
+.admin-form select{
+  margin-left: 15px;
+}
+
+.admin-form .dropdown-container label{
+  min-width: 100px;
+}
+
+.admin-form .dropdown-container select{
+  width: 220px;
+}
+.admin-form .dropdown-container select + button{
+  margin-left: 15px;
+}

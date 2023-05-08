@@ -9,6 +9,8 @@ const payment_order_success_page = "http://localhost:3000/payment-success"
 const payment_cancel_page = "http://localhost:3000/order-confirmation"
 const Payment_Detail = require("../../models/Payment_Detail");
 const Order_Detail = require("../../models/Order_Detail");
+const ProductSale = require('../../models/ProductSale');
+const Order_Item = require('../../models/Order_Item');
 //ROUTE: 1 - Create checkout session - POST "backend-gadgetbazaar/payment/create-payment-session"
 router.post('/create-payment-session', fetchuser, async (req, res) => {
     const { order_id } = req.body;
@@ -74,37 +76,80 @@ router.post('/stripe-webhook', async (req, res) => {
         const checkoutPaymentStatus = checkoutSession.payment_status;
         if(checkoutSession && checkoutOrderId && checkoutPaymentIntentId && checkoutPaymentStatus){
             if(checkoutPaymentStatus === "paid"){
-                try{
-                    // Get order details from the database
-                    const orderDetails = await Order_Detail.findOne({ order_id: checkoutOrderId });
-                    if (!orderDetails) {
-                        throw new Error('Order not found in checkout session webhook');
-                    }
-                    // Update order status to 'paid'
-                    orderDetails.payment_status = 'paid';
-                    await orderDetails.save();
-        
-                    // Create a payment record with the Stripe session ID
-                    const paymentRecord = new Payment_Detail({
-                        user_id: req.user.id,
-                        payment_order_id: checkoutPaymentIntentId,
-                        order_id: orderDetails,
-                    });
-                    await paymentRecord.save();
-
-                    try{
-                        await CartItem.deleteMany({ customer_id: req.user.id });
-                    }catch(err){
-                        console.log("Error in stripe webhook while deleting the cart: " + err);
-                    }
-
-                    if(localStorage.getItem("user_order"))
-                        localStorage.removeItem("user_order");
-
-                }catch(err){
-                    console.error("Error in creating new updating order details/payment record in stripe webhook"+err.message);
-                    return res.status(500).send({ error: "Error in creating new updating order details/payment record in stripe webhook"+err.message });
+              try {
+                // Get order details from the database
+                const orderDetails = await Order_Detail.findOne({ order_id: checkoutOrderId });
+                if (!orderDetails) {
+                  throw new Error('Order not found in checkout session webhook');
                 }
+              
+                // Update order status to 'paid'
+                orderDetails.payment_status = 'paid';
+                await orderDetails.save();
+              
+                // Create a payment record with the Stripe session ID
+                try{
+                  const paymentRecord = new Payment_Detail({
+                    user_id: orderDetails.user_id,
+                    payment_order_id: checkoutPaymentIntentId,
+                    order_id: orderDetails,
+                  });
+                  await paymentRecord.save();
+                }catch(err){
+                  console.log("Error while creating paymentrecord: " + err)
+                }
+              
+                try {
+                  // Get order items from the database
+                  const orderItems = await Order_Item.find({ order_id: checkoutOrderId });
+              
+                  // Update Sales Table for each order item
+                  for (let i = 0; i < orderItems.length; i++) {
+                    const orderItem = orderItems[i];
+              
+                    const salesData = {
+                      date: orderDetails.order_date.getDate(),
+                      month: orderDetails.order_date.getMonth() + 1,
+                      year: orderDetails.order_date.getFullYear(),
+                      total_sale: parseFloat(orderItem.price) * orderItem.quantity,
+                      quantitySold: orderItem.quantity,
+                      productId: orderItem.product_id
+                    };
+                    console.log("Salesdata")
+                    console.log(salesData)
+                    const existingSales = await ProductSale.findOne({
+                      date: salesData.date,
+                      month: salesData.month,
+                      year: salesData.year,
+                      productId: salesData.productId
+                    });
+              
+                    if (existingSales) {
+                      existingSales.total_sale = parseFloat(existingSales.total_sale) + parseFloat(salesData.total_sale);
+                      existingSales.quantitySold += salesData.quantitySold;
+                      await existingSales.save();
+                    } else {
+                      const newSales = new ProductSale(salesData);
+                      await newSales.save();
+                      console.log("New Sale Data: ")
+                      console.log(newSales)
+                    }
+                    console.log("Salesdata")
+                    console.log(salesData)
+                    console.log("Existing Sale Data: ")
+                    console.log(existingSales)
+                  }
+              
+                } catch (err) {
+                  console.error("Error in updating sales table in stripe webhook: " + err.message);
+                  return res.status(500).send({ error: "Error in updating sales table in stripe webhook: " + err.message });
+                }
+              
+              } catch (err) {
+                console.error("Error in creating new updating order details/payment record in stripe webhook: " + err.message);
+                return res.status(500).send({ error: "Error in creating new updating order details/payment record in stripe webhook: " + err.message });
+              }
+              
             }
         }
     }

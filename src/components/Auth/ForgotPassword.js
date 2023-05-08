@@ -43,7 +43,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="container ">
+    <div className="container mb-5" style={{marginTop: "104px"}}>
 
       <div className="row justify-content-center">
         <div className="col-md-6 mt-5 mb-5">

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchAllOrdersForCurrentUser } from '../../helpers/orderHelper';
 import { useLoginMiddleware } from '../../helpers/userHelper';
 import { myOrdersPreUrl } from '../../config/config';
+import { Link } from 'react-router-dom';
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
 
@@ -52,7 +53,10 @@ const MyOrders = () => {
           </table>
         </div>
       ) : (
-        <p>No orders found.</p>
+        <>
+          <p>No orders found.</p>
+          <Link to="/products"> Shop Now </Link>
+        </>
       )}
     </div>
   );

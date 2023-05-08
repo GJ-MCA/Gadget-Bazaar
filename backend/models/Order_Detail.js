@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 const orderDetailSchema = new Schema({
   order_reference_code: {
     type: String,
+    unique: true,
     default: null
   },
   user_id: {
@@ -14,8 +15,13 @@ const orderDetailSchema = new Schema({
   },
   total: {
       type: Number,
-      get: v => (v/100).toFixed(2),
-      set: v => v*100
+      default: 0,
+      get: function(value) {
+        return value.toFixed(2);
+      },
+      set: function(value) {
+        return parseFloat(value);
+      }
   },
   shipping_address: {
       type: mongoose.Schema.Types.ObjectId,
@@ -61,6 +67,14 @@ const orderDetailSchema = new Schema({
     type: String,
     enum: ['N/A','pending','paid'],
     default: 'pending'
+  },
+  estimated_delivery_date: {
+    type: Date,
+    default: () => {
+      const date = new Date();
+      date.setDate(date.getDate() + 3);
+      return date;
+    }
   }
 },
 { 

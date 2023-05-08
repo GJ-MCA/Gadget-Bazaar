@@ -113,9 +113,61 @@ router.post('/checkout', fetchuser, async (req, res) => {
     }
 
     const orderDetails = new OrderDetails({ order_reference_code: orderReferenceCode,user_id, shipping_address, billing_address, shipping_method: current_shipping_method , shipping_charge, total });
-    const orderItems = items.map(item => new OrderItems({ order_id: orderDetails._id, product_id: item.product_id, price:item.price, quantity: item.quantity }));
+    console.log("------------------------------------------")
+    console.log("------------------------------------------")
+    console.log("------------------------------------------")
+    console.log("Items: ")
+    console.log(items)
+    // Group items by product ID
+    var i = 0;
+    const groupedItems = items.reduce((acc, item) => {
+      
+      console.log("Items in Groupeditems: ")
+      console.log(items[i])
+      i++;
+      console.log("Acc in Groupeditems: ")
+      console.log(acc)
+      console.log("Item in Groupeditems: ")
+      console.log(item)
+      const { product_id, price, quantity } = item;
+      console.log("Product id in Groupeditems: ")
+      console.log(product_id)
+      const key = product_id.id;
+    
+      if (!acc[key]) {
+        acc[key] = { ...product_id, price, quantity };
+      } else {
+        acc[key].quantity += quantity;
+        acc[key].price += price;
+      }
+    
+      return acc;
+    }, {});
 
-    await Promise.all([orderDetails.save(), ...orderItems.map(item => item.save())]);
+
+    console.log("Grouped Items: ")
+    console.log(groupedItems)
+    console.log("OrderDetail: ")
+    // Create OrderItems records
+    const orderItems = Object.values(groupedItems).map(item => {
+      console.log("Item before creating orderitems: ")
+      console.log(item)
+      return new OrderItems({
+        order_id: orderDetails.id,
+        product_id: item.id,
+        price: item.price,
+        quantity: item.quantity
+      })
+    });
+    
+    console.log(orderDetails)
+    console.log("OrderItems: ")
+    console.log(orderItems)
+    await Promise.all([orderDetails.save(), ...orderItems.map(item => {
+      console.log("Item before saving: ")
+      console.log(item); 
+      item.save();
+    })]);
 
     res.json({ success: true, orderDetails, orderItems });
   } catch (error) {

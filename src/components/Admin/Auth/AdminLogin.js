@@ -1,5 +1,5 @@
 import React, { useState, useEffect  } from 'react';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const config = require('../../../config/config');
 
 
@@ -104,6 +104,8 @@ style={{backgroundImage: "url('https://mdbcdn.b-cdn.net/img/Photos/new-templates
                   required
                 />
               </div>
+              <p className="text-muted mt-4 mb-2"><Link to={config.adminBaseUrl+"/auth/forgotpassword"}
+                    className="fw-bold text-body"><u>Forgot Password?</u></Link></p>
               <button type="submit" className="btn btn-primary btn-block">
                 Login
               </button>

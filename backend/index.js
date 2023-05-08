@@ -27,10 +27,11 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/backend-gadgetbazaar/auth', require('./routes/auth'));
 app.use('/backend-gadgetbazaar/products', require('./routes/products/products_main'));
+app.use('/backend-gadgetbazaar/admin/main', require('./routes/admin/admin_main'));
 app.use('/backend-gadgetbazaar/admin/products', require('./routes/admin/admin_products'));
 app.use('/backend-gadgetbazaar/order', require('./routes/products/products_order'));
 app.use('/backend-gadgetbazaar/payment', require('./routes/payment/payment_main'));
 
 app.listen(port, () => {
-  console.log(`Example app listening on port http://localhost:${port}`)
+  console.log(`Gadgetbazaar Backend listening on port http://localhost:${port}`)
 })
