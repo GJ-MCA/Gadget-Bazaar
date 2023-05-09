@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
-import { useNavigate } from 'react-router-dom';
-import { addNeccessaryClasses, adminFrontBrandsPostFix } from '../../../../helpers/adminHelper';
+import { addNeccessaryClasses } from '../../../../helpers/adminHelper';
 
 function AddBrand() {
   const [name, setName] = useState('');
   const [logo, setLogo] = useState('');
   const [description, setDescription] = useState('');
   const [is_active, setIsActive] = useState(true);
-  const navigate = useNavigate();
   const [errors, setErrors] = useState([]);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     addNeccessaryClasses();
   }, [])
-  
+
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
@@ -30,13 +29,25 @@ function AddBrand() {
       });
       const data = await response.json();
       if (response.ok) {
-        navigate(adminFrontBrandsPostFix);
+        console.log(data)
+        if(data){
+          if(data.message){
+            setMessage(data.message); 
+            setErrors("")
+            setName("");
+            setLogo("");
+            setDescription("");
+            setIsActive(true);
+          }
+        }
       } else {
+        setMessage("")
         setErrors(data.errors);
         console.error('Error creating brand.');
         console.log(data.errors)
       }
     } catch (error) {
+      setMessage("");
       console.error('Error creating brand:', error);
     }
   };
@@ -44,16 +55,21 @@ function AddBrand() {
   return (
     <div>
       <h2>Add Brand</h2>
-      <form onSubmit={handleFormSubmit}>
-      {errors.length > 0 && (
-                  <div className="alert alert-danger">
-                    <ul style={{paddingLeft: "15px", marginBottom: "0"}}>
-                      {errors.map((error, index) => (
-                        <li key={index}>{error.msg}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+      <form>
+        {message && message.length > 0 && (
+          <div className={message.includes("successfully") ? "alert alert-success": "alert alert-info"}>
+            {message}
+          </div>
+        )}
+        {errors && errors.length > 0 && (
+          <div className="alert alert-danger">
+            <ul style={{paddingLeft: "15px", marginBottom: "0"}}>
+              {errors.map((error, index) => (
+                <li key={index}>{error.msg}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div>
           <label htmlFor="name">Name:</label>
           <input
@@ -61,6 +77,7 @@ function AddBrand() {
             id="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
+            required
           />
         </div>
         <div>
@@ -70,6 +87,7 @@ function AddBrand() {
             id="logo"
             accept="image/png, image/jpeg"
             onChange={(event) => setLogo(event.target.files[0])}
+            required
           />
         </div>
         <div>
@@ -78,20 +96,21 @@ function AddBrand() {
             id="description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
+            required
           />
         </div>
         <div className='checkbox-container'>
-            <label htmlFor="is_active">Active:</label>
-            <input
-                type="checkbox"
-                id="is_active"
-                name="is_active"
-                checked={is_active}
-                onChange={(e) => setIsActive(e.target.checked)}
-                className="form-control"
-            />
+          <label htmlFor="is_active">Active:</label>
+          <input
+            type="checkbox"
+            id="is_active"
+            name="is_active"
+            checked={is_active}
+            onChange={(e) => setIsActive(e.target.checked)}
+            className="form-control"
+          />
         </div>
-        <button type="submit">Submit</button>
+        <button type="button" onClick={handleFormSubmit}>Submit</button>
       </form>
     </div>
   );

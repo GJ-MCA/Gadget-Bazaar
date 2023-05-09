@@ -86,8 +86,8 @@ router.post('/add', productImageUpload.array('images'),/* checkAdminUser, */[
 });
 //ROUTE: 2 - Add a Brand - Admin - POST "backend-gadgetbazaar/admin/products/brands/add"
 router.post('/brands/add', brandLogoUpload.single('logo'), /*checkAdminUser,*/ [
-  body('name','Enter at least 5 characters').isLength({min: 5}),
-  body('description','Enter at least 20 characters' ).isLength({min: 20}),
+  body('name','Enter Name').notEmpty(),
+  body('description','Enter at least 50 characters in description' ).isLength({min: 50}),
 ], async (req,res)=>{
   try{
     const errors = validationResult(req);
@@ -103,17 +103,17 @@ router.post('/brands/add', brandLogoUpload.single('logo'), /*checkAdminUser,*/ [
     const {name, description, is_active} = req.body;
     console.log(name, description,is_active)
     // Check if the same data already exists
-    const existingBrand = await Brand.findOne({ name, description });
+    const existingBrand = await Brand.findOne({ name: { $regex: new RegExp('^' + name + '$', 'i') } });
     if (existingBrand) {
-      return res.status(409).json({ error: 'Brand already exists' });
+      return res.status(400).json({ errors: [{ msg: 'Brand already exists' }] });
     }
-
+    
     const brand = new Brand({
       name, description, logo: req.file.path.replace('public', ''), is_active
     });
 
     const savedBrand = await brand.save();
-    res.json(savedBrand);
+    return res.status(200).json({ message: 'Brand added successfully' , savedBrand});
 
   }catch(error){
     res.status(500).send("Internal Server Error: "+ error);
@@ -218,6 +218,7 @@ router.post('/specifications/add', [ body('name','Please Enter Specification Nam
 body('value','Please Enter Specification Value!' ).exists(),],async (req, res) => {
   try {
     const { name, value, is_active } = req.body;
+    console.log(name, value, is_active)
     if (!name || !value) {
       return res.status(400).json({ errors: 'Please enter details properly' });
     }

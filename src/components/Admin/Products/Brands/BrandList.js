@@ -29,7 +29,7 @@ function BrandList() {
     }
   }
   return (
-    <div className='main-table-container'>
+    <div className='main-table-container content'>
       <h2>Brand List</h2>
       <button onClick={handleAddBrandClick}>Add Brand</button>
         {brands && brands.length > 0 ? 
@@ -49,7 +49,7 @@ function BrandList() {
                     {brands.map((brand) => (
                         <tr key={brand._id}>
                         <td>{brand.name}</td>
-                        <td>
+                        <td style={{width: "100px"}}>
                             <img src={brand.logo} alt="Brand Logo" />
                         </td>
                         <td>{brand.description}</td>

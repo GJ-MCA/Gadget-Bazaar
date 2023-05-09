@@ -70,31 +70,31 @@ const AdminLayout = ({ children }) => {
                   <p>Dashboard</p>
                 </Link>
               </li>
-              <li className={window.location.href === adminDashboardUrl+"/products" ? "active" : ""}>
+              <li className={window.location.href.startsWith(adminDashboardUrl+"/products") ? "active" : ""}>
                 <Link to={adminDashboardUrl+"/products"}>
                   <i className="nc-icon nc-box"></i>
                   <p>Products</p>
                 </Link>
               </li>
-              <li className={window.location.href === adminDashboardUrl+"/brands" ? "active" : ""}>
+              <li className={window.location.href.startsWith(adminDashboardUrl+"/brands") ? "active" : ""}>
                 <Link to={adminDashboardUrl+"/brands"}>
                   <i className="nc-icon nc-tag-content"></i>
                   <p>Brands</p>
                 </Link>
               </li>
-              <li className={window.location.href === adminDashboardUrl+"/specifications" ? "active" : ""}>
+              <li className={window.location.href.startsWith(adminDashboardUrl+"/specifications") ? "active" : ""}>
                 <Link to={adminDashboardUrl+"/specifications"}>
                   <i className="nc-icon nc-settings-gear-65"></i>
                   <p>Specifications</p>
                 </Link>
               </li>
-              <li className={window.location.href === adminDashboardUrl+"/users" ? "active" : ""}>
+              <li className={window.location.href.startsWith(adminDashboardUrl+"/users") ? "active" : ""}>
                 <Link to={adminDashboardUrl+"/users"}>
                   <i className="nc-icon nc-single-02"></i>
                   <p>Users</p>
                 </Link>
               </li>
-              <li className={window.location.href === adminDashboardUrl+"/reports" ? "active" : ""}>
+              <li className={window.location.href.startsWith(adminDashboardUrl+"/reports") ? "active" : ""}>
                 <Link to={adminDashboardUrl+"/reports"}>
                   <i className="nc-icon nc-chart-bar-32"></i>
                   <p>Reports</p>

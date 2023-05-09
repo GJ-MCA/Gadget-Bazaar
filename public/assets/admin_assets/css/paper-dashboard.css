@@ -4323,3 +4323,7 @@ License - nucleoapp.com/license/
 .admin-form .dropdown-container select + button{
   margin-left: 15px;
 }
+
+.gadgetbazaar-admin-panel .content{
+  min-height: 84vh;
+}
