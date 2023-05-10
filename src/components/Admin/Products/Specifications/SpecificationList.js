@@ -42,8 +42,7 @@ function SpecificationList() {
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Description</th>
-                        <th>Unit of Measurement</th>
+                        <th>Value</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -52,8 +51,7 @@ function SpecificationList() {
                     {specs.map((spec) => (
                         <tr key={spec._id}>
                         <td>{spec.name}</td>
-                        <td>{spec.description}</td>
-                        <td>{spec.unit_of_measurement}</td>
+                        <td>{spec.value}</td>
                         <td>{spec.is_active ? 'Active' : 'Disabled'}</td>
                         <td>
                             <button onClick={() => handleEditSpecClick(spec._id)}>Edit</button>

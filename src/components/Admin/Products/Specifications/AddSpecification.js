@@ -19,6 +19,8 @@ function AddSpecification() {
     formData.append('name', name);
     formData.append('description', description);
     formData.append('is_active', is_active);
+    console.log("Handle Submit Called")
+    console.log(formData)
     try {
       const response = await fetch(`${adminProductAPIUrl}/specifications/add`, {
         method: 'POST',
@@ -38,7 +40,7 @@ function AddSpecification() {
   return (
     <div>
       <h2>Add Specification</h2>
-      <form onSubmit={handleSubmit} className='admin-form'>
+      <form className='admin-form'>
       {errors.length > 0 && (
                   <div className="alert alert-danger">
                     <ul style={{paddingLeft: "15px", marginBottom: "0"}}>
@@ -81,7 +83,7 @@ function AddSpecification() {
                 className="form-control"
             />
             </div>
-            <button type="submit">Submit</button>
+            <button type="button" onClick={handleSubmit}>Submit</button>
         </div>
       </form>
     </div>

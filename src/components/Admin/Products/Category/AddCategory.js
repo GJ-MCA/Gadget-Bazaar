@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { addNeccessaryClasses } from '../../../../helpers/adminHelper';
 
-function AddBrand() {
+function AddCategory() {
   const [name, setName] = useState('');
-  const [logo, setLogo] = useState('');
+  const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
   const [is_active, setIsActive] = useState(true);
   const [errors, setErrors] = useState([]);
@@ -19,11 +19,11 @@ function AddBrand() {
 
     const formData = new FormData();
     formData.append('name', name);
-    formData.append('logo', logo);
+    formData.append('image', image);
     formData.append('description', description);
     formData.append('is_active', is_active);
     try {
-      const response = await fetch(`${adminProductAPIUrl}/brands/add`, {
+      const response = await fetch(`${adminProductAPIUrl}/category/add`, {
         method: 'POST',
         body: formData,
       });
@@ -35,7 +35,7 @@ function AddBrand() {
             setMessage(data.message); 
             setErrors("")
             setName("");
-            setLogo("");
+            setImage("");
             setDescription("");
             setIsActive(true);
           }
@@ -43,18 +43,18 @@ function AddBrand() {
       } else {
         setMessage("")
         setErrors(data.errors);
-        console.error('Error creating brand.');
+        console.error('Error creating category.');
         console.log(data.errors)
       }
     } catch (error) {
       setMessage("");
-      console.error('Error creating brand:', error);
+      console.error('Error creating category:', error);
     }
   };
 
   return (
     <div>
-      <h2>Add Brand</h2>
+      <h2>Add Category</h2>
       <form className='admin-form'>
         {message && message.length > 0 && (
           <div className={message.includes("successfully") ? "alert alert-success": "alert alert-info"}>
@@ -81,12 +81,12 @@ function AddBrand() {
           />
         </div>
         <div>
-          <label htmlFor="logo">Logo:</label>
+          <label htmlFor="image">Image:</label>
           <input
             type="file"
-            id="logo"
+            id="image"
             accept="image/png, image/jpeg"
-            onChange={(event) => setLogo(event.target.files[0])}
+            onChange={(event) => setImage(event.target.files[0])}
             required
           />
         </div>
@@ -116,4 +116,4 @@ function AddBrand() {
   );
 }
 
-export default AddBrand;
+export default AddCategory;

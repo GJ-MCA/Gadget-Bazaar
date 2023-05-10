@@ -7,6 +7,7 @@ export const adminFrontForgotPasswordPostFix = `${adminFrontBasePostFix}/auth/fo
 export const adminFrontResetPasswordPostFix = `${adminFrontBasePostFix}/auth/resetpassword`;
 export const adminFrontDashboardPostFix = `${adminFrontBasePostFix}/dashboard`;
 export const adminFrontProductsPostFix = `${adminFrontDashboardPostFix}/products`;
+export const adminFrontCategoryPostFix = `${adminFrontDashboardPostFix}/category`;
 export const adminFrontBrandsPostFix = `${adminFrontDashboardPostFix}/brands`;
 export const adminFrontSpecificationsPostFix = `${adminFrontDashboardPostFix}/specifications`;
 export const adminFrontReportsPostFix = `${adminFrontDashboardPostFix}/reports`;

@@ -1,13 +1,32 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {ProductList} from './Products/ProductList'
 import { Link } from 'react-router-dom'
+import { orderAPIUrl } from '../config/config';
 const config = require("../config/config");
 
 export const Home = () => {
+   const [coupon, setCoupon] = useState(null);
+
+   useEffect(() => {
+     async function fetchCoupon() {
+       try {
+         const response = await fetch(`${orderAPIUrl}/get-active-coupon`);
+         const data = await response.json();
+         console.log(data)
+         if(response.ok)
+            setCoupon(data);
+       } catch (error) {
+         console.error(error);
+       }
+     }
+ 
+     fetchCoupon();
+   }, []);
   return (
     <> 
 	<div className="hero_area">
          {/* <!-- slider section --> */}
+         {coupon && (
          <section className="slider_section ">
             <div className="slider_bg_box">
                <img src="/assets/img/slider-bg.jpg" alt=""/>
@@ -21,13 +40,13 @@ export const Home = () => {
                               <div className="detail-box">
                                  <h1>
                                     <span>
-                                    Sale 20% Off
+                                    Sale {coupon && coupon.promotion_name && coupon.promotion_name}
                                     </span>
                                     <br/>
                                     On Everything
                                  </h1>
                                  <p>
-                                    Explicabo esse amet tempora quibusdam laudantium, laborum eaque magnam fugiat hic? Esse dicta aliquid error repudiandae earum suscipit fugiat molestias, veniam, vel architecto veritatis delectus repellat modi impedit sequi.
+                                 Ready to save on your next order? Use the code '{coupon && coupon.coupon_code && coupon.coupon_code}' to enjoy '{coupon && coupon.promotion_name && coupon.promotion_name}' on everything. Don't wait, shop now!
                                  </p>
                                  <div className="btn-box">
                                     <Link to="/products" className="btn1">
@@ -39,66 +58,10 @@ export const Home = () => {
                         </div>
                      </div>
                   </div>
-                  <div className="carousel-item ">
-                     <div className="container ">
-                        <div className="row">
-                           <div className="col-md-7 col-lg-6 ">
-                              <div className="detail-box">
-                                 <h1>
-                                    <span>
-                                    Sale 20% Off
-                                    </span>
-                                    <br/>
-                                    On Everything
-                                 </h1>
-                                 <p>
-                                    Explicabo esse amet tempora quibusdam laudantium, laborum eaque magnam fugiat hic? Esse dicta aliquid error repudiandae earum suscipit fugiat molestias, veniam, vel architecto veritatis delectus repellat modi impedit sequi.
-                                 </p>
-                                 <div className="btn-box">
-                                    <Link to="/products" className="btn1">
-                                    Shop Now
-                                    </Link>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-                  <div className="carousel-item">
-                     <div className="container ">
-                        <div className="row">
-                           <div className="col-md-7 col-lg-6 ">
-                              <div className="detail-box">
-                                 <h1>
-                                    <span>
-                                    Sale 20% Off
-                                    </span>
-                                    <br/>
-                                    On Everything
-                                 </h1>
-                                 <p>
-                                    Explicabo esse amet tempora quibusdam laudantium, laborum eaque magnam fugiat hic? Esse dicta aliquid error repudiandae earum suscipit fugiat molestias, veniam, vel architecto veritatis delectus repellat modi impedit sequi.
-                                 </p>
-                                 <div className="btn-box">
-                                    <Link to="/products" className="btn1">
-                                    Shop Now
-                                    </Link>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-               <div className="container">
-                  <ol className="carousel-indicators">
-                     <li data-target="#customCarousel1" data-slide-to="0" className="active"></li>
-                     <li data-target="#customCarousel1" data-slide-to="1"></li>
-                     <li data-target="#customCarousel1" data-slide-to="2"></li>
-                  </ol>
                </div>
             </div>
          </section>
+            )}
          <form method="POST" action={`${config.baseUrl}/admin/products/add`} encType="multipart/form-data">
             <label htmlFor="name">Name:</label>
             <input type="text" name="name" id="name" required/>
@@ -142,7 +105,7 @@ export const Home = () => {
                            Fast Delivery
                         </h5>
                         <p>
-                           variations of passages of Lorem Ipsum available
+                           Don't wait around for your new gadget to arrive. Our fast delivery service guarantees your order will be on your doorstep in record time, so you can start using your new device right away.
                         </p>
                      </div>
                   </div>
@@ -150,14 +113,14 @@ export const Home = () => {
                <div className="col-md-4">
                   <div className="box ">
                      <div className="img-box">
-                     <img className="svg-img" src="/assets/img/svg/free-shipping.svg" alt="Free Shipping"/>
+                     <img className="svg-img" src="/assets/img/svg/cart-icon-white.svg" alt="Free Shipping"/>
                      </div>
                      <div className="detail-box">
                         <h5>
-                           Free Shiping
+                        Best Value
                         </h5>
                         <p>
-                           variations of passages of Lorem Ipsum available
+                        We are committed to providing our customers with the best value for their money. Our competitive prices, combined with our fast delivery and high-quality products, make us the go-to destination for the latest tech.
                         </p>
                      </div>
                   </div>
@@ -172,7 +135,7 @@ export const Home = () => {
                            Best Quality
                         </h5>
                         <p>
-                           variations of passages of Lorem Ipsum available
+                        Quality is our top priority at GadgetBazaar. We believe that our customers deserve nothing but the best, which is why we go above and beyond to ensure that every product we offer is of the highest quality.
                         </p>
                      </div>
                   </div>
@@ -182,61 +145,9 @@ export const Home = () => {
       </section>
       {/* <!-- end why section --> */}
       
-      {/* <!-- arrival section --> */}
-      <section className="arrival_section">
-         <div className="container">
-            <div className="box">
-               <div className="arrival_bg_box">
-                  <img src="/assets/img/arrival-bg.png" alt=""/>
-               </div>
-               <div className="row">
-                  <div className="col-md-6 ml-auto">
-                     <div className="heading_container remove_line_bt">
-                        <h2>
-                           #NewArrivals
-                        </h2>
-                     </div>
-                     <p style={{marginRight: 20 + 'px',marginBottom: 30 + 'px'}}>
-                        Vitae fugiat laboriosam officia perferendis provident aliquid voluptatibus dolorem, fugit ullam sit earum id eaque nisi hic? Tenetur commodi, nisi rem vel, ea eaque ab ipsa, autem similique ex unde!
-                     </p>
-                     <Link to="/products">
-                     Shop Now
-                     </Link>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-      {/* <!-- end arrival section --> */}
-      
       {/* <!-- product section --> */}
       <ProductList/>
       {/* <!-- end product section --> */}
-
-      {/* <!-- subscribe section --> */}
-      <section className="subscribe_section">
-         <div className="container-fuild">
-            <div className="box">
-               <div className="row">
-                  <div className="col-md-6 offset-md-3">
-                     <div className="subscribe_form ">
-                        <div className="heading_container heading_center">
-                           <h3>Subscribe To Get Discount Offers</h3>
-                        </div>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor</p>
-                        <form action="">
-                           <input type="email" placeholder="Enter your email"/>
-                           <button>
-                           subscribe
-                           </button>
-                        </form>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-      {/* <!-- end subscribe section --> */}
       {/* <!-- client section --> */}
       <section className="client_section layout_padding">
          <div className="container">

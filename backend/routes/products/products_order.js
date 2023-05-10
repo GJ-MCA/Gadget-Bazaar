@@ -700,4 +700,23 @@ router.get('/getallorders', fetchuser, async (req, res) => {
   }
 });
 
+// ROUTE 22 - Get active coupon - GET "backend-gadgetbazaar/order/get-active-coupon"
+router.get('/get-active-coupon', async (req, res) => {
+  try {
+    const coupon = await Promotion.findOne({ status: 'Active'});
+    const currentDate = new Date().toISOString(); // convert current date to ISO string in UTC
+    if (coupon && coupon.expiry_date.toISOString() >= currentDate) { // compare dates in UTC
+      res.status(200).json(coupon);
+    } else {
+      res.status(404).json({ message: 'No active coupons found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+module.exports = router;
+
 module.exports = router;

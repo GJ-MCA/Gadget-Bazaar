@@ -5,6 +5,7 @@ const { body, validationResult } = require('express-validator');
 const Brand = require('../../models/Brand');
 const Product = require('../../models/Product');
 const Specification = require('../../models/Specification');
+const Category = require('../../models/Category');
 const checkAdminUser = require('../../middleware/checkAdminUser');
 const router = express.Router();
 // Define storage for uploaded product images
@@ -37,6 +38,21 @@ const brandLogoStorage = multer.diskStorage({
 });
 
 const brandLogoUpload = multer({ storage: brandLogoStorage });
+
+const categoryLogoStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const dir = 'public/assets/img/categories';
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+    cb(null, dir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const categoryLogoUpload = multer({ storage: categoryLogoStorage });
 
 
 //ROUTE: 1 - Add a Product - Admin - POST "backend-gadgetbazaar/admin/products/add"
@@ -84,6 +100,118 @@ router.post('/add', productImageUpload.array('images'),/* checkAdminUser, */[
     res.status(500).send("Internal Server Error");
   }
 });
+//ROUTE: 2 - Update a Product - Admin - PUT "backend-gadgetbazaar/admin/products/update/:id"
+router.put('/update/:id', productImageUpload.single('image'),checkAdminUser,[
+  body('name','Enter at least 5 characters').custom(value => {
+    if(value.length < 5){
+        throw new Error('Name must be at least 5 characters long');
+    }
+    return true;
+  }),
+  body('description','Enter at least 20 characters' ).isLength({min: 20}),], async (req,res)=>{
+  try{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      if(req.file){
+        return res.status(400).json({ errors: errors.array() });
+      }else{
+        return res.status(400).json({ errors: {error: errors.array(), "Image": "Please Upload Image"} });
+      }
+    }
+
+    const {name, description, sku, price} = req.body;
+
+    // Check if the product exists
+    let product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+  // Check if the user is an admin
+    const user = await User.findOne({ email: req.user.email });
+    if (!user) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    if (user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    // Update the product
+    product.name = name;
+    product.description = description;
+    product.sku = sku;
+    product.price = price;
+    if (req.file) {
+      product.image = req.file.path.replace('public', '');
+    }
+    const savedProduct = await product.save();
+    res.json(savedProduct);
+
+  }catch(error){
+    res.status(500).send("Internal Server Error");
+  }
+})
+
+//ROUTE: 3 - Disable a Product - Admin - PUT "backend-gadgetbazaar/admin/products/disable/:id"
+router.put('/disable/:id', checkAdminUser, async (req,res)=>{
+  try{
+    // Check if the product exists
+    let product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    
+    // Disable the product
+    product.status = false;
+    const savedProduct = await product.save();
+    res.json(savedProduct);
+  }catch(error){
+    res.status(500).send("Internal Server Error");
+  }
+})
+
+//ROUTE: 4 - Enable a Product - Admin - PUT "backend-gadgetbazaar/admin/products/enable/:id"
+router.put('/enable/:id', checkAdminUser, async (req,res)=>{
+  try{
+    // Check if the product exists
+    let product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    
+    // Enable the product
+    product.status = true;
+    const savedProduct = await product.save();
+    res.json(savedProduct);
+  }catch(error){
+    res.status(500).send("Internal Server Error");
+  }
+})
+
+//ROUTE: 5 - Delete a Product - Admin - DELETE "backend-gadgetbazaar/admin/products/delete/:id"
+router.delete('/delete/:id', checkAdminUser, async (req,res)=>{
+  try{
+    // Check if the product exists
+    let product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+  
+    // Delete the product
+    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+    
+    // If the product was not deleted for some reason
+    if (!deletedProduct) {
+      return res.status(500).json({ message: 'Unable to delete product' });
+    }
+    
+    res.json({ message: 'Product deleted successfully' });
+
+  }catch(error){
+    res.status(500).send("Internal Server Error");
+  }
+})
+
 //ROUTE: 2 - Add a Brand - Admin - POST "backend-gadgetbazaar/admin/products/brands/add"
 router.post('/brands/add', brandLogoUpload.single('logo'), /*checkAdminUser,*/ [
   body('name','Enter Name').notEmpty(),
@@ -214,8 +342,8 @@ router.get('/brands/getnotactive', async (req, res) => {
   }
 });
 //ROUTE: 5 - Add a Specification - Admin - POST "backend-gadgetbazaar/admin/products/specifications/add"
-router.post('/specifications/add', [ body('name','Please Enter Specification Name!').exists(),
-body('value','Please Enter Specification Value!' ).exists(),],async (req, res) => {
+router.post('/specifications/add', [ body('name','Please Enter Specification Name!').notEmpty(),
+body('value','Please Enter Specification Value!' ).notEmpty(),],async (req, res) => {
   try {
     const { name, value, is_active } = req.body;
     console.log(name, value, is_active)
@@ -259,6 +387,42 @@ router.put('/specifications/enable/:id', async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+//ROUTE: 4 - Get a Specification from id - Admin - POST "backend-gadgetbazaar/admin/products/specifications/get/:id/"
+router.get('/specifications/get/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const specification = await Specification.findById(id);
+    if (!specification) {
+      return res.status(404).send("Specification not found");
+    }
+    res.json(specification);
+  } catch (error) {
+    res.status(500).send("Internal Server Error");
+  }
+});
+//ROUTE: 4 - Edit a Specification - Admin - POST "backend-gadgetbazaar/admin/products/specifications/edit/:id"
+router.put('/specifications/edit/:id', /*checkAdminUser,*/ async (req,res)=>{
+  try{
+    const {id} = req.params;
+
+    const {name, value, is_active} = req.body;
+    console.log(name, value, is_active)
+    const specification = await Specification.findOne({_id: id});
+    if(!specification){
+      return res.status(400).send("Specification not found");
+    }
+
+    specification.name = name;
+    specification.value = value;
+    specification.is_active = is_active;
+
+    const savedSpecification = await specification.save();
+    res.json(savedSpecification);
+
+  }catch(error){
+    res.status(500).send("Internal Server Error: " + error);
+  }
+});
 //ROUTE: 7 - Get all Specifications - Admin - POST "backend-gadgetbazaar/admin/products/specifications/getall
 router.get('/specifications/getall', async (req, res) => {
   try {
@@ -286,117 +450,124 @@ router.get('/specifications/getnotactive', async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-//ROUTE: 2 - Update a Product - Admin - PUT "backend-gadgetbazaar/admin/products/update/:id"
-router.put('/update/:id', productImageUpload.single('image'),checkAdminUser,[
-  body('name','Enter at least 5 characters').custom(value => {
-    if(value.length < 5){
-        throw new Error('Name must be at least 5 characters long');
-    }
-    return true;
-  }),
-  body('description','Enter at least 20 characters' ).isLength({min: 20}),], async (req,res)=>{
-  try{
+//ROUTE: 9 -  Add a Category - Admin - POST "backend-gadgetbazaar/admin/products/category/add"
+router.post('/category/add',categoryLogoUpload.single('image'), [ body('name','Enter Name').notEmpty(),
+body('description','Enter at least 20 characters in description' ).isLength({min: 20}),], async (req, res) => {
+  try {
+    const { name, description, is_active } = req.body;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      if(req.file){
+      if (req.file) {
         return res.status(400).json({ errors: errors.array() });
-      }else{
-        return res.status(400).json({ errors: {error: errors.array(), "Image": "Please Upload Image"} });
+      } else {
+        const my_errors = errors.array().concat({ msg: "Please upload category image!" });
+        return res.status(400).json({ errors: my_errors });
       }
     }
-
-    const {name, description, sku, price} = req.body;
-
-    // Check if the product exists
-    let product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+    const existingCategory = await Category.findOne({ name: { $regex: new RegExp('^' + name + '$', 'i') } });
+    if (existingCategory) {
+      return res.status(400).json({ errors: [{ msg: 'Category already exists' }] });
     }
-  // Check if the user is an admin
-    const user = await User.findOne({ email: req.user.email });
-    if (!user) {
-      return res.status(403).json({ message: 'Not authorized' });
+    const category = new Category({ name, description, image:req.file.path.replace('public', ''), is_active });
+    const newCategory = await category.save();
+    return res.status(200).json({ message: 'Category added successfully' , newCategory});
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+//ROUTE: 3 - Disable a Category - Admin - POST "backend-gadgetbazaar/admin/products/category/disable/:id"
+router.put('/category/disable/:id', async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
     }
-
-    if (user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not authorized' });
-    }
-
-    // Update the product
-    product.name = name;
-    product.description = description;
-    product.sku = sku;
-    product.price = price;
-    if (req.file) {
-      product.image = req.file.path.replace('public', '');
-    }
-    const savedProduct = await product.save();
-    res.json(savedProduct);
-
-  }catch(error){
+    category.is_active = false;
+    const disabledCategory = await category.save();
+    res.json(disabledCategory);
+  } catch (error) {
     res.status(500).send("Internal Server Error");
   }
-})
-
-//ROUTE: 3 - Disable a Product - Admin - PUT "backend-gadgetbazaar/admin/products/disable/:id"
-router.put('/disable/:id', checkAdminUser, async (req,res)=>{
+});
+//ROUTE: 4 - Enable a Category - Admin - POST "backend-gadgetbazaar/admin/products/category/enable/:id/"
+router.put('/category/enable/:id', async (req, res) => {
+  try {
+    const category = await Category.findByIdAndUpdate(req.params.id, { is_active: true }, { new: true });
+    if (!category) {
+      return res.status(404).send("category not found");
+    }
+    res.json(category);
+  } catch (error) {
+    res.status(500).send("Internal Server Error: " + error);
+  }
+});
+//ROUTE: 4 - Get a category from id - Admin - POST "backend-gadgetbazaar/admin/products/category/get/:id/"
+router.get('/category/get/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const category = await Category.findById(id);
+    if (!category) {
+      return res.status(404).send("Category not found");
+    }
+    res.json(category);
+  } catch (error) {
+    res.status(500).send("Internal Server Error: " + error);
+  }
+});
+//ROUTE: 4 - Edit a category - Admin - POST "backend-gadgetbazaar/admin/products/category/edit/:id"
+router.put('/category/edit/:id', categoryLogoUpload.single('image'), /*checkAdminUser,*/ async (req,res)=>{
   try{
-    // Check if the product exists
-    let product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-    
-    // Disable the product
-    product.status = false;
-    const savedProduct = await product.save();
-    res.json(savedProduct);
-  }catch(error){
-    res.status(500).send("Internal Server Error");
-  }
-})
+    const {id} = req.params;
 
-//ROUTE: 4 - Enable a Product - Admin - PUT "backend-gadgetbazaar/admin/products/enable/:id"
-router.put('/enable/:id', checkAdminUser, async (req,res)=>{
-  try{
-    // Check if the product exists
-    let product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-    
-    // Enable the product
-    product.status = true;
-    const savedProduct = await product.save();
-    res.json(savedProduct);
-  }catch(error){
-    res.status(500).send("Internal Server Error");
-  }
-})
+    const {name, description, is_active} = req.body;
 
-//ROUTE: 5 - Delete a Product - Admin - DELETE "backend-gadgetbazaar/admin/products/delete/:id"
-router.delete('/delete/:id', checkAdminUser, async (req,res)=>{
-  try{
-    // Check if the product exists
-    let product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+    const category = await Category.findOne({_id: id});
+    if(!category){
+      return res.status(400).send("Category not found");
     }
-  
-    // Delete the product
-    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-    
-    // If the product was not deleted for some reason
-    if (!deletedProduct) {
-      return res.status(500).json({ message: 'Unable to delete product' });
+
+    category.name = name;
+    category.description = description;
+    category.is_active = is_active;
+
+    if(req.file){
+      category.image = req.file.path.replace('public', '');
     }
-    
-    res.json({ message: 'Product deleted successfully' });
+
+    const savedCategory = await category.save();
+    res.json(savedCategory);
 
   }catch(error){
     res.status(500).send("Internal Server Error");
   }
-})
-
+});
+//ROUTE: 7 - Get all category - Admin - POST "backend-gadgetbazaar/admin/products/category/getall
+router.get('/category/getall', async (req, res) => {
+  try {
+    const category = await Category.find();
+    res.json(category);
+  } catch (error) {
+    res.status(500).send("Internal Server Error");
+  }
+});
+//ROUTE: 8 - Get active category - Admin - POST "backend-gadgetbazaar/admin/products/category/getactive
+router.get('/category/getactive', async (req, res) => {
+  try {
+    const category = await Category.find({ is_active: true });
+    res.json(category);
+  } catch (error) {
+    res.status(500).send("Internal Server Error");
+  }
+});
+//ROUTE: 9 - Get not active category - Admin - POST "backend-gadgetbazaar/admin/products/category/getnotactive
+router.get('/category/getnotactive', async (req, res) => {
+  try {
+    const category = await Category.find({ is_active: false});
+    res.json(category);
+  } catch (error) {
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 module.exports = router;

@@ -7,18 +7,20 @@ import { data } from 'jquery';
 function EditSpecification() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [specification, setSpecification] = useState({
-    name: '',
-    value: '',
-    is_active: false
-  });
+  const [specificationName, setSpecificationName] = useState("");
+  const [specificationValue, setSpecificationValue] = useState("");
+  const [isSpecificationActive, setIsSpecificationActive] = useState("");
   const [errors, setErrors] = useState([]);
   useEffect(() => {
     async function fetchData() {
       try {
         const response = await fetch(`${adminProductAPIUrl}/specifications/get/${id}`);
         const data = await response.json();
-        setSpecification(data);
+        if(data){
+          setSpecificationName(data.name)
+          setSpecificationValue(data.value)
+          setIsSpecificationActive(data.is_active)
+        }
       } catch (error) {
         console.error(error);
       }
@@ -30,18 +32,14 @@ function EditSpecification() {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setSpecification((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleCheckboxChange = (event) => {
-    const { name, checked } = event.target;
-    setSpecification((prevState) => ({
-      ...prevState,
-      [name]: checked
-    }));
+    console.log(name, value)
+    if(name === "name")
+      setSpecificationName(value)
+    else if(name === "value")
+      setSpecificationValue(value)
+    else if(name === "is_active"){
+      setIsSpecificationActive(event.target.checked)
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -52,7 +50,11 @@ function EditSpecification() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(specification)
+        body: JSON.stringify({
+          name: specificationName,
+          value: specificationValue,
+          is_active: isSpecificationActive
+        })
       });
       if (response.ok) {
         navigate(adminFrontSpecificationsPostFix);
@@ -66,9 +68,9 @@ function EditSpecification() {
   };
 
   return (
-    <div>
+    <div className='content'>
       <h2>Edit Specification</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='admin-form'>
       {errors.length > 0 && (
                   <div className="alert alert-danger">
                     <ul style={{paddingLeft: "15px", marginBottom: "0"}}>
@@ -80,15 +82,15 @@ function EditSpecification() {
                 )}
         <div>
           <label htmlFor="name">Name:</label>
-          <input type="text" id="name" name="name" value={specification.name} onChange={handleInputChange} />
+          <input type="text" id="name" name="name" value={specificationName} onChange={handleInputChange} />
         </div>
         <div>
-          <label htmlFor="unit">Unit:</label>
-          <input type="text" id="unit" name="unit" value={specification.unit} onChange={handleInputChange} />
+          <label htmlFor="unit">Value:</label>
+          <input type="text" id="value" name="value" value={specificationValue} onChange={handleInputChange} />
         </div>
-        <div>
+        <div className='checkbox-container'>
           <label htmlFor="is_active">Active:</label>
-          <input type="checkbox" id="is_active" name="is_active" checked={specification.is_active} onChange={handleCheckboxChange} />
+          <input type="checkbox" id="is_active" name="is_active" checked={isSpecificationActive} onChange={handleInputChange} />
         </div>
         <button type="submit">Update Specification</button>
       </form>

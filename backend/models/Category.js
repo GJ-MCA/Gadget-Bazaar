@@ -12,7 +12,7 @@ const categorySchema = new Schema({
     maxlength: 500
   },
   image: { type: String },
-  status: {
+  is_active: {
     type: Boolean,
     required: true
   },
