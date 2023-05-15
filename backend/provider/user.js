@@ -1,0 +1,9 @@
+const GADGETBAZAAR_MSG_API_AUTH_KEY = "86f6e6ed1544832e";
+const GADGETBAZAAR_MSG_API_SID = "5312";
+const GADGETBAZAAR_MSG_API_LINK = "https://api.authkey.io/request?";
+
+module.exports = {
+    GADGETBAZAAR_MSG_API_AUTH_KEY,
+    GADGETBAZAAR_MSG_API_SID,
+    GADGETBAZAAR_MSG_API_LINK
+};

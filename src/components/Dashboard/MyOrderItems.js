@@ -48,7 +48,7 @@ const MyOrderItems = () => {
 
   
   return (
-    <div className='container my-orders-container'>
+    <div className='container my-orders-container' style={{marginTop: "104px"}}>
       <h2>My Order Items</h2>
       {isOrderFound ? (
         <>
@@ -134,7 +134,7 @@ const MyOrderItems = () => {
                     <td>&#8377;{parseFloat(order_item.price).toFixed(2)}</td>
                     <td>{order_item.quantity}</td>
                     <td>&#8377;{(parseFloat(order_item.price) * order_item.quantity).toFixed(2)}</td>
-                    <td>{capitalizeFirstLetter(order_item.order_details_status)}</td>
+                    <td>{capitalizeFirstLetter(order_item.order_items_status)}</td>
                   </tr>
                 ))}
               </tbody>

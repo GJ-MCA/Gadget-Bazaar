@@ -26,7 +26,7 @@ const orderItemSchema = new Schema({
       return parseFloat(value);
     }
   },
-  order_details_status: {
+  order_items_status: {
       type: String,
       enum: ['pending', 'shipped', 'outfordelivery', 'delivered'],
       default: 'pending'

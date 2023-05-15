@@ -62,27 +62,6 @@ export const Home = () => {
             </div>
          </section>
             )}
-         <form method="POST" action={`${config.baseUrl}/admin/products/add`} encType="multipart/form-data">
-            <label htmlFor="name">Name:</label>
-            <input type="text" name="name" id="name" required/>
-            <br/>
-            <label htmlFor="desc">Description:</label>
-            <input type="text" name="description" required/>
-            <br/>
-            <label htmlFor="sku">SKU:</label>
-            <input type="text" name="sku" required/>
-            <br/>
-            <label htmlFor="category">Category:</label>
-            <input type="text" name="category" required/>
-            <br/>
-            <label htmlFor="price">Price:</label>
-            <input type="number" name="price" required/>
-            <br/>
-            <label htmlFor="image">Image:</label>
-            <input type="file" name="image" accept=".jpg, .jpeg, .png"/>
-            <br/>
-            <button type="submit">Add Product</button>
-         </form>
 
          {/* <!-- end slider section --> */}
       </div>
@@ -148,97 +127,6 @@ export const Home = () => {
       {/* <!-- product section --> */}
       <ProductList/>
       {/* <!-- end product section --> */}
-      {/* <!-- client section --> */}
-      <section className="client_section layout_padding">
-         <div className="container">
-            <div className="heading_container heading_center">
-               <h2>
-                  Customer's Testimonial
-               </h2>
-            </div>
-            <div id="homeslider" className="carousel slide" data-ride="carousel">
-               <div className="carousel-inner">
-                  <div className="carousel-item active">
-                     <div className="box col-lg-10 mx-auto">
-                        <div className="img_container">
-                           <div className="img-box">
-                              <div className="img_box-inner">
-                                 <img src="/assets/img/client.jpg" alt=""/>
-                              </div>
-                           </div>
-                        </div>
-                        <div className="detail-box">
-                           <h5>
-                              Anna Trevor
-                           </h5>
-                           <h6>
-                              Customer
-                           </h6>
-                           <p>
-                              Dignissimos reprehenderit repellendus nobis error quibusdam? Atque animi sint unde quis reprehenderit, et, perspiciatis, debitis totam est deserunt eius officiis ipsum ducimus ad labore modi voluptatibus accusantium sapiente nam! Quaerat.
-                           </p>
-                        </div>
-                     </div>
-                  </div>
-                  <div className="carousel-item">
-                     <div className="box col-lg-10 mx-auto">
-                        <div className="img_container">
-                           <div className="img-box">
-                              <div className="img_box-inner">
-                                 <img src="/assets/img/client.jpg" alt=""/>
-                              </div>
-                           </div>
-                        </div>
-                        <div className="detail-box">
-                           <h5>
-                              Anna Trevor
-                           </h5>
-                           <h6>
-                              Customer
-                           </h6>
-                           <p>
-                              Dignissimos reprehenderit repellendus nobis error quibusdam? Atque animi sint unde quis reprehenderit, et, perspiciatis, debitis totam est deserunt eius officiis ipsum ducimus ad labore modi voluptatibus accusantium sapiente nam! Quaerat.
-                           </p>
-                        </div>
-                     </div>
-                  </div>
-                  <div className="carousel-item">
-                     <div className="box col-lg-10 mx-auto">
-                        <div className="img_container">
-                           <div className="img-box">
-                              <div className="img_box-inner">
-                                 <img src="/assets/img/client.jpg" alt=""/>
-                              </div>
-                           </div>
-                        </div>
-                        <div className="detail-box">
-                           <h5>
-                              Anna Trevor
-                           </h5>
-                           <h6>
-                              Customer
-                           </h6>
-                           <p>
-                              Dignissimos reprehenderit repellendus nobis error quibusdam? Atque animi sint unde quis reprehenderit, et, perspiciatis, debitis totam est deserunt eius officiis ipsum ducimus ad labore modi voluptatibus accusantium sapiente nam! Quaerat.
-                           </p>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-               <div className="carousel_btn_box">
-                  <a className="carousel-control-prev" href="#homeslider" role="button" data-slide="prev">
-                  <i className="fa fa-long-arrow-left" aria-hidden="true"></i>
-                  <span className="sr-only">Previous</span>
-                  </a>
-                  <a className="carousel-control-next" href="#homeslider" role="button" data-slide="next">
-                  <i className="fa fa-long-arrow-right" aria-hidden="true"></i>
-                  <span className="sr-only">Next</span>
-                  </a>
-               </div>
-            </div>
-         </div>
-      </section>
-      {/* <!-- end client section --> */}
     </>
   )
 }

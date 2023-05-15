@@ -18,6 +18,7 @@ const adminBaseUrl = `${clientUrl}/gadgetbazaar/admin` //Admin Base URL
 const adminLoginUrl = `${adminBaseUrl}/auth/login` //Admin Login URL
 const adminDashboardUrl = `${adminBaseUrl}/dashboard` //Admin Dashboard URL
 const pdpPagePreUrl = `${clientUrl}/product/`; //PDP Prefix URL
+const categoriesPagePreUrl = `${clientUrl}/categories`; //Categories Prefix URL
 const myOrdersPreUrl = `${clientUrl}/my-orders/`; //My Orders Prefix URL
 const productBaseAPIUrl = `${baseUrl}/products`; //My Orders Prefix URL
 module.exports = {
@@ -39,6 +40,7 @@ module.exports = {
     adminLoginUrl,
     adminDashboardUrl,
     pdpPagePreUrl,
+    categoriesPagePreUrl,
     myOrdersPreUrl,
     productBaseAPIUrl
 };

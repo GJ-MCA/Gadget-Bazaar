@@ -9,7 +9,7 @@ const categorySchema = new Schema({
   description: {
     type: String,
     required: true,
-    maxlength: 500
+    maxlength: 1000
   },
   image: { type: String },
   is_active: {

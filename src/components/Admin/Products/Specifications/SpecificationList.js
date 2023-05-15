@@ -31,7 +31,7 @@ function SpecificationList() {
   };
 
   return (
-    <div className='main-table-container'>
+    <div className='main-table-container content'>
       <h2>Specification List</h2>
       <button onClick={handleAddSpecClick}>Add Specification</button>
       {console.log(specs)}

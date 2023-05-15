@@ -5,7 +5,8 @@ import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginMiddleware } from '../../helpers/userHelper';
 import { updateLoader } from '../../helpers/generalHelper';
-/* const config = require("../../config/config"); */
+
+const config = require("../../config/config");
 const PUBLIC_CSS_DIR = `${process.env.PUBLIC_URL}/assets/css`;
 export const ShoppingCart = () => {
     const loginMiddleware = useLoginMiddleware(); //used to check if user is logged in, if not then redirect to login page
@@ -19,7 +20,7 @@ export const ShoppingCart = () => {
           ),
         [cartItems]
       );
-      
+      const [categories, setCategories] = useState({});
       const totalQty = useMemo(() => {
         return cartItems.reduce((total, item) => total + item.quantity, 0);
       }, [cartItems]);
@@ -66,6 +67,31 @@ export const ShoppingCart = () => {
         setDiscountAmount((cartFinalWithoutShipping * couponDiscount).toFixed(2));
         const discountedamount = (cartFinalWithoutShipping - (cartFinalWithoutShipping * couponDiscount)).toFixed(2);
         setDiscountedPrice((Number(discountedamount) + 40).toFixed(2));
+        const getCategoryName = async (categoryId) => {
+            try {
+              const response = await fetch(`${config.productBaseAPIUrl}/categories/getbyid/${categoryId}`);
+              if (!response.ok) {
+                throw new Error('Unable to fetch category');
+              }
+              const category = await response.json();
+              return category.name;
+            } catch (error) {
+              console.error(error);
+            }
+          };
+      
+          const getCategoryNamesForCartItems = async () => {
+            const categoryPromises = cartItems.map((cartItem) => getCategoryName(cartItem.product_id.category));
+            const categoryNames = await Promise.all(categoryPromises);
+            const categoriesObject = {};
+            categoryNames.forEach((categoryName, index) => {
+              const cartItem = cartItems[index];
+              categoriesObject[cartItem.product_id.category] = categoryName;
+            });
+            setCategories(categoriesObject);
+          };
+      
+          getCategoryNamesForCartItems();
         updateLoader(false)
       }, [totalQty, setCartCount, couponDiscount, cartFinalTotal, cartFinalWithoutShipping]);
       const handleUpdateCartItemQuantity = async (productId, newQuantity) => {
@@ -248,11 +274,15 @@ export const ShoppingCart = () => {
                                         {cartItems.map((cartItem) => (
                                           <div className="row mb-4 d-flex justify-content-between align-items-center" key={cartItem._id}>
                                               <div className="col-md-2 col-lg-2 col-xl-2 text-left">
-                                                  <img src={cartItem.product_id.image} className="img-fluid rounded-3" alt={cartItem.product_id.name}/>
+                                                  <img src={cartItem.product_id.images[0]} className="img-fluid rounded-3" alt={cartItem.product_id.name}/>
                                               </div>
                                               <div className="col-md-3 col-lg-3 col-xl-2 text-center">
-                                                  <h6 className="text-muted">Category</h6>
-                                                  <h6 className="text-black mb-0">{cartItem.product_id.name}</h6>
+                                                  <h6 className="text-muted">{categories[cartItem.product_id.category]}</h6>
+                                                  <h6 className="text-black mb-0">
+                                                    <Link to={"/product/"+cartItem.product_id.sku}>
+                                                    {cartItem.product_id.name}
+                                                    </Link>
+                                                  </h6>
                                               </div>
                                               <div className="col-md-3 col-lg-3 col-xl-2 d-flex text-center justify-content-center">
                                                   <button className="btn px-2" onClick={() => handleUpdateCartItemQuantity(cartItem.product_id, cartItem.quantity - 1)}>

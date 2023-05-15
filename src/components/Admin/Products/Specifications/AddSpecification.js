@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontSpecificationsPostFix } from '../../../../helpers/adminHelper';
+import { updateLoader } from '../../../../helpers/generalHelper';
 
 function AddSpecification() {
   const [name, setName] = useState('');
@@ -19,9 +20,9 @@ function AddSpecification() {
     formData.append('name', name);
     formData.append('description', description);
     formData.append('is_active', is_active);
-    console.log("Handle Submit Called")
-    console.log(formData)
+
     try {
+      updateLoader(true);
       const response = await fetch(`${adminProductAPIUrl}/specifications/add`, {
         method: 'POST',
         body: formData,
@@ -35,10 +36,11 @@ function AddSpecification() {
     } catch (error) {
       console.log(error);
     }
+    updateLoader(false);
   };
 
   return (
-    <div>
+    <div className='content'>
       <h2>Add Specification</h2>
       <form className='admin-form'>
       {errors.length > 0 && (
@@ -63,7 +65,7 @@ function AddSpecification() {
             />
             </div>
             <div>
-            <label htmlFor="description">Description:</label>
+            <label htmlFor="description">Value:</label>
             <input
                 id="description"
                 name="description"

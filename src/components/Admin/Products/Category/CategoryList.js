@@ -46,7 +46,7 @@ function CategoryList() {
                     </tr>
                     </thead>
                     <tbody>
-                    {categories.map((category) => (
+                    {categories && categories.map((category) => (
                         <tr key={category._id}>
                         <td>{category.name}</td>
                         <td style={{width: "100px"}}>

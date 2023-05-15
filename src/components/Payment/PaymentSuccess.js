@@ -3,6 +3,7 @@ import fetchOrderById from '../../helpers/orderHelper';
 import { clearCart } from '../../helpers/cartHelper';
 import { myOrdersPreUrl } from '../../config/config';
 import { updateLoader } from '../../helpers/generalHelper';
+import { Link } from 'react-router-dom';
 export const PaymentSuccess = () => {
   const [referenceCode, setReferenceCode] = useState('');
   const token = localStorage.getItem('auth-token');
@@ -35,7 +36,7 @@ export const PaymentSuccess = () => {
       <div className='payment-success-message-container'>
         <h2>Payment Successful!</h2>
         <p>Your order has been placed successfully.</p>
-        {referenceCode && <p>Your order id is: <a href={myOrdersPreUrl + referenceCode}>{referenceCode}</a></p>}
+        {referenceCode && <p>Your order id is: <Link to={myOrdersPreUrl + referenceCode}>{referenceCode}</Link></p>}
       </div>
     </div>
   );

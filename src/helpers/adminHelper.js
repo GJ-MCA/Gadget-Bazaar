@@ -10,6 +10,9 @@ export const adminFrontProductsPostFix = `${adminFrontDashboardPostFix}/products
 export const adminFrontCategoryPostFix = `${adminFrontDashboardPostFix}/category`;
 export const adminFrontBrandsPostFix = `${adminFrontDashboardPostFix}/brands`;
 export const adminFrontSpecificationsPostFix = `${adminFrontDashboardPostFix}/specifications`;
+export const adminFrontPromotionsPostFix = `${adminFrontDashboardPostFix}/promotions`;
+export const adminFrontOrdersPostFix = `${adminFrontDashboardPostFix}/orders`;
+export const adminFrontUsersPostFix = `${adminFrontDashboardPostFix}/users`;
 export const adminFrontReportsPostFix = `${adminFrontDashboardPostFix}/reports`;
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -146,3 +149,48 @@ export const generatePdf = (salesReport, fromDate, toDate) => {
  
     }
   }
+  export const getOrderByReferenceCode = async (order_reference_code) => {
+    try {
+      console.log(order_reference_code)
+      const response = await fetch(`${config.adminMainAPIUrl}/orders/getorderbyreferencecode`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({order_reference_code: order_reference_code })
+      });
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+  export const getOrderStatusValues = async () => {
+    try {
+      const response = await fetch(`${config.adminMainAPIUrl}/orders/status/getallvalues`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+  export const updateOrderStatusValue = async (order_id, status) => {
+    try {
+      const response = await fetch(`${config.adminMainAPIUrl}/orders/status/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({order_id: order_id, order_status: status })
+      });
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error(err.message);
+    }
+  };

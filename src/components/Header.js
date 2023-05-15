@@ -9,6 +9,8 @@
 	
 		const [user, setUser] = useState(null);
 		const { cartCount, setCartCount } = useContext(GadgetBazaarContext);
+		const [searchQuery, setSearchQuery] = useState('');
+  		const [searchResults, setSearchResults] = useState([]);
 		const location = useLocation();
 		const navigate = useNavigate();
 
@@ -41,7 +43,7 @@
 			}
 			
 		}, [location]);
-	
+		
 		useEffect(() => {
 			if (user) {
 				const token = localStorage.getItem('auth-token');
@@ -76,7 +78,21 @@
 				setCartCount(0);
 			}
 		}, [user, setCartCount]);
-
+		const handleSearchSubmit = (event) => {
+			event.preventDefault();
+			console.log("Search Button Clicked!")
+			console.log("Search query: ")
+			console.log(searchQuery)
+			if(searchQuery)
+				navigate(`/search/${searchQuery}`);
+			else
+				alert("Please enter text you want to search!")
+		  };
+		
+		  const handleSearchQueryChange = (event) => {
+			setSearchQuery(event.target.value);
+		  };
+		
 		const handleLogout = () => {
 			// Remove the token from local storage to log the user out
 			setUser(null);
@@ -101,11 +117,8 @@
 									<li className={`nav-item ${location.pathname === '/products' ? 'active' : ''}`}>
 										<Link className="nav-link" to="/products">Products</Link>
 									</li>
-									<li className="nav-item">
-										<Link className="nav-link" to="/contact">Contact</Link>
-									</li>
-									<li className={`nav-item ${location.pathname === '/about' ? 'active' : ''}`}>
-										<Link className="nav-link" to="about">About Us</Link>
+									<li className={`nav-item ${location.pathname === '/categories' ? 'active' : ''}`}>
+										<Link className="nav-link" to="/categories">Categories</Link>
 									</li>
 									{user ? (
 									<li className="nav-item">
@@ -116,14 +129,23 @@
 									</li>
 							
 									):null}
-									<form className="form-inline">
+									<form className="form-inline" onSubmit={handleSearchSubmit}>
+										<input
+										type="text"
+										className="form-control mr-sm-2 mr-2"
+										style={{margin: "0"}}
+										placeholder="Search"
+										aria-label="Search"
+										value={searchQuery}
+										onChange={handleSearchQueryChange}
+										/>
 										<button className="btn  my-2 my-sm-0 nav_search-btn" type="submit">
-											<i className="fa fa-search" aria-hidden="true"></i>
+										<i className="fa fa-search" aria-hidden="true"></i>
 										</button>
 									</form>
 									{user ? (
 										<>
-											<li className={`nav-item ${location.pathname === '/my-account' ? 'active' : ''}`}>
+											<li className={`nav-item myaccount-link ${location.pathname === '/my-account' ? 'active' : ''}`}>
 											<Link className="nav-link" to="/my-account">
 												{user.name}
 											</Link>

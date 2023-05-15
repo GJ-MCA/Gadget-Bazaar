@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { Link, useNavigate } from 'react-router-dom';
-import { addNeccessaryClasses, adminFrontBrandsPostFix, adminFrontSpecificationsPostFix } from '../../../../helpers/adminHelper';
+import { addNeccessaryClasses, adminFrontBrandsPostFix } from '../../../../helpers/adminHelper';
 
 function BrandList() {
   const [brands, setBrands] = useState([]);

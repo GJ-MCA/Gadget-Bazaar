@@ -13,6 +13,7 @@ const mongoose = require('mongoose');
 const { checkIfOrderRefIDExists } = require('../../services/orderService');
 const moment = require('moment');
 const shortid = require('shortid');
+const Order_Detail = require('../../models/Order_Detail');
 
 //ROUTE: 1 - Add to Cart the Product - POST "backend-gadgetbazaar/order/cart/add"
 router.post('/cart/add', fetchuser, async (req, res) => {
@@ -651,10 +652,18 @@ router.post('/getorderbyreferencecode', fetchuser, async (req, res) => {
     const { order_reference_code } = req.body;
     const order_details = await OrderDetails.findOne({ order_reference_code: order_reference_code, user_id: userId });
     if (order_details) {
-      const order_items = await OrderItems.find({ order_detail_id: order_details._id }).populate('product_id').exec();
+      const order_items = await OrderItems.find({ order_id: order_details._id })
+        .populate('product_id')
+        .populate({
+          path: 'order_id',
+          model: 'Order_Detail',
+          select: 'order_reference_code'
+        })
+        .exec();
       const itemsWithProduct = order_items.map(item => ({
         ...item.toObject(),
-        product: item.product_id.toObject()
+        product: item.product_id.toObject(),
+        order_reference_code: item.order_id.order_reference_code
       }));
       const orderWithItems = {
         ...order_details.toObject(),
@@ -714,9 +723,5 @@ router.get('/get-active-coupon', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-
-
-module.exports = router;
 
 module.exports = router;

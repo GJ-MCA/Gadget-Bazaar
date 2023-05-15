@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontSpecificationsPostFix } from '../../../../helpers/adminHelper';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { data } from 'jquery';
+import { updateLoader } from '../../../../helpers/generalHelper';
 
 function EditSpecification() {
   const { id } = useParams();
@@ -11,6 +12,7 @@ function EditSpecification() {
   const [specificationValue, setSpecificationValue] = useState("");
   const [isSpecificationActive, setIsSpecificationActive] = useState("");
   const [errors, setErrors] = useState([]);
+  const [message, setMessage] = useState("");
   useEffect(() => {
     async function fetchData() {
       try {
@@ -45,6 +47,7 @@ function EditSpecification() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      updateLoader(true);
       const response = await fetch(`${adminProductAPIUrl}/specifications/edit/${id}`, {
         method: 'PUT',
         headers: {
@@ -56,21 +59,32 @@ function EditSpecification() {
           is_active: isSpecificationActive
         })
       });
+      const data = await response.json();
       if (response.ok) {
-        navigate(adminFrontSpecificationsPostFix);
-        setErrors(data.errors)
+        if(data.success){
+          setMessage(data.success);
+          setErrors([])
+        }
       } else {
+        setErrors(data.errors)
+        setMessage("")
         console.error(response.statusText);
       }
     } catch (error) {
       console.error(error);
     }
+    updateLoader(false);
   };
 
   return (
     <div className='content'>
       <h2>Edit Specification</h2>
-      <form onSubmit={handleSubmit} className='admin-form'>
+      <form className='admin-form'>
+      {message && (
+          <div className='alert alert-success'>
+            {message}
+          </div>
+        )}
       {errors.length > 0 && (
                   <div className="alert alert-danger">
                     <ul style={{paddingLeft: "15px", marginBottom: "0"}}>
@@ -92,7 +106,7 @@ function EditSpecification() {
           <label htmlFor="is_active">Active:</label>
           <input type="checkbox" id="is_active" name="is_active" checked={isSpecificationActive} onChange={handleInputChange} />
         </div>
-        <button type="submit">Update Specification</button>
+        <button type="button" onClick={handleSubmit}>Update Specification</button>
       </form>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { addNeccessaryClasses } from '../../../../helpers/adminHelper';
+import { updateLoader } from '../../../../helpers/generalHelper';
 
 function AddBrand() {
   const [name, setName] = useState('');
@@ -23,6 +24,7 @@ function AddBrand() {
     formData.append('description', description);
     formData.append('is_active', is_active);
     try {
+      updateLoader(true);
       const response = await fetch(`${adminProductAPIUrl}/brands/add`, {
         method: 'POST',
         body: formData,
@@ -50,10 +52,11 @@ function AddBrand() {
       setMessage("");
       console.error('Error creating brand:', error);
     }
+    updateLoader(false);
   };
 
   return (
-    <div>
+    <div className='content'>
       <h2>Add Brand</h2>
       <form className='admin-form'>
         {message && message.length > 0 && (

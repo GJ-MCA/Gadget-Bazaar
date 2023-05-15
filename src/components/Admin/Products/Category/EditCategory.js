@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { addNeccessaryClasses, adminFrontCategoryPostFix } from '../../../../helpers/adminHelper';
+import { updateLoader } from '../../../../helpers/generalHelper';
 
 const EditCategory = () => {
   const { id } = useParams();
@@ -60,13 +61,14 @@ const EditCategory = () => {
     }
 
     try {
+      updateLoader(true);
       const response = await fetch(`${adminProductAPIUrl}/category/edit/${id}`, {
         method: 'PUT',
         body: formData,
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error('Failed to update brand');
+        throw new Error('Failed to update category');
       }else{
         setErrors(data.errors)
       }
@@ -74,14 +76,15 @@ const EditCategory = () => {
     } catch (error) {
       setError(error.message);
     }
+    updateLoader(false);
   };
 
   return (
-    <div>
+    <div className='content'>
       {error ? (
         <p>{error}</p>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form>
                 {errors.length > 0 && (
                   <div className="alert alert-danger">
                     <ul style={{paddingLeft: "15px", marginBottom: "0"}}>
@@ -123,7 +126,7 @@ const EditCategory = () => {
             <label htmlFor="is_active">Active:</label>
             <input type="checkbox" name="is_active" checked={isActive} onChange={handleInputChange} />
           </div>
-          <button type="submit">Update Brand</button>
+          <button type="button" onClick={handleSubmit}>Update Category</button>
         </form>
       )}
     </div>

@@ -4299,10 +4299,10 @@ License - nucleoapp.com/license/
   width: auto;
   margin: 0;
 }
-.gadgetbazaar-admin-panel form button{
+.admin-main-panel form button{
   padding: 8px 15px;
 }
-.gadgetbazaar-admin-panel table td{
+.admin-main-panel table td{
   padding-top: 15px !important;
   padding-bottom: 15px !important;
 }
@@ -4324,6 +4324,112 @@ License - nucleoapp.com/license/
   margin-left: 15px;
 }
 
-.gadgetbazaar-admin-panel .content{
+.admin-main-panel .content{
   min-height: 84vh;
+}
+
+.form-group-half{
+  width: 49%;
+  display: inline-block;
+  margin-right: 15px;
+}
+.form-group-half select{
+  margin-left: 0;
+  background-size: 5px 5px,
+    5px 5px,
+    2.8em 2.8em;
+}
+.button-with-select{
+  height: 37px;
+  width: 80px;
+}
+.image-preview-container{
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.image-preview-main{
+  width: 140px;
+  position: relative;
+  overflow: hidden;
+}
+.image-preview-main p{
+word-break: break-all;
+}
+.image-preview{
+  width: 140px;
+  height: 140px;
+  position: relative;
+  overflow: hidden;
+}
+.image-preview img{
+  display: block;
+  max-height: 100%;
+  object-fit: cover;
+  width: 100%;
+  height: auto;
+}
+.image-preview button{
+  position: absolute;
+  width: 65px;
+  height: 22px;
+  padding: 0 !important;
+  font-size: 13px;
+  top: 0;
+  right: 0;
+}
+.width-40{
+  width: 40%  !important;
+}
+.main-panel.products-edit-active{
+  height: auto !important;
+}
+.spec-form-group select{
+  margin-left: 0;
+  background-size: 5px 5px,
+  5px 5px,
+  2.8em 2.8em;
+}
+.specifications-container{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content:flex-start;
+  position: relative;
+  border: 2px dashed #d1d1d1;
+  padding: 15px;
+  padding-bottom: 55px;
+}
+.specifications-container .form-group{
+  width: 33% !important;
+}
+.specifications-container .form-group label{
+  display: block;
+}
+.specifications-container .form-group select.first{
+  width: 97%;
+}
+.specifications-container .form-group select{
+  display: inline-block;
+  width: 75%;
+  margin-right: 15px;
+}
+.specifications-container .form-group button{
+  display: inline-block;
+}
+.specifications-container .add-spec-btn{
+  position: absolute;
+  bottom: 15px;
+  transform: translateX(-50%);
+  left: 50%;
+}
+.admin-main-panel button{
+  height: 37px;
+  padding: 0 10px;
+}
+
+.admin-main-panel a{
+  color: #0f00ff;
+}
+.admin-main-panel a:hover{
+  opacity: .7;
 }

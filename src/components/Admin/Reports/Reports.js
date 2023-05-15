@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { generatePdf } from '../../../helpers/adminHelper';
+import { Link } from 'react-router-dom';
 
 const generatePdfUrl = async (data,fromDate,toDate) => {
     const pdfDocGenerator = generatePdf(data,fromDate,toDate);
@@ -76,9 +77,9 @@ const Reports = () => {
                 <button onClick={handleGeneratePdf}>Generate PDF</button>
                 {pdfUrl && !pdfDownloaded && (
                     <p className='text-right'>
-                    <a href={pdfUrl} download={`sales-report-${new Date().toLocaleDateString()}.pdf`} onClick={handlePdfDownload}>
+                    <Link to={pdfUrl} download={`sales-report-${new Date().toLocaleDateString()}.pdf`} onClick={handlePdfDownload}>
                         Download PDF
-                    </a>
+                    </Link>
                     </p>
                 )}
             </div>

@@ -2,6 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
 import Slider from "react-slick";
+import { updateLoader } from '../../helpers/generalHelper';
+import ProductReview from './ProductReview';
+import ProductReviewList from './ProductReviewList';
 
 const config = require("../../config/config");
 
@@ -9,11 +12,12 @@ export const ProductDetail = () => {
   
   const { setCartCount } = useContext(GadgetBazaarContext);
   const [product, setProduct] = useState({});
-  const [activeTab, setActiveTab] = useState(0);
+  const [specifications, setSpecifications] = useState([]);
   const { sku } = useParams();
   const navigate = useNavigate();
   const cartAddUrl = `${config.orderAPIUrl}/cart/add`;
   useEffect(() => {
+    updateLoader(true)
     const fetchProduct = async () => {
       try {
         const response = await fetch(`${config.baseUrl}/products/show/${sku}`);
@@ -21,13 +25,25 @@ export const ProductDetail = () => {
           throw new Error('Unable to fetch product');
         }
         const productData = await response.json();
-        console.log(productData[0])
+        console.log(productData)
         setProduct(productData[0]);
+        const specs = [];
+        for (const spec of productData[0].specification) {
+          const specResponse = await fetch(`${config.baseUrl}/products/specifications/get/${spec}`);
+          if (!specResponse.ok) {
+            throw new Error('Unable to fetch specification');
+          }
+          const specData = await specResponse.json();
+          specs.push(specData);
+        }
+        setSpecifications(specs);
       } catch (error) {
         console.error(error);
       }
     };
+    
     fetchProduct();
+    updateLoader(false)
   }, [sku]);
 
   const showNotification = () =>{
@@ -109,9 +125,6 @@ export const ProductDetail = () => {
     }
 
   };
-  const handleTabClick = (index) => {
-    setActiveTab(index);
-  };
   
   const settings = {
     dots: true,
@@ -120,27 +133,13 @@ export const ProductDetail = () => {
     slidesToShow: 1,
     slidesToScroll: 1
   };
-  const tabs = [
-    {
-      title: "Tab 1",
-      content: "Tab 1 content",
-    },
-    {
-      title: "Tab 2",
-      content: "Tab 2 content",
-    },
-    {
-      title: "Tab 3",
-      content: "Tab 3 content",
-    },
-  ];
   
   return (
     
     <>
     <link rel="stylesheet" type="text/css" charSet="UTF-8" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" /> 
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" />
-    <section className="py-5 product-detail-section">
+    <section className="py-5 product-detail-section" style={{marginTop: "104px"}}>
 
       <div id="snackbar" className="alert alert-success">
           Product added to cart!
@@ -178,14 +177,28 @@ export const ProductDetail = () => {
               </p>
 
               <hr />
-              <div className="options">
-                <button className="option1" onClick={() => handleAddToCart(product)}>
-                  Add to Cart
-                </button>
-                <button className="option2" onClick={() => handleAddToCart(product, true)}>
-                  Buy Now
-                </button>
-              </div>
+              {product.quantity <= 0 ? (
+                <div className="alert alert-danger bg-light" role="alert">
+                  <i className="fa fa-exclamation-circle me-2"></i> Sorry, this item is currently out of stock. Please check back later.
+                </div>
+              ) : (
+                localStorage.getItem("auth-token") ? (
+                  <div className="options">
+                    <button className="option1" onClick={() => handleAddToCart(product)}>
+                      Add to Cart
+                    </button>
+                    <button className="option2" onClick={() => handleAddToCart(product, true)}>
+                      Buy Now
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <p> Login to Purchase the product</p>
+                    <button onClick={() => {navigate("/login") }}> Login </button>
+                  </div>
+                )
+              )}
+
             </div>
           </main>
         </div>
@@ -196,32 +209,24 @@ export const ProductDetail = () => {
         <div className="row gx-4">
           <div className="col mb-4">
             <div className="border rounded-2 px-3 py-2 bg-white">
-            <ul className="nav nav-tabs mb-3 custom-nav-tabs" id="ex1" role="tablist">
-              {tabs.map((tab, index) => (
-                <li className="nav-item" role="presentation" key={index}>
-                  <button
-                    className={`nav-link${activeTab === index ? " active" : ""}`}
-                    onClick={() => handleTabClick(index)}
-                  >
-                    {tab.title}
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <div className="tab-content" id="ex1-content">
-              {tabs.map((tab, index) => (
-                <div
-                  className={`tab-pane fade${activeTab === index ? " show active" : ""}`}
-                  id={`ex1-tabs-${index}`}
-                  role="tabpanel"
-                  aria-labelledby={`ex1-tab-${index}`}
-                  key={index}
-                >
-                  {tab.content}
+         
+          
+              <div className='specifications-container'>
+                <h3 style={{borderBottom: "2px dashed rgb(170 170 170)", paddingBottom: "5px"}}> Specifications </h3>
+                {specifications.map((spec, index) => (
+                  <div key={index}>
+                    <h6>{spec.name}: <span style={{fontWeight: "400"}}>{spec.value}</span></h6>
+                    
+                  </div>
+                  ))}
                 </div>
-              ))}
             </div>
-            </div>
+            {product && product._id && (
+              <>
+                <ProductReview productId={product._id} />
+                <ProductReviewList productId={product._id} />
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -27,7 +27,7 @@ const MyOrders = () => {
   }
 
   return (
-    <div className='container my-orders-container'>
+    <div className='container my-orders-container' style={{minHeight: "30vh", marginTop: "104px"}}>
       <h2>My Orders</h2>
       {orders.length > 0 ? (
         <div className='table-container'>
@@ -43,7 +43,7 @@ const MyOrders = () => {
             <tbody>
               {orders.map((order) => (
                 <tr key={order._id}>
-                  <td><a href={myOrdersPreUrl + order.order_reference_code}>{order.order_reference_code}</a></td>
+                  <td><Link to={myOrdersPreUrl + order.order_reference_code}>{order.order_reference_code}</Link></td>
                   <td>{new Date(order.order_date).toLocaleString()}</td>
                   <td>&#8377;{order.total}</td>
                   <td>{capitalizeFirstLetter(order.order_status)}</td>

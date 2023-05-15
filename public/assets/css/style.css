@@ -374,8 +374,10 @@ header + .hero_area{
     -webkit-transition: all .3s;
     transition: all .3s;
     overflow: hidden;
-    box-shadow: 5px 5px 5px -5px rgba(0,0,0,.2);
+    box-shadow: 0px 0px 10px 7px rgba(0,0,0,.2);
     border: solid #fff 10px;
+    max-height: 430px;
+    min-height: 430px;
 }
 
 .product_section .box .img-box {
@@ -457,7 +459,7 @@ header + .hero_area{
   -webkit-transform: translateY(100%);
           transform: translateY(100%);
 }
-.product-detail-section{
+product-.detail-section{
   margin-top: 104px !important;
   margin-bottom: 50px !important;
 }
@@ -1596,4 +1598,33 @@ header.page-loading{
   #progressbar-2 li.active:before,
   #progressbar-2 li.active:after {
   background: #6520ff;
+  }
+
+  .product-desc h6{
+    text-overflow: ellipsis;
+    max-width: 100%;
+    max-height: 75px;
+    overflow: hidden;
+  }
+
+  .myaccount-link a{
+    max-width: 145px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-height: 38px;
+    padding: 5px 8px !important;
+  }
+
+  .btn-links{
+    padding: 5px 20px;
+    color: #ff0037;
+    text-align: center;
+    text-transform: uppercase;
+    border-radius: 5px;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    font-weight: 700;
+  }
+  .btn-links:hover{
+    .btn-links
   }

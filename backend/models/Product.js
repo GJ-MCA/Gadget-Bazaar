@@ -14,7 +14,8 @@ const productSchema = new Schema({
   },
   description: {
     type: String,
-    required: true
+    required: true,
+    maxlength: 1000
   },
   sku: {
     type: String,
@@ -31,11 +32,12 @@ const productSchema = new Schema({
     ref: 'Brand',
     default: null
   },
-  specification: {
+  specification: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Specification',
-    default: null
-  },
+    required: false,
+    default: []
+  }],
   price: {
     type: Number,
     get: function(value) {

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { addNeccessaryClasses } from '../../../../helpers/adminHelper';
+import { updateLoader } from '../../../../helpers/generalHelper';
 
 function AddCategory() {
   const [name, setName] = useState('');
-  const [image, setImage] = useState('');
+  const [image, setImage] = useState(null);
   const [description, setDescription] = useState('');
   const [is_active, setIsActive] = useState(true);
   const [errors, setErrors] = useState([]);
@@ -23,6 +24,7 @@ function AddCategory() {
     formData.append('description', description);
     formData.append('is_active', is_active);
     try {
+      updateLoader(true);
       const response = await fetch(`${adminProductAPIUrl}/category/add`, {
         method: 'POST',
         body: formData,
@@ -33,9 +35,9 @@ function AddCategory() {
         if(data){
           if(data.message){
             setMessage(data.message); 
-            setErrors("")
+            setErrors([])
             setName("");
-            setImage("");
+            setImage(null);
             setDescription("");
             setIsActive(true);
           }
@@ -50,10 +52,11 @@ function AddCategory() {
       setMessage("");
       console.error('Error creating category:', error);
     }
+    updateLoader(false);
   };
 
   return (
-    <div>
+    <div className='content'>
       <h2>Add Category</h2>
       <form className='admin-form'>
         {message && message.length > 0 && (

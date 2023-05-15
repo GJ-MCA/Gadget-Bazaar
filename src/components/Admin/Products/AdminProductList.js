@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { adminFrontBrandsPostFix, adminFrontProductsPostFix, adminFrontSpecificationsPostFix } from '../../../helpers/adminHelper';
 const config = require("../../../config/config");
-const AdminProducts = () => {
+const AdminProductList = () => {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
@@ -31,12 +31,19 @@ const AdminProducts = () => {
   const handleAddSProductClick = ()=>{
     navigate(adminFrontProductsPostFix+"/add")
   }
+  const handleEditProductClick = (id) => {
+    if (id) {
+      navigate(adminFrontProductsPostFix + '/edit/' + id);
+    } else {
+      alert('Something went wrong!');
+    }
+  };
   return (
-    <div className="">
+    <div className="content">
       <h2>Product List</h2>
       <button onClick={handleAddSProductClick}>Add Product</button>
-      <button onClick={handleBrandsClick}>Brands</button>
-      <button onClick={handleSpecificationsClick}>Specifications</button>
+      <button className='ml-3' onClick={handleBrandsClick}>Brands</button>
+      <button className='ml-3' onClick={handleSpecificationsClick}>Specifications</button>
       <table className="table table-striped">
         <thead>
           <tr>
@@ -59,9 +66,9 @@ const AdminProducts = () => {
               <td>{product.quantity}</td>
               <td>&#8377;{product.price}</td>
               <td>
-                <Link to={`/admin/products/${product._id}`} className="btn btn-primary">
+                <button onClick={() => handleEditProductClick(product._id)}>
                   Edit
-                </Link>
+                </button>
               </td>
             </tr>
           ))}
@@ -71,4 +78,4 @@ const AdminProducts = () => {
   );
 };
 
-export default AdminProducts;
+export default AdminProductList;

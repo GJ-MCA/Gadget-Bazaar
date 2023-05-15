@@ -45,24 +45,6 @@ export const Footer = () => {
                   </div>
                      </div>
                   </div>     
-                  <div className="col-md-5">
-                     <div className="widget_menu">
-                        <h3>Newsletter</h3>
-                        <div className="information_f">
-                          <p>Subscribe by our newsletter and get update protidin.</p>
-                        </div>
-                        <div className="form_sub">
-                           <form>
-                              <fieldset>
-                                 <div className="field">
-                                    <input type="email" placeholder="Enter Your Mail" name="email" />
-                                    <input type="submit" value="Subscribe" />
-                                 </div>
-                              </fieldset>
-                           </form>
-                        </div>
-                     </div>
-                  </div>
                   </div>
                </div>
             </div>

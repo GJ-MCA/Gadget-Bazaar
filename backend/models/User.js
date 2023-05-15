@@ -35,7 +35,27 @@ const userSchema = new Schema({
   is_active: {
     type: Boolean,
     default: true
-  }
+  },
+  mobile_otp: {
+    type: String,
+    required: false,
+    default: ""
+  },
+  is_mobile_verified: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  email_otp: {
+    type: String,
+    required: false,
+    default: ""
+  },
+  is_email_verified: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
 },
 { 
     toJSON: { getters: true }
@@ -46,5 +66,6 @@ const userSchema = new Schema({
     updatedAt: 'updated_at' 
   }
 });
-
+userSchema.index({ mobile_otp: 1 }, { expireAfterSeconds: 300 });
+userSchema.index({ email_otp: 1 }, { expireAfterSeconds: 300 });
 module.exports = mongoose.model('User',userSchema)

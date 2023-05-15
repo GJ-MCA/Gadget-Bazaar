@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { updateLoader } from '../../helpers/generalHelper';
 const config = require("../../config/config")
 
 export const ProductList = () => {
@@ -11,6 +12,7 @@ export const ProductList = () => {
   const productsToDisplay = 8;
   const navigate = useNavigate();
   useEffect(() => {
+    updateLoader(true)
     fetch(getAllProductsUrl)
       .then(response => {
         if (response.ok) {
@@ -25,6 +27,7 @@ export const ProductList = () => {
       .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
       });
+      updateLoader(false)
   },[getAllProductsUrl]);
   const showNotification = () =>{
     console.log("Show notification called")
@@ -128,24 +131,34 @@ export const ProductList = () => {
                       <div className="box">
                         <div className="option_container">
                         {product.quantity <= 0 ? (
-                        <div className="alert alert-danger bg-light" role="alert">
+                      <div className="alert alert-danger bg-light" role="alert">
                         <i className="fa fa-exclamation-circle me-2"></i> Sorry, this item is currently out of stock. Please check back later.
                       </div>
-                      
-                        
-                        ) : (
-                            <div className="options">
-                              <button className="option1" onClick={() => handleAddToCart(product)}>
-                                Add to Cart
-                              </button>
-                              <button className="option2" onClick={() => handleAddToCart(product, true)}>
-                                Buy Now
-                              </button>
-                              <a href={config.pdpPagePreUrl+product.sku} className='option3 pdp-page-btn'>
+                    ) : (
+                      localStorage.getItem("auth-token") ? (
+                        <div className="options">
+                          <button className="option1" onClick={() => handleAddToCart(product)}>
+                            Add to Cart
+                          </button>
+                          <button className="option2" onClick={() => handleAddToCart(product, true)}>
+                            Buy Now
+                          </button>
+                          <Link to={config.pdpPagePreUrl+product.sku} className='option3 pdp-page-btn d-block text-center'>
                                 View Product
-                              </a>
-                            </div>
-                        )}
+                              </Link>
+                        </div>
+                      ) : (
+                        <div className='text-center' style={{backgroundColor: "#ffd1d1", padding: "15px", borderRadius: "20px"}}>
+                
+                          <Link to={config.pdpPagePreUrl+product.sku} className='option3 pdp-page-btn d-block text-center' style={{margin: "auto"}}>
+                                View Product
+                              </Link>
+                          <p style={{marginBottom: "0"}}> OR </p>
+                          <p style={{marginBottom: "0"}}> Login to Purchase the product</p>
+                          <button onClick={() => {navigate("/login") }} className='pdp-page-btn'> Login </button>
+                        </div>
+                      )
+                    )}
                         </div>
 
                         <div className="img-box">
@@ -161,6 +174,11 @@ export const ProductList = () => {
                         ) : (
                           <span className="badge badge-success text-uppercase">In Stock</span>
                         )}
+                         <div className='product-desc mt-2'>
+                          <h6>
+                            {product.description}
+                          </h6>
+                        </div>
                       </div>
                     </div>
                   ))}

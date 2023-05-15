@@ -3,6 +3,7 @@ import {
   createBrowserRouter,
   Link,
   RouterProvider,
+  useNavigate,
 } from "react-router-dom";
 import Root from './routes/root';
 import {Home} from './components/Home'
@@ -31,7 +32,7 @@ import AdminResetPassword from './components/Admin/Auth/AdminResetPassword';
 import ResetPassword from './components/Auth/ResetPassword';
 import { adminBaseUrl, adminDashboardUrl } from './config/config';
 import Reports from './components/Admin/Reports/Reports';
-import AdminProducts from './components/Admin/Products/AdminProducts';
+import AdminProductList from './components/Admin/Products/AdminProductList';
 import BrandList from './components/Admin/Products/Brands/BrandList';
 import EditBrand from './components/Admin/Products/Brands/EditBrand';
 import AddBrand from './components/Admin/Products/Brands/AddBrand';
@@ -45,12 +46,33 @@ import {
   adminFrontBrandsPostFix,
   adminFrontReportsPostFix,
   adminFrontSpecificationsPostFix,
+  adminFrontCategoryPostFix,
+  adminFrontPromotionsPostFix,
+  adminFrontUsersPostFix,
+  adminFrontOrdersPostFix,
 } from './helpers/adminHelper';
 import SpecificationList from './components/Admin/Products/Specifications/SpecificationList';
 import EditSpecification from './components/Admin/Products/Specifications/EditSpecification';
 import AddSpecification from './components/Admin/Products/Specifications/AddSpecification';
 import AddProduct from './components/Admin/Products/AddProduct';
+import AddCategory from './components/Admin/Products/Category/AddCategory';
+import CategoryList from './components/Admin/Products/Category/CategoryList';
+import EditCategory from './components/Admin/Products/Category/EditCategory';
+import EditProduct from './components/Admin/Products/EditProduct';
+import Search from './components/Products/ProductSearch';
+import CategoryProducts from './components/Products/Categories/CategoryProducts';
+import { Categories } from './components/Products/Categories/Categories';
+import PromotionList from './components/Admin/Promotions/PromotionList';
+import UserList from './components/Admin/Users/UserList';
+import OrderList from './components/Admin/Orders/OrderList';
+import OrderItems from './components/Admin/Orders/OrderItems';
 const AdminLayout = ({ children }) => {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    // Remove the token from local storage to log the user out
+    localStorage.removeItem('auth-token');
+    navigate(adminFrontLoginPostFix);
+   };
   return (
     <>
       <div className="wrapper ">
@@ -76,6 +98,12 @@ const AdminLayout = ({ children }) => {
                   <p>Products</p>
                 </Link>
               </li>
+              <li className={window.location.href.startsWith(adminDashboardUrl+"/category") ? "active" : ""}>
+                <Link to={adminDashboardUrl+"/category"}>
+                  <i className="nc-icon nc-layout-11"></i>
+                  <p>Categories</p>
+                </Link>
+              </li>
               <li className={window.location.href.startsWith(adminDashboardUrl+"/brands") ? "active" : ""}>
                 <Link to={adminDashboardUrl+"/brands"}>
                   <i className="nc-icon nc-tag-content"></i>
@@ -88,10 +116,22 @@ const AdminLayout = ({ children }) => {
                   <p>Specifications</p>
                 </Link>
               </li>
+              <li className={window.location.href.startsWith(adminDashboardUrl+"/orders") ? "active" : ""}>
+                <Link to={adminDashboardUrl+"/orders"}>
+                  <i className="nc-icon nc-bag-16"></i>
+                  <p>Orders</p>
+                </Link>
+              </li>
               <li className={window.location.href.startsWith(adminDashboardUrl+"/users") ? "active" : ""}>
                 <Link to={adminDashboardUrl+"/users"}>
                   <i className="nc-icon nc-single-02"></i>
                   <p>Users</p>
+                </Link>
+              </li>
+              <li className={window.location.href.startsWith(adminDashboardUrl+"/promotions") ? "active" : ""}>
+                <Link to={adminDashboardUrl+"/promotions"}>
+                  <i className="nc-icon nc-money-coins"></i>
+                  <p>Promotions</p>
                 </Link>
               </li>
               <li className={window.location.href.startsWith(adminDashboardUrl+"/reports") ? "active" : ""}>
@@ -109,7 +149,7 @@ const AdminLayout = ({ children }) => {
             </ul>
           </div>
         </div>
-        <div className="main-panel" style={{height: '100vh',paddingLeft: '20px', paddingRight: '20px'}}>
+        <div className={`admin-main-panel main-panel ${window.location.href.startsWith(adminDashboardUrl+"/products/edit") ? " products-edit-active" : ""}`} style={{minHeight: '100vh',paddingLeft: '20px', paddingRight: '20px'}}>
           <nav className="navbar navbar-expand-lg navbar-absolute fixed-top navbar-transparent">
             <div className="container-fluid">
               <div className="navbar-wrapper">
@@ -122,10 +162,8 @@ const AdminLayout = ({ children }) => {
                 </div>
                 <Link className="navbar-brand" to={adminFrontDashboardPostFix}>GadgetBazaar Admin Panel</Link>
               </div>
-              <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
-                <span className="navbar-toggler-bar navbar-kebab"></span>
-                <span className="navbar-toggler-bar navbar-kebab"></span>
-                <span className="navbar-toggler-bar navbar-kebab"></span>
+              <button className='logout-btn' onClick={handleLogout}>
+                  Logout
               </button>
           
             </div>
@@ -195,6 +233,18 @@ const router = createBrowserRouter([
         element: <ResetPassword />,
       },
       {
+        path: '/search/:q',
+        element: <Search />,
+      },
+      {
+        path: '/categories',
+        element: <Categories />,
+      },
+      {
+        path: '/categories/:name',
+        element: <CategoryProducts />,
+      },
+      {
         path: '/products',
         element: <ProductList />,
       },
@@ -260,11 +310,27 @@ const router = createBrowserRouter([
       },
       {
         path: adminFrontProductsPostFix,
-        element: <AdminLayout> <AdminProducts /> </AdminLayout>,
+        element: <AdminLayout> <AdminProductList /> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontProductsPostFix}/edit/:id`,
+        element: <AdminLayout> <EditProduct/> </AdminLayout>,
       },
       {
         path: adminFrontProductsPostFix + "/add",
         element: <AdminLayout> <AddProduct /> </AdminLayout>,
+      },
+      {
+        path: adminFrontCategoryPostFix,
+        element: <AdminLayout> <CategoryList /> </AdminLayout>,
+      },
+      {
+        path: adminFrontCategoryPostFix + "/add",
+        element: <AdminLayout> <AddCategory /> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontCategoryPostFix}/edit/:id`,
+        element: <AdminLayout> <EditCategory/> </AdminLayout>,
       },
       {
         path: adminFrontBrandsPostFix,
@@ -289,6 +355,22 @@ const router = createBrowserRouter([
       {
         path: `${adminFrontSpecificationsPostFix}/add`,
         element: <AdminLayout> <AddSpecification/> </AdminLayout>,
+      },
+      {
+        path: adminFrontPromotionsPostFix,
+        element: <AdminLayout> <PromotionList /> </AdminLayout>,
+      },
+      {
+        path: adminFrontUsersPostFix,
+        element: <AdminLayout> <UserList /> </AdminLayout>,
+      },
+      {
+        path: adminFrontOrdersPostFix,
+        element: <AdminLayout> <OrderList /> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontOrdersPostFix}/:order_reference_code`,
+        element: <AdminLayout> <OrderItems /> </AdminLayout>,
       },
       {
         path: adminFrontReportsPostFix,
