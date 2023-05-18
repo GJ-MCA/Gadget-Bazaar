@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserProfile, updateUserProfile } from '../../helpers/userHelper';
 import { updateLoader } from '../../helpers/generalHelper';
+import { getAdminUserProfile, updateAdminUserProfile } from '../../helpers/adminHelper';
 
-const Profile = () => {
+const AdminProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
@@ -22,7 +22,7 @@ const Profile = () => {
   const token = localStorage.getItem('auth-token');
   const config = require("../../config/config")
   useEffect(() => {
-    getUserProfile(token)
+    getAdminUserProfile(token)
       .then((data) => {
         console.log(data);
         if (data.errors) {
@@ -33,11 +33,18 @@ const Profile = () => {
             setMessage(data.success)
             setErrors("")
         }
-        setName(data.name);
-        setContact(data.contact);
-        setEmail(data.email);
-        setIsMobileVerified(data.is_mobile_verified);
-        setIsEmailVerified(data.is_email_verified);
+        if(data.name){
+          setName(data.name);
+        }
+        if(data.contact){
+          setContact(data.contact);
+        }
+        if(data.email){
+          setEmail(data.email);
+        }
+        if(data.is_mobile_verified){
+          setIsMobileVerified(data.is_mobile_verified);
+        }
       })
       .catch((err) => console.log(err));
   }, [token]);
@@ -65,7 +72,7 @@ const Profile = () => {
       alert("Password and Confirm Password Did not match!")
       return false;
     }
-    updateUserProfile(token, updatedProfile)
+    updateAdminUserProfile(token, updatedProfile)
       .then((data) => {
         if (data.errors) {
           setErrors(data.errors);
@@ -205,7 +212,7 @@ const Profile = () => {
       if(data.success){
           setMessage(data.success)
           setErrors("")
-          setIsEmailVerified(true);
+          setIsMobileVerified(true);
           setIsEmailOTPSent(false);
       }
     })
@@ -256,7 +263,7 @@ const Profile = () => {
   }
   return (
     <>
-      <div className="container bootstrap snippet">
+      <div className="content bootstrap snippet">
         <div className="row">
           <div className="col-sm-10">
             <h1
@@ -264,7 +271,7 @@ const Profile = () => {
                 textAlign: 'center',
                 fontSize: '2rem',
                 fontWeight: 'bold',
-                margin: '2rem 0',
+                margin: '0',
                 fontFamily:
                   '-apple-system, BlinkMacSystemFont,Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
               }}
@@ -307,7 +314,7 @@ const Profile = () => {
                             <div className="form-group">
                               <div className="col-xs-6">
                                 <label htmlFor="name">
-                                  <h4>Name</h4>
+                                  <h5 className='mb-0'>Name</h5>
                                 </label>
                                 <input
                                   type="text"
@@ -325,7 +332,7 @@ const Profile = () => {
                             <div className="form-group">
                               <div className="col-xs-6">
                                 <label htmlFor="email">
-                                  <h4>Email</h4>
+                                  <h5 className='mb-0'>Email</h5>
                                 </label>
                                 <input
                                   type="text"
@@ -353,7 +360,7 @@ const Profile = () => {
                               <div className="form-group">
                                   <div className="col-xs-6">
                                   <label htmlFor="email_otp">
-                                    <h4>Enter Email OTP</h4>
+                                    <h5 className='mb-0'>Enter Email OTP</h5>
                                     </label>
                                       <input
                                         type="text"
@@ -378,7 +385,7 @@ const Profile = () => {
                             <div className="form-group">
                               <div className="col-xs-6">
                               <label htmlFor="contact">
-                                <h4>Contact</h4>
+                                <h5 className='mb-0'>Contact</h5>
                                 </label>
                                   <input
                                     type="text"
@@ -407,7 +414,7 @@ const Profile = () => {
                               <div className="form-group">
                                   <div className="col-xs-6">
                                   <label htmlFor="mobile_otp">
-                                    <h4>Enter Contact OTP</h4>
+                                    <h5 className='mb-0'>Enter Contact OTP</h5>
                                     </label>
                                       <input
                                         type="text"
@@ -433,7 +440,7 @@ const Profile = () => {
                             <div className="form-group">
                               <div className="col-xs-6">
                               <label htmlFor="password">
-                                <h4>Password</h4>
+                                <h5 className='mb-0'>Password</h5>
                                 </label>
                                   <input
                                     type="password"
@@ -451,7 +458,7 @@ const Profile = () => {
                             <div className="form-group">
                               <div className="col-xs-6">
                               <label htmlFor="confirmpassword">
-                                <h4>Confirm Password</h4>
+                                <h5 className='mb-0'>Confirm Password</h5>
                                 </label>
                                   <input
                                     type="password"
@@ -521,6 +528,6 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default AdminProfile;
 
                        

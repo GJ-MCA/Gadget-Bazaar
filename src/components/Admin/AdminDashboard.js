@@ -5,6 +5,7 @@ export const AdminDashboard = () => {
 
   const [total_customers, setTotalCustomers] = useState(0);
   const [total_products, setTotalProducts] = useState(0);
+  const [total_orders, setTotalOrders] = useState(0);
   const [total_sell, setTotalSell] = useState(0);
   const [total_reviews, setTotalReviews] = useState(0);
   const [updateText, setUpdateText] = useState("Update Now");
@@ -16,7 +17,9 @@ export const AdminDashboard = () => {
       const response = await getDashboardCounts();
       setTotalCustomers(response.customers)
       setTotalProducts(response.products)
+      setTotalOrders(response.orders.length)
       setTotalSell(parseFloat(response.totalSaleAmount).toFixed(2))
+      setTotalReviews(response.reviews)
       setLastUpdated(new Date().toLocaleString());
     } catch (error) {
       console.error(error.message);
@@ -80,13 +83,32 @@ export const AdminDashboard = () => {
                   <div className="row">
                     <div className="col-5 col-md-4">
                       <div className="icon-big text-center icon-warning">
-                        <i className="nc-icon nc-box-2 text-success"></i>
+                        <i className="nc-icon nc-box text-success"></i>
                       </div>
                     </div>
                     <div className="col-7 col-md-8">
                       <div className="numbers">
                         <p className="card-category">Products</p>
                         <p className="card-title">{total_products || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-md-6 col-sm-6">
+              <div className="card card-stats">
+                <div className="card-body ">
+                  <div className="row">
+                    <div className="col-5 col-md-4">
+                      <div className="icon-big text-center icon-warning">
+                        <i className="nc-icon nc-bag-16 text-primary"></i>
+                      </div>
+                    </div>
+                    <div className="col-7 col-md-8">
+                      <div className="numbers">
+                        <p className="card-category">Orders</p>
+                        <p className="card-title">{total_orders || 0}</p>
                       </div>
                     </div>
                   </div>
@@ -123,7 +145,7 @@ export const AdminDashboard = () => {
                     </div>
                     <div className="col-7 col-md-8">
                       <div className="numbers">
-                        <p className="card-category">Reviews</p>
+                        <p className="card-category">Product Reviews</p>
                         <p className="card-title">{total_reviews || 0}</p>
                       </div>
                     </div>

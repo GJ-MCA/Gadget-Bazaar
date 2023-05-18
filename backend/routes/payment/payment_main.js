@@ -11,6 +11,7 @@ const Payment_Detail = require("../../models/Payment_Detail");
 const Order_Detail = require("../../models/Order_Detail");
 const ProductSale = require('../../models/ProductSale');
 const Order_Item = require('../../models/Order_Item');
+const { sendEmail } = require('../../services/emailService');
 //ROUTE: 1 - Create checkout session - POST "backend-gadgetbazaar/payment/create-payment-session"
 router.post('/create-payment-session', fetchuser, async (req, res) => {
     const { order_id } = req.body;
@@ -78,7 +79,7 @@ router.post('/stripe-webhook', async (req, res) => {
             if(checkoutPaymentStatus === "paid"){
               try {
                 // Get order details from the database
-                const orderDetails = await Order_Detail.findOne({ order_id: checkoutOrderId });
+                const orderDetails = await Order_Detail.findOne({ order_id: checkoutOrderId }).populate('user_id').exec();
                 if (!orderDetails) {
                   throw new Error('Order not found in checkout session webhook');
                 }
@@ -101,7 +102,7 @@ router.post('/stripe-webhook', async (req, res) => {
               
                 try {
                   // Get order items from the database
-                  const orderItems = await Order_Item.find({ order_id: checkoutOrderId });
+                  const orderItems = await Order_Item.find({ order_id: checkoutOrderId }).populate('product_id').exec();
               
                   // Update Sales Table for each order item
                   for (let i = 0; i < orderItems.length; i++) {
@@ -139,7 +140,74 @@ router.post('/stripe-webhook', async (req, res) => {
                     console.log("Existing Sale Data: ")
                     console.log(existingSales)
                   }
-              
+                  let estimated_delivery_date = orderDetails.estimated_delivery_date;
+                  const dateTime = new Date(estimated_delivery_date);
+                  const options = {
+                  year: 'numeric', month: 'short', day: 'numeric',
+                  };
+                  const formattedEstimated_delivery_date = dateTime.toLocaleString('en-IN', options);
+                  let order_date_time = orderDetails.order_date;
+                  const orderdateTime = new Date(order_date_time);
+                  const orderdatetimeoptions = {
+                  year: 'numeric', month: 'short', day: 'numeric',
+                  hour: 'numeric', minute: 'numeric', second: 'numeric',
+                  hour12: true,
+                  };
+                  const formattedOrderDateTime = orderdateTime.toLocaleString('en-IN', orderdatetimeoptions);
+                  let totalQty = 0;
+                  orderItems.map((item) => totalQty += item.quantity);
+                  // Send payment receipt email
+                  const customerName = orderDetails.user_id.name;
+                  const customerEmail = orderDetails.user_id.email;
+                  const subject = "Payment Receipt";
+                  const paymentHtml = `
+                      <p>Thank you for your payment. Below are the details of your payment:</p>
+                      <p>Transaction Id: ${checkoutPaymentIntentId}</p>
+                      <p>Order Id: ${orderDetails.order_reference_code}</p>
+                      <table style="border-collapse: collapse; width: 100%;">
+                        <tr>
+                          <th style="border: 1px solid #ddd; padding: 8px;">Items Purchased</th>
+                          <th style="border: 1px solid #ddd; padding: 8px;">Total Amount</th>
+                        </tr>
+                        <tr>
+                          <td style="text-align: center; border: 1px solid #ddd; padding: 8px;"><strong>${totalQty}</strong></td>
+                          <td style="border: 1px solid #ddd; padding: 8px;text-align: center">&#8377;${parseFloat(orderDetails.total).toFixed(2)}</td>
+                        </tr>
+                      </table>
+                  `;
+                  await sendEmail(customerName, customerEmail, subject, paymentHtml);
+                  console.log(`Payment receipt email sent to ${customerEmail}`);
+                  
+                  // Send order email
+                  const orderHtml = `
+                    <p>Thank you for your order. Below are the details of your order:</p>
+                    <p>Estimated Delivery Date: ${formattedEstimated_delivery_date}</p>
+                    <p>Order Id: ${orderDetails.order_reference_code}</p>
+                    <p>Order Date and Time: ${formattedOrderDateTime}</p>
+                    <p>Order Items:</p>
+                    <table style="border-collapse: collapse; width: 100%;">
+                      <tr>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Item</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Quantity</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Amount</th>
+                      </tr>
+                      ${orderItems.map((item) => `
+                        <tr>
+                          <td align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">${item.product_id.name}</td>
+                          <td align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">${item.quantity}</td>
+                          <td align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">&#8377;${(item.price * item.quantity).toFixed(2)}</td>
+                        </tr>
+                      `).join('')}
+                      <tr>
+                          <td colspan="2" style="text-align: right; border: 1px solid #ddd; padding: 8px; text-align:center;" align="center"><strong>Total</strong></td>
+                          <td style="border: 1px solid #ddd; padding: 8px; text-align:center;" align="center">&#8377;${parseFloat(orderDetails.total).toFixed(2)}</td>
+                        </tr>
+                    </table>
+                  `;
+                  
+                  const orderSubject = "Order Confirmation";
+                  await sendEmail(customerName, customerEmail, orderSubject, orderHtml);
+                  console.log(`Order confirmation email sent to ${customerEmail}`);
                 } catch (err) {
                   console.error("Error in updating sales table in stripe webhook: " + err.message);
                   return res.status(500).send({ error: "Error in updating sales table in stripe webhook: " + err.message });

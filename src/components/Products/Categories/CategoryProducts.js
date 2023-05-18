@@ -185,7 +185,7 @@ function CategoryProducts() {
                         )}
                         <div className='product-desc mt-2'>
                           <h6>
-                            {product.description}
+                             {product.description.slice(0, 120)}{product.description.length > 120 ? '...' : ''}
                           </h6>
                         </div>
                       </div>

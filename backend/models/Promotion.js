@@ -22,10 +22,11 @@ const promotionSchema = new Schema({
   },
   times_remaining: {
     type: Number,
-    default: null
+    default: 0
   },
   status: {
     type: String,
+    enum: ['Active', 'Inactive'],
     default: 'Active'
   },
   expiry_date: {

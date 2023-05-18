@@ -176,8 +176,36 @@ const EditProduct = () => {
         
         const handleSubmit = async (event) => {
         event.preventDefault();
-        setIsLoading(true);
         setError(null);
+        if (!name) {
+            setErrors([{ msg: 'Please enter name' }]);
+            return;
+        }
+        if (!description) {
+            setErrors([{ msg: 'Please enter description' }]);
+            return;
+        }
+        if (!sku) {
+            setErrors([{ msg: 'Please enter sku' }]);
+            return;
+        }
+        if (!category) {
+            setErrors([{ msg: 'Please select a category' }]);
+            return;
+        }
+        if (!brand) {
+            setErrors([{ msg: 'Please select a brand' }]);
+            return;
+        }
+        if (!price) {
+            setErrors([{ msg: 'Please enter price' }]);
+            return;
+        }
+        if (!quantity) {
+            setErrors([{ msg: 'Please enter quantity' }]);
+            return;
+        }
+        setIsLoading(true);
         const formData = new FormData();
         formData.append('name', name);
         formData.append('description', description);
@@ -204,8 +232,10 @@ const EditProduct = () => {
             setIsLoading(false);
             if (data.errors) {
             setErrors(data.errors);
+            setMessage("");
             }
             if(data.success){
+                setErrors([]);
                 setMessage(data.success)
             }
         })
@@ -218,7 +248,7 @@ const EditProduct = () => {
         setIsLoading(false);
         await fetchProductData();
         updateLoader(false);
-    };
+        };
 
 return (
 <div className="container-fluid content">

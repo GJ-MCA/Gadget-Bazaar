@@ -45,6 +45,21 @@ router.post('/createuser',[
               id: user.id
           }
       }
+      // Send registration success email
+      const name = req.body.name;
+      const email = req.body.email;
+      const subject = 'Registration Success';
+      const html = `
+        <p>Thank you for registering with GadgetBazaar. Your registration was successful.</p>
+        <p>Enjoy shopping with us!</p>
+      `;
+
+      try {
+        await emailService.sendEmail(name, email, subject, html);
+        console.log(`Registration success email sent to ${email}`);
+      } catch (error) {
+        console.error(`Error sending registration success email to ${email}: ${error.message}`);
+      }
       const authtoken = jwt.sign(data, config.jwtSecret);
       res.json({authtoken});
     }
@@ -84,6 +99,10 @@ router.post('/login',[
         }
         if(isadminattempt && user.role != 'admin'){
           return res.status(401).json({error: "You are not authorized to access admin page"})
+        }
+        if(user){
+          user.last_login = Date.now();
+          await user.save()
         }
         const authtoken = jwt.sign(data, config.jwtSecret);
         res.json({authtoken});
@@ -274,6 +293,23 @@ router.put('/updateuserprofile', fetchuser,[
       }
       user.contact = contact || user.contact;
       const updatedUser = await user.save();
+      if(password){
+        const name = req.user.name; // Get the user's name from the authenticated user object
+        const email = req.user.email; // Get the user's email from the authenticated user object
+        const subject = 'Password Changed'; // Email subject
+        const html = `
+          <p>Your password has been successfully changed.</p>
+          <p>If you did not initiate this change, please contact us immediately.</p>
+          <p>Thank you for using our services!</p>
+        `;
+
+        try {
+          await sendEmail(name, email, subject, html); // Send the email
+          console.log(`Password changed email sent to ${email}`);
+        } catch (error) {
+          console.error(`Error sending password changed email to ${email}: ${error.message}`);
+        }
+      }
       res.status(200).json({
         _id: updatedUser._id,
         name: updatedUser.name,

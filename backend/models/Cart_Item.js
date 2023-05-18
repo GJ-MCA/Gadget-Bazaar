@@ -30,9 +30,7 @@ const cartItemSchema = new mongoose.Schema({
   }
 },
 { 
-    toJSON: { getters: true }
-},
-{
+  toJSON: { getters: true },
   timestamps: { 
     createdAt: 'created_at', 
     updatedAt: 'updated_at' 

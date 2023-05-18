@@ -27,6 +27,13 @@ const feedbackSchema = new Schema({
     type: Date,
     default: Date.now
   }
+},
+{ 
+  toJSON: { getters: true },
+  timestamps: { 
+    createdAt: 'created_at', 
+    updatedAt: 'updated_at' 
+  }
 });
 
 module.exports = mongoose.model('Feedback', feedbackSchema);

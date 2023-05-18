@@ -65,7 +65,6 @@ export const ProductDetail = () => {
       quantity: 1
     };
     try {
-      		// Check if the user is logged in and set the user state accordingly
 			const token = localStorage.getItem('auth-token');
       if(token){
         const response = await fetch(cartAddUrl, {

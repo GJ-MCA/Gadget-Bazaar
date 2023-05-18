@@ -323,7 +323,7 @@ export const Checkout = () => {
                             <li key={cartItem.product_id.id} className="list-group-item d-flex justify-content-between lh-condensed">
                                 <div>
                                     <h6 className="my-0">{cartItem.product_id.name}</h6>
-                                    <small className="text-muted">{cartItem.product_id.description}</small>
+                                    <small className="text-muted">{cartItem.product_id.description.slice(0, 120)}{cartItem.product_id.description.length > 120 ? '...' : ''}</small>
                                 </div>
                                 <span className="text-muted">&#8377;{cartItem.price * cartItem.quantity}</span>
                             </li>

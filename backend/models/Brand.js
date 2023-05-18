@@ -17,6 +17,13 @@ const brandSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   }
+},
+{ 
+  toJSON: { getters: true },
+  timestamps: { 
+    createdAt: 'created_at', 
+    updatedAt: 'updated_at' 
+  }
 });
 
 module.exports = mongoose.model('Brand',brandSchema)

@@ -103,6 +103,7 @@ const OrderItems = () => {
         <h5>Total Amount: &#8377;{Number(order_items.total).toFixed(2)}</h5>
         <h5>Order Status: {capitalizeFirstLetter(order_items.order_status)}</h5>
         <h5>Estimated Delivery Date: {order_items.estimated_delivery_date ? formatEstimatedDate(order_items.estimated_delivery_date) : "Calculating, Please check again later."}</h5>
+        <h5>Payment Status: {capitalizeFirstLetter(order_items.payment_status)}</h5>
         <div id="snackbar" className="alert alert-success">
             Order Status Updated!
         </div>
@@ -205,9 +206,6 @@ const OrderItems = () => {
           <p className='text-center'> Please Go to My Orders Page Using Below Link and Check Your Orders </p>
         </>
       )}
-      <div className='container mt-4 text-center'>
-      <Link to="/my-orders">Go to My Orders</Link>
-      </div>
     </div>
   );
 };

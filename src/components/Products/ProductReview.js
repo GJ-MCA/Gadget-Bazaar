@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import StarRating from './StarRating';
 const config = require("../../config/config")
 const ProductReview = ({ productId }) => {
   const [name, setName] = useState('');
@@ -8,18 +9,46 @@ const ProductReview = ({ productId }) => {
   const [success, setSuccess] = useState(null);
   const [errors, setErrors] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+      const token = localStorage.getItem('auth-token');
+			if (token) {
+				// Make an API call to get the user's details
+				fetch(`${config.authAPIUrl}/getuser`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'auth-token': `Bearer ${token}`
+				},
+				})
+				.then(response => {
+				if (response.ok) {
+					return response.json();
+				}
+				throw new Error('Network response was not ok');
+				})
+				.then(data => {
+					setName(data.name);
+				})
+				.catch(error => {
+				console.error('There was a problem with the fetch operation:', error);
+				});
+			}
+      
+    }, [])
+    
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      const token = localStorage.getItem('auth-token');
       const response = await fetch(`${config.productBaseAPIUrl}/reviews/add/${productId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'auth-token': `Bearer ${token}` },
         body: JSON.stringify({ name, rating, msg }),
       });
       const data = await response.json();
       setSuccess(data.success);
-      setName('');
-      setRating(0);
+      setRating(5);
       setMsg('');
     } catch (err) {
       setErrors('Failed to submit review');
@@ -50,22 +79,14 @@ const ProductReview = ({ productId }) => {
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          disabled={name !== ''}
           required
         />
       </div>
       <div>
-        <label htmlFor="rating">Rating:</label>
-        <input
-          type="number"
-          className='form-control'
-          id="rating"
-          min="1"
-          max="5"
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
-          required
-        />
-      </div>
+          <label htmlFor="rating" style={{marginBottom: "0"}}>Rating:</label>
+          <StarRating rating={rating} setRating={setRating} />
+        </div>
       <div>
         <label htmlFor="msg">Message:</label>
         <textarea

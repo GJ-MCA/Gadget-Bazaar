@@ -67,7 +67,7 @@ export const Categories = () => {
                         </div>
                         <div className='product-desc mt-2'>
                           <h6>
-                            {category.description}
+                           {category.description.slice(0, 150)}{category.description.length > 150 ? '...' : ''}
                           </h6>
                         </div>
                       </div>

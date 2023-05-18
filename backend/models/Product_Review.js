@@ -20,11 +20,19 @@ const productReviewSchema = new Schema({
     type: Number,
     required: true,
   },
+  is_approved:{
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  created_date:{
+    type: Date,
+    required: false,
+    default: Date.now()
+  }
 },
 { 
-    toJSON: { getters: true }
-},
-{
+  toJSON: { getters: true },
   timestamps: { 
     createdAt: 'created_at', 
     updatedAt: 'updated_at' 

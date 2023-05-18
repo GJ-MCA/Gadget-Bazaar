@@ -50,6 +50,7 @@ import {
   adminFrontPromotionsPostFix,
   adminFrontUsersPostFix,
   adminFrontOrdersPostFix,
+  adminFrontProductReviewPostFix,
 } from './helpers/adminHelper';
 import SpecificationList from './components/Admin/Products/Specifications/SpecificationList';
 import EditSpecification from './components/Admin/Products/Specifications/EditSpecification';
@@ -66,6 +67,15 @@ import PromotionList from './components/Admin/Promotions/PromotionList';
 import UserList from './components/Admin/Users/UserList';
 import OrderList from './components/Admin/Orders/OrderList';
 import OrderItems from './components/Admin/Orders/OrderItems';
+import EditUser from './components/Admin/Users/EditUser';
+import AddUser from './components/Admin/Users/AddUser';
+import AddPromotion from './components/Admin/Promotions/AddPromotion';
+import EditPromotion from './components/Admin/Promotions/EditPromotion';
+import SalesReport from './components/Admin/Reports/SalesReport';
+import ProductSalesReport from './components/Admin/Reports/ProductSalesReport';
+import ReviewList from './components/Admin/Products/Reviews/ReviewList';
+import EditReview from './components/Admin/Products/Reviews/EditReview';
+import AdminProfile from './components/Admin/AdminProfile';
 const AdminLayout = ({ children }) => {
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -114,6 +124,12 @@ const AdminLayout = ({ children }) => {
                 <Link to={adminDashboardUrl+"/specifications"}>
                   <i className="nc-icon nc-settings-gear-65"></i>
                   <p>Specifications</p>
+                </Link>
+              </li>
+              <li className={window.location.href.startsWith(adminDashboardUrl+"/product-reviews") ? "active" : ""}>
+                <Link to={adminDashboardUrl+"/product-reviews"}>
+                  <i className="nc-icon nc-single-copy-04"></i>
+                  <p>Product Reviews</p>
                 </Link>
               </li>
               <li className={window.location.href.startsWith(adminDashboardUrl+"/orders") ? "active" : ""}>
@@ -321,6 +337,14 @@ const router = createBrowserRouter([
         element: <AdminLayout> <AddProduct /> </AdminLayout>,
       },
       {
+        path: adminFrontProductReviewPostFix,
+        element: <AdminLayout> <ReviewList /> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontProductReviewPostFix}/edit/:id`,
+        element: <AdminLayout> <EditReview/> </AdminLayout>,
+      },
+      {
         path: adminFrontCategoryPostFix,
         element: <AdminLayout> <CategoryList /> </AdminLayout>,
       },
@@ -361,8 +385,24 @@ const router = createBrowserRouter([
         element: <AdminLayout> <PromotionList /> </AdminLayout>,
       },
       {
+        path: `${adminFrontPromotionsPostFix}/add`,
+        element: <AdminLayout> <AddPromotion/> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontPromotionsPostFix}/edit/:id`,
+        element: <AdminLayout> <EditPromotion/> </AdminLayout>,
+      },
+      {
         path: adminFrontUsersPostFix,
         element: <AdminLayout> <UserList /> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontUsersPostFix}/add`,
+        element: <AdminLayout> <AddUser/> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontUsersPostFix}/edit/:id`,
+        element: <AdminLayout> <EditUser/> </AdminLayout>,
       },
       {
         path: adminFrontOrdersPostFix,
@@ -375,6 +415,18 @@ const router = createBrowserRouter([
       {
         path: adminFrontReportsPostFix,
         element: <AdminLayout> <Reports /> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontReportsPostFix}/sales-report`,
+        element: <AdminLayout> <SalesReport /> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontReportsPostFix}/product-sales-report`,
+        element: <AdminLayout> <ProductSalesReport /> </AdminLayout>,
+      },
+      {
+        path: `${adminFrontDashboardPostFix}/profile`,
+        element: <AdminLayout> <AdminProfile /> </AdminLayout>,
       },
       {
         path: `${adminFrontDashboardPostFix}/*`,

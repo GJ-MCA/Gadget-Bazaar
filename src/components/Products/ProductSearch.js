@@ -181,8 +181,7 @@ function Search() {
                           <span className="badge badge-success text-uppercase">In Stock</span>
                         )}
                         <div className='product-desc mt-2'>
-                          <h6>
-                            {product.description}
+                          <h6>{product.description.slice(0, 120)}{product.description.length > 120 ? '...' : ''}
                           </h6>
                         </div>
                       </div>

@@ -15,6 +15,13 @@ const forgotPasswordTokenSchema = new mongoose.Schema({
     default: Date.now,
     expires: 3600 // expires in 1 hour
   }
+},
+{ 
+  toJSON: { getters: true },
+  timestamps: { 
+    createdAt: 'created_at', 
+    updatedAt: 'updated_at' 
+  }
 });
 
 const ForgotPasswordToken = mongoose.model('ForgotPasswordToken', forgotPasswordTokenSchema);

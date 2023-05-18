@@ -5,6 +5,7 @@ const Product = require("../../models/Product")
 const Specification = require("../../models/Specification");
 const Category = require('../../models/Category');
 const Product_Review = require('../../models/Product_Review');
+const fetchuser = require('../../middleware/fetchuser');
 //ROUTE: 1 - Get All Products - GET "backend-gadgetbazaar/products/showall"
 router.get('/showall', async (req, res) => {
   try {
@@ -114,14 +115,21 @@ router.get('/categories/getbyid/:id', async (req, res) => {
     res.status(500).json({ message: 'Unable to fetch category by id' });
   }
 });
-router.post('/reviews/add/:productId', async (req, res) => {
+router.post('/reviews/add/:productId',fetchuser, async (req, res) => {
   try {
+    const user_id = req.user.id;
     const productId = req.params.productId;
     const { name, rating, msg } = req.body;
     const product = await Product.findById(productId);
 
-    const review = new Product_Review({product_id:product._id, name, rating, msg });
-    return res.status(200).json({success: "Review Added Successfully", review});
+    const review = await new Product_Review({ product_id: product._id, user_id: user_id, name, rating, msg })
+    .populate('user_id')
+    .execPopulate();
+    if(review){
+      await review.save();
+      return res.status(200).json({success: "Review Added Successfully, It will be visible after approval", review});
+    }
+    return res.status(200).json({errors: [{msg:"Unable to add review, please try again!"}]});
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error: '+error });
@@ -132,7 +140,8 @@ router.get('/reviews/get/:productId', async (req, res) => {
     const productId = req.params.productId;
     const product = await Product.findById(productId);
 
-    const reviews = await Product_Review.find({product_id: product._id}).exec();
+    const reviews = await Product_Review.find({product_id: product._id, is_approved: true}).populate('user_id')
+    .exec();;
     console.log(productId)
     console.log(product)
     console.log(reviews)

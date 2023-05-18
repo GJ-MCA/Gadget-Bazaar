@@ -9,7 +9,9 @@ export const ProductList = () => {
   const { setCartCount } = useContext(GadgetBazaarContext);
   const getAllProductsUrl = `${config.baseUrl}/products/showall`;
   const cartAddUrl = `${config.orderAPIUrl}/cart/add`;
-  const productsToDisplay = 8;
+  const [productsToDisplay, setProductsToDisplay] = useState(3);
+  const [totalProducts, setTotalProducts] = useState(0);
+
   const navigate = useNavigate();
   useEffect(() => {
     updateLoader(true)
@@ -23,6 +25,7 @@ export const ProductList = () => {
       })
       .then(data => {
         setProducts(data);
+        setTotalProducts(data.length)
       })
       .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
@@ -108,7 +111,15 @@ export const ProductList = () => {
     }
 
   };
-
+  const handleLoadMoreProductsClick = ()=>{
+    if(productsToDisplay < totalProducts){
+      if((productsToDisplay * 2) < totalProducts){
+        setProductsToDisplay(productsToDisplay * 2)
+      }else{
+        setProductsToDisplay(totalProducts)
+      }
+    }
+  }
   return (
     <>
       <section className="product_section layout_padding">
@@ -175,14 +186,18 @@ export const ProductList = () => {
                           <span className="badge badge-success text-uppercase">In Stock</span>
                         )}
                          <div className='product-desc mt-2'>
-                          <h6>
-                            {product.description}
-                          </h6>
+                         <h6>{product.description.slice(0, 120)}{product.description.length > 120 ? '...' : ''}</h6>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
+                {productsToDisplay && totalProducts && productsToDisplay < totalProducts &&(
+
+                  <div className='text-center mt-5 mb-2'>
+                    <button type='button' onClick={handleLoadMoreProductsClick} style={{padding: "10px"}}> Load More Products </button>
+                  </div>
+                )}
               </>
           )}
         </div>

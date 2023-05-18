@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { adminMainAPIUrl, adminProductAPIUrl } from '../../../config/config';
 import { Link, useNavigate } from 'react-router-dom';
-import { addNeccessaryClasses, adminFrontPromotionsPostFix } from '../../../helpers/adminHelper';
+import { addNeccessaryClasses, adminFrontUsersPostFix } from '../../../helpers/adminHelper';
 
 function UserList() {
-  const [promos, setPromos] = useState([]);
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
-      const response = await fetch(`${adminMainAPIUrl}/promotions/getall`);
+      const response = await fetch(`${adminMainAPIUrl}/users/getall`);
       const data = await response.json();
-      setPromos(data);
+      setUsers(data);
     }
     fetchData();
     
     addNeccessaryClasses();
   }, []);
 
-  const handleAddPromoClick = () => {
-    navigate(adminFrontPromotionsPostFix + '/add');
+  const handleAddUserClick = () => {
+    navigate(adminFrontUsersPostFix + '/add');
   };
 
-  const handleEditPromoClick = (id) => {
+  const handleEditUserClick = (id) => {
     if (id) {
-      navigate(adminFrontPromotionsPostFix + '/edit/' + id);
+      navigate(adminFrontUsersPostFix + '/edit/' + id);
     } else {
       alert('Something went wrong!');
     }
@@ -40,37 +40,41 @@ function UserList() {
   }
   return (
     <div className='main-table-container content'>
-      <h2>Promotions List</h2>
-      <button onClick={handleAddPromoClick}>Add Promotion</button>
-      {console.log(promos)}
-        {promos && promos.length > 0 ? 
+      <h2>Users List</h2>
+      <button onClick={handleAddUserClick}>Add User</button>
+      {console.log(users)}
+        {users && users.length > 0 ? 
         <>
             <div className='table-container mt-4'>
                 <table>
                     <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Name</th>
-                        <th>Coupon Code</th>
-                        <th>Discount</th>
-                        <th>Times Used</th>
-                        <th>Times Remaining</th>
-                        <th>Expiry Date</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Email Verification</th>
+                        <th>Contact Verification</th>
+                        <th>Role</th>
+                        <th>Date Created</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {promos.map((promo) => (
-                        <tr key={promo._id}>
-                        <td>{promo.promotion_name}</td>
-                        <td>{promo.coupon_code}</td>
-                        <td>{promo.discount}%</td>
-                        <td>{promo.times_used}</td>
-                        <td>{promo.times_remaining}</td>
-                        <td>{formatDate(promo.expiry_date)}</td>
-                        <td>{promo.status}</td>
+                    {users.map((user) => (
+                        <tr key={user._id}>
+                        <td>{user._id}</td>
+                        <td>{user.name}</td>
+                        <td>{user.email}</td>
+                        <td>{user.contact || "-"}</td>
+                        <td style={user.is_email_verified ? {color: "#00bd00", fontWeight: "600"} : {color: "red", fontWeight: "600"}}>{user.is_email_verified ? "Verified" : "Not Verified"}</td>
+                        <td style={user.is_mobile_verified ? {color: "#00bd00", fontWeight: "600"} : {color: "red", fontWeight: "600"}}>{user.is_mobile_verified ? "Verified" : "Not Verified"}</td>
+                        <td style={{textTransform: "capitalize"}}>{user.role}</td>
+                        <td>{formatDate(user.date_created)}</td>
+                        <td style={user.is_active ? {color: "#00bd00", fontWeight: "600"} : {color: "red", fontWeight: "600"}}>{user.is_active ? "Active" : "Not Active"}</td>
                         <td>
-                            <button onClick={() => handleEditPromoClick(promo._id)}>Edit</button>
+                            <button onClick={() => handleEditUserClick(user._id)}>Edit</button>
                         </td>
                         </tr>
                     ))}
@@ -79,7 +83,7 @@ function UserList() {
             </div>
         </>
         : <>
-          <p>No Promotions found.</p>
+          <p>No Users found.</p>
         </>}
     </div>
   );

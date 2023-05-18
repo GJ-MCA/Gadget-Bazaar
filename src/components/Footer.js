@@ -39,7 +39,6 @@ export const Footer = () => {
                         <h3>Account</h3>
                         <ul>
                            <li><Link to="/my-account">Account</Link></li>
-                           <li><Link to="/login">Login</Link></li>
                         </ul>
                      </div>
                   </div>
