@@ -15,60 +15,45 @@ const userProvider = require("../provider/user");
 
 
 //ROUTE: 1 - Create a User - Registration - POST "backend-gadgetbazaar/auth/createuser"
-router.post('/createuser',[
-  body('name').isLength({ min: 3 }).withMessage('Name must have at least 3 characters'),	
-  body('email').isEmail().withMessage('Invalid email'),	
-  body('password').isLength({ min: 6 }).withMessage('Password must have at least 6 characters')	
-      .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$/)	
-      .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
-], async (req,res)=>{
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+router.post('/createuser', [
+  body('name').isLength({ min: 3 }).withMessage('Name must have at least 3 characters'),
+  body('email').isEmail().withMessage('Invalid email'),
+  body('password').isLength({ min: 6 }).withMessage('Password must have at least 6 characters'),
+  body('confirmPassword').custom((value, { req }) => {
+    if (value !== req.body.password) {
+      throw new Error('Confirm password does not match');
     }
-    try{
-      //Check whether the user with this email exists already
-      let user = await User.findOne({email: req.body.email});
-             
-      if(user){
-        return res.status(400).json({error: "Email already registered"})
-      }
-      const salt = await bcrypt.genSalt(10);
-      const securedPass = await bcrypt.hash(req.body.password, salt);
-      user = await User.create({
-          name: req.body.name,
-          email: req.body.email,
-          password: securedPass,
-      });
-      const data = {
-          user: {
-              id: user.id
-          }
-      }
-      // Send registration success email
-      const name = req.body.name;
-      const email = req.body.email;
-      const subject = 'Registration Success';
-      const html = `
-        <p>Thank you for registering with GadgetBazaar. Your registration was successful.</p>
-        <p>Enjoy shopping with us!</p>
-      `;
+    return true;
+  }),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-      try {
-        await emailService.sendEmail(name, email, subject, html);
-        console.log(`Registration success email sent to ${email}`);
-      } catch (error) {
-        console.error(`Error sending registration success email to ${email}: ${error.message}`);
-      }
-      const authtoken = jwt.sign(data, config.jwtSecret);
-      res.json({authtoken});
+  try {
+    // Check whether the user with this email exists already
+    let user = await User.findOne({ email: req.body.email });
+    if (user) {
+      return res.status(400).json({ errors: [{ msg: 'Email is already registered, please login to your account!' }] });
     }
-    catch(error){
-        console.error(error.message);
-        res.status(500).json({ error: 'Failed to create user' });
-    }
-    
-})
+
+    const salt = await bcrypt.genSalt(10);
+    const securedPass = await bcrypt.hash(req.body.password, salt);
+
+    user = await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: securedPass,
+    });
+
+    // Send registration success response
+    res.json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
 
 //ROUTE: 2 - Authenticate the User - Login - POST "backend-gadgetbazaar/auth/login"
 router.post('/login',[

@@ -4433,3 +4433,12 @@ word-break: break-all;
 .admin-main-panel a:hover{
   opacity: .7;
 }
+.order-status-update-info-text{
+  transition: .4s all;
+}
+.order-status-update-info-text:hover{
+  border-color: #007090;
+  background-color: #007090;
+  transform: scale(1.1);
+  margin-left: 40px !important;
+}

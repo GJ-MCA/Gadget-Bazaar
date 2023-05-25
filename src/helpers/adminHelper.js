@@ -297,6 +297,21 @@ export const generateSalesReportPdf = (salesReport, fromDate, toDate) => {
       console.error(err.message);
     }
   };
+  export const updateOrderEstimatedDeliveryDate = async (order_id, estimated_delivery_date) => {
+    try {
+      const response = await fetch(`${config.adminMainAPIUrl}/orders/estimated-delivery/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({order_id: order_id, estimated_delivery_date  })
+      });
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
   export const getUserRoleValues = async () => {
     try {
       const response = await fetch(`${config.adminMainAPIUrl}/users/role/getallvalues`, {

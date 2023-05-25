@@ -94,7 +94,7 @@ router.post('/checkout', fetchuser, async (req, res) => {
   try {
     let shipping_charge = 0;
     let current_shipping_method = null;
-    const { shipping_address, billing_address,shipping_method, items, total } = req.body;
+    const { shipping_address, billing_address,shipping_method, items, total, main_total, coupon_code } = req.body;
     
     const user_id = req.user.id;
     if (!user_id || !items || !total || !shipping_address || !billing_address || !shipping_method) {
@@ -112,8 +112,13 @@ router.post('/checkout', fetchuser, async (req, res) => {
       orderReferenceCode = `GB_ORD${dateTime}_${randomString}`;
       orderIDExists = await checkIfOrderRefIDExists(orderReferenceCode);
     }
-
-    const orderDetails = new OrderDetails({ order_reference_code: orderReferenceCode,user_id, shipping_address, billing_address, shipping_method: current_shipping_method , shipping_charge, total });
+    let coupon_obj =  null;
+    if(coupon_code){
+      coupon_obj = await Promotion.findOne({
+        coupon_code
+      });
+    }
+    const orderDetails = new OrderDetails({ order_reference_code: orderReferenceCode,user_id, shipping_address, billing_address, shipping_method: current_shipping_method , shipping_charge, total: main_total, discounted_total: total, coupon_code});
     console.log("------------------------------------------")
     console.log("------------------------------------------")
     console.log("------------------------------------------")
@@ -627,7 +632,7 @@ router.post('/getorder', fetchuser, async (req, res) => {
   try {
     const { order_id} = req.body;
     const order_obj = mongoose.Types.ObjectId(order_id);
-    const order_details = await OrderDetails.find({_id: order_obj, user_id: userId});
+    const order_details = await OrderDetails.find({_id: order_obj, user_id: userId}).populate("coupon_code").exec();
     if(order_details){
       const order_items = await OrderItems.find({ order_id: order_details }).exec();
       if(order_items){
@@ -650,7 +655,7 @@ router.post('/getorderbyreferencecode', fetchuser, async (req, res) => {
   const userId = req.user.id;
   try {
     const { order_reference_code } = req.body;
-    const order_details = await OrderDetails.findOne({ order_reference_code: order_reference_code, user_id: userId });
+    const order_details = await OrderDetails.findOne({ order_reference_code: order_reference_code, user_id: userId }).populate("coupon_code").exec();
     if (order_details) {
       const order_items = await OrderItems.find({ order_id: order_details._id })
         .populate('product_id')
@@ -684,7 +689,7 @@ router.post('/getorderbyreferencecode', fetchuser, async (req, res) => {
 router.get('/getallorders', fetchuser, async (req, res) => {
   const userId = req.user.id;
   try {
-    const orders = await OrderDetails.find({ user_id: userId }).sort({ createdAt: -1 }).exec();
+    const orders = await OrderDetails.find({ user_id: userId }).populate("coupon_code").sort({ createdAt: -1 }).exec();
     if (orders) {
       // Join order_items table with orders table
       const ordersWithItems = await Promise.all(orders.map(async (order) => {

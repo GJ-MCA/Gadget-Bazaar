@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getOrderByReferenceCode, getOrderStatusValues, updateOrderStatusValue } from '../../../helpers/adminHelper';
+import { getOrderByReferenceCode, getOrderStatusValues, updateOrderEstimatedDeliveryDate, updateOrderStatusValue } from '../../../helpers/adminHelper';
 import { Link, useParams } from 'react-router-dom';
 import { pdpPagePreUrl } from '../../../config/config';
 import { updateLoader } from '../../../helpers/generalHelper';
@@ -7,6 +7,7 @@ const OrderItems = () => {
   const [order_items, setOrderItems] = useState([]);
   const [orderStatusValues, setOrderStatusValues] = useState([]);
   const [orderStatus, setOrderStatus] = useState("");
+  const [estimatedDelivery, setEstimatedDelivery] = useState("");
   const { order_reference_code } = useParams();
   console.log(order_reference_code)
   const [isOrderFound, setIsOrderFound] = useState(false)
@@ -22,6 +23,11 @@ const OrderItems = () => {
               setOrderItems(data.order)
               setIsOrderFound(true);
               setOrderStatus(data.order.order_status)
+              if(data.order.estimated_delivery_date){
+                const dateObj = new Date(data.order.estimated_delivery_date)
+                const formattedDate = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')}`;
+                setEstimatedDelivery(formattedDate);
+              }
             }else{
               setIsOrderFound(false);
             }
@@ -93,6 +99,33 @@ const OrderItems = () => {
       showNotification();
   }
   
+  const handleOrderEstimatedDeliveryDate = async(event)=>{
+    updateLoader(true);
+    await updateOrderEstimatedDeliveryDate(order_items._id, event.target.value).then(
+      (data)=>{
+        if(data.success === true){
+          setEstimatedDelivery(event.target.value)
+        }
+      }
+    )
+    await getOrderByReferenceCode(order_reference_code).then(
+      (data) => {
+        if(data){
+          console.log(data)
+          if(data.success === true){
+            setOrderItems(data.order)
+            setIsOrderFound(true);
+            setOrderStatus(data.order.order_status)
+            setEstimatedDelivery(data.order.estimated_delivery_date);
+          }else{
+            setIsOrderFound(false);
+          }
+        }
+      });
+      updateLoader(false);
+      showNotification();
+  }
+  
   return (
     <div className='container my-orders-container content' style={{marginTop: "104px"}}>
       <h2>Order Items</h2>
@@ -101,6 +134,8 @@ const OrderItems = () => {
         { <h5>Order Id: {order_reference_code}</h5>}
         <h5>Order Date & Time: {new Date(order_items.order_date).toLocaleString()}</h5>
         <h5>Total Amount: &#8377;{Number(order_items.total).toFixed(2)}</h5>
+        {order_items.coupon_code && (<h5>Coupon Code Used: {order_items.coupon_code.coupon_code}</h5>)}
+        {order_items.discounted_total && (<h5>Discounted Amount: &#8377;{Number(order_items.total).toFixed(2)}</h5>)}
         <h5>Order Status: {capitalizeFirstLetter(order_items.order_status)}</h5>
         <h5>Estimated Delivery Date: {order_items.estimated_delivery_date ? formatEstimatedDate(order_items.estimated_delivery_date) : "Calculating, Please check again later."}</h5>
         <h5>Payment Status: {capitalizeFirstLetter(order_items.payment_status)}</h5>
@@ -120,9 +155,6 @@ const OrderItems = () => {
                     <li className={`text-center ${order_items.order_status === "outfordelivery" || order_items.order_status === "delivered" ? "active" : ""}`} id="step3"></li>
                     <li className={`text-center ${order_items.order_status === "delivered" ? "active" : ""}`} id="step4"></li>
                   </ul>
-
-
-
                     <div className="d-flex justify-content-between">
                       <div className="d-lg-flex align-items-center">
                         <i className="fa fa-list-alt fa-3x me-lg-4 mb-3 mb-lg-0 mr-2"></i>
@@ -153,14 +185,21 @@ const OrderItems = () => {
                         </div>
                       </div>
                     </div>
-
+                    <div className='form-control mt-4'>
+                      <label htmlFor='estimated_delivery' style={{fontSize: "1rem", color: "#000", marginBottom: "0"}}> Update Estimated Delivery Date:  </label>
+                      <input type='date' className='ml-2' style={{textTransform: "capitalize"}} id="estimated_delivery" name='estimated_delivery' value={estimatedDelivery || ""}  onChange={(event) => handleOrderEstimatedDeliveryDate(event)}/>
+                    </div>
                     <div className='dropdown-container form-control mt-4'>
                       <label htmlFor='order_status' style={{fontSize: "1rem", color: "#000", marginBottom: "0"}}> Update Order Status:  </label>
                       <select className='ml-2' style={{textTransform: "capitalize"}} id="order_status" name='order_status' value={orderStatus || ""}  onChange={(event) => handleOrderStatus(event)}>
                         {orderStatusValues.map(option => (
-                          <option key={option} value={option}>{option}</option>
+                          <option key={option} value={option}>{(option)==="outfordelivery"?"Out For Delivery":(option)}</option>
                         ))}
                       </select>
+                      <span className='badge badge-info ml-2 order-status-update-info-text' style={{fontSize: "100%"}}>
+                        <i className='fa fa-info-circle mr-2'></i>
+                        Order Status Update Email Will be Sent to The Customer
+                      </span>
                     </div>
                   </div>
 

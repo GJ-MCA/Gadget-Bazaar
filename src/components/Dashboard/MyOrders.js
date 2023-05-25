@@ -37,6 +37,7 @@ const MyOrders = () => {
                 <th>Order ID</th>
                 <th>Order Date & Time</th>
                 <th>Total Amount</th>
+                <th>Discounted Amount</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -46,6 +47,7 @@ const MyOrders = () => {
                   <td><Link to={myOrdersPreUrl + order.order_reference_code}>{order.order_reference_code}</Link></td>
                   <td>{new Date(order.order_date).toLocaleString()}</td>
                   <td>&#8377;{order.total}</td>
+                  <td>{order.discounted_total ? '\u20B9' + order.discounted_total : 'N/A'}</td>
                   <td>{capitalizeFirstLetter(order.order_status)}</td>
                 </tr>
               ))}

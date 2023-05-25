@@ -15,6 +15,19 @@ const { sendEmail } = require("../../services/emailService");
 const promoUpload = multer();
 const userUpload = multer();
 const reviewUpload = multer();
+function capitalizeFirstLetter(str) {
+  if(str)
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+function formatEstimatedDate(date_string) {
+  const date = new Date(date_string);
+  const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+  const formattedDate = date.toLocaleDateString('en-US', options);
+  const formattedDateArray = formattedDate.split(", ");
+  const formattedDayArray = formattedDateArray[1].split(" ");
+  const formattedDateString = formattedDayArray[1] + "-" + formattedDayArray[0].substring(0, 3) + "-" + formattedDateArray[2] + " " + formattedDateArray[0];
+  return formattedDateString;
+}
 
 //ROUTE: 1 - Get Dashboard Counts - Admin - GET "backend-gadgetbazaar/admin/main/get-counts"
 router.get('/get-counts', checkAdminUser, async (req, res) => {
@@ -311,7 +324,7 @@ router.get('/specifications/getnotactive', async (req, res) => {
 //ROUTE: 10 - Get all Orders - Admin - POST "backend-gadgetbazaar/admin/main/orders/getall
 router.get('/orders/getall', async (req, res) => {
   try {
-    const orders = await Order_Detail.find().exec();
+    const orders = await Order_Detail.find().populate("user_id").populate("coupon_code").exec();
     if (orders) {
       const ordersWithItems = [];
       for (const order of orders) {
@@ -345,7 +358,7 @@ router.post('/orders/getorderbyreferencecode', async (req, res) => {
     
     const { order_reference_code } = req.body;
     console.log(order_reference_code)
-    const order_details = await Order_Detail.findOne({ order_reference_code: order_reference_code});
+    const order_details = await Order_Detail.findOne({ order_reference_code: order_reference_code}).populate("coupon_code").exec();
     console.log(order_details)
     if (order_details) {
       const order_items = await Order_Item.find({ order_id: order_details._id })
@@ -391,18 +404,100 @@ router.get('/orders/status/getallvalues', async (req, res) => {
     res.status(500).json({ message: 'Internal server error: '+err, success: false });
   }
 });
-//ROUTE: 12 - Update order status value the authenticated user - GET "backend-gadgetbazaar/admin/main/orders/status/update"
+//ROUTE: 12 - Update order status value the authenticated user - POST "backend-gadgetbazaar/admin/main/orders/status/update"
 router.post('/orders/status/update', async (req, res) => {
   try {
     const {order_id, order_status} = req.body;
-    const order_details = await Order_Detail.findById(order_id);
+    const order_details = await Order_Detail.findById(order_id).populate("user_id").exec();
     if (order_details) {
         order_details.order_status = order_status;
        await order_details.save();
-      return res.json({ message: "Order status updated successfully", success: true });
+       const orderItems = await Order_Item.find({ order_id: order_details._id }).populate('product_id').exec();
+      
+        // Format the order items for the email
+        const formattedOrderItems = orderItems.map((item) => `
+        <tr>
+          <td align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">${item.product_id.name}</td>
+          <td align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">${item.quantity}</td>
+          <td align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">&#8377;${(item.price * item.quantity).toFixed(2)}</td>
+        </tr>
+      `).join('');
+
+      // Send an email to the customer about the order status update
+      let subject = "";
+      let html = "";
+      if (capitalizeFirstLetter(order_status) === 'Delivered') {
+        subject = 'Order Delivered';
+        html = `
+          <p>Your order with Order ID: ${order_details.order_reference_code} has been delivered.</p>
+          <p> Order Items:  </p>
+          <table style="width:100%">
+            <tr>
+              <th align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">Product Name</th>
+              <th align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">Quantity</th>
+              <th align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">Total Price</th>
+            </tr>
+            ${formattedOrderItems}
+          </table>
+          <p>Thank you for shopping with us. We hope you enjoy your purchase!</p>
+        `;
+      }else{
+        if(capitalizeFirstLetter(order_status)==="Outfordelivery"){
+          subject = 'Order Status Update: Order is '+ "Out For Delivery";
+        }else if(capitalizeFirstLetter(order_status)==="Pending"){
+          subject = 'Order Status Update: Order '+ "Processed";
+        }else{
+          subject = 'Order Status Update: Order is '+ capitalizeFirstLetter(order_status);
+        }
+        let data_html_order_status = null;
+        if(capitalizeFirstLetter(order_status)==="Outfordelivery"){
+          data_html_order_status = "Out For Delivery";
+        }else if(capitalizeFirstLetter(order_status)==="Pending"){
+          data_html_order_status = "Processed";
+        }else{
+          data_html_order_status = capitalizeFirstLetter(order_status);
+        }
+        html = `
+          <p>Your order with Order ID: ${order_details.order_reference_code} has been updated.</p>
+          <p> Order Status: ${data_html_order_status} </p>
+          <p> Estimated Delivery Date: ${formatEstimatedDate(order_details.estimated_delivery_date)} </p>
+          <p> Order Items:  </p>
+          <table style="width:100%">
+            <tr>
+              <th align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">Product Name</th>
+              <th align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">Quantity</th>
+              <th align="center" style="border: 1px solid #ddd; padding: 8px;text-align: center;">Total Price</th>
+            </tr>
+            ${formattedOrderItems}
+          </table>
+          <p>Thank you for choosing our services. If you have any questions or need further assistance, please feel free to contact our customer support.</p>
+        `;
+      }
+      
+      await sendEmail(order_details.user_id.name, order_details.user_id.email, subject, html);
+      return res.json({ message: "Order status updated successfully", mail_sent: "Order Status Update Mail Sent to: " + order_details.user_id.email, success: true });
     }
     else {
       return res.json({ message: "Order status can not be updated!", success: false });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error: '+err, success: false });
+  }
+});
+//ROUTE: 13 - Update order estimated delivery date - POST "backend-gadgetbazaar/admin/main/orders/estimated-delivery/update"
+router.post('/orders/estimated-delivery/update', async (req, res) => {
+  try {
+    const {order_id, estimated_delivery_date} = req.body;
+    const order_details = await Order_Detail.findById(order_id).populate("user_id").exec();
+    if (order_details) {
+        const estimatedDeliveryDate = new Date(estimated_delivery_date);
+        order_details.estimated_delivery_date = estimatedDeliveryDate;
+       await order_details.save();
+      return res.json({ message: "Order estimated delivery date updated successfully", success: true });
+    }
+    else {
+      return res.json({ message: "Order estimated delivery date can not be updated!", success: false });
     }
   } catch (err) {
     console.error(err);

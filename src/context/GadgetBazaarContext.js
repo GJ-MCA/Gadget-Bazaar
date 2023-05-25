@@ -18,9 +18,10 @@ export const CartProvider = ({ children }) => {
   const [discountedPrice, setDiscountedPrice] = useState(0); //Final Price After Discount
   const [discountedPriceWithoutShipping, setDiscountedPriceWithoutShipping] = useState(0); //Discounted price without shipping
   const [discountAmount, setDiscountAmount] = useState(0)//Actual amount of discount which will be decreased from the final before discount
+  const [checkoutMainTotal, setCheckoutMainTotal] = useState(0)//Actual amount of discount which will be decreased from the final before discount
   
   return (
-    <GadgetBazaarContext.Provider value={{ cartCount, setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, shippingMethods, setShippingMethods, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses, couponCode, setCouponCode, couponCodeMessage, setCouponCodeMessage, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount, cartFinalWithoutShipping, setCartFinalWithoutShipping, discountedPriceWithoutShipping, setDiscountedPriceWithoutShipping }}>
+    <GadgetBazaarContext.Provider value={{ cartCount, setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, shippingMethods, setShippingMethods, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses, couponCode, setCouponCode, couponCodeMessage, setCouponCodeMessage, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount, cartFinalWithoutShipping, setCartFinalWithoutShipping, discountedPriceWithoutShipping, setDiscountedPriceWithoutShipping, checkoutMainTotal, setCheckoutMainTotal }}>
       {children}
     </GadgetBazaarContext.Provider>
   );

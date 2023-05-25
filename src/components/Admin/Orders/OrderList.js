@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminMainAPIUrl, orderAPIUrl } from '../../../config/config';
-import { adminFrontOrdersPostFix, addNeccessaryClasses } from '../../../helpers/adminHelper';
+import { adminFrontOrdersPostFix, addNeccessaryClasses, adminFrontUsersPostFix } from '../../../helpers/adminHelper';
 
 function OrderList() {
   const [orders, setOrders] = useState([]);
@@ -52,6 +52,7 @@ function OrderList() {
                     <tr>
                         <th>Order Reference Code</th>
                         <th>User ID</th>
+                        <th>User Name</th>
                         <th>Order Date</th>
                         <th>Action</th>
                     </tr>
@@ -60,7 +61,8 @@ function OrderList() {
                     {orders.map((order) => (
                         <tr key={order._id}>
                             <td>{order.order_reference_code}</td>
-                            <td>{order.user_id}</td>
+                            <td><Link to={adminFrontUsersPostFix + "/edit/"+order.user_id._id} >{order.user_id._id} </Link></td>
+                            <td>{order.user_id.name}</td>
                             <td>{formatDate(order.order_date)}</td>
                             <td>
                                 <Link to={adminFrontOrdersPostFix+"/"+order.order_reference_code}> View/Edit Order </Link>

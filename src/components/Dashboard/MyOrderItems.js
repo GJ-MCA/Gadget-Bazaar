@@ -55,6 +55,8 @@ const MyOrderItems = () => {
         { <h5>Order Id: {order_reference_code}</h5>}
         <h5>Order Date & Time: {new Date(order_items.order_date).toLocaleString()}</h5>
         <h5>Total Amount: &#8377;{Number(order_items.total).toFixed(2)}</h5>
+        {order_items.coupon_code && (<h5>Coupon Code Used: {order_items.coupon_code.coupon_code}</h5>)}
+        {order_items.discounted_total && (<h5>Discounted Amount: &#8377;{Number(order_items.total).toFixed(2)}</h5>)}
         <h5>Order Status: {capitalizeFirstLetter(order_items.order_status)}</h5>
         <h5>Estimated Delivery Date: {order_items.estimated_delivery_date ? formatEstimatedDate(order_items.estimated_delivery_date) : "Calculating, Please check again later."}</h5>
 

@@ -23,6 +23,12 @@ const orderDetailSchema = new Schema({
         return parseFloat(value);
       }
   },
+  discounted_total:{
+    type: Number,
+    get: v => (v/100).toFixed(2),
+    set: v => v*100,
+    default: null
+  },
   shipping_address: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Address',

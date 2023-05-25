@@ -9,6 +9,7 @@ function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState([]);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ function Register() {
     const response = await fetch(`${config.authAPIUrl}/createuser`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ name, email, password, confirmPassword })
     });
     const data = await response.json();
     if (response.ok) {
@@ -70,7 +71,7 @@ function Register() {
 
                 {errors.length > 0 && (
                   <div className="alert alert-danger">
-                    <ul>
+                    <ul className='mb-0'>
                       {errors.map((error, index) => (
                         <li key={index}>{error.msg}</li>
                       ))}
@@ -79,21 +80,32 @@ function Register() {
                 )}
                 <div className="form-outline mb-4">
                   <label className="form-label" for="name">Your Name</label>
-                  <input type="text" id="name" name="name" className="form-control " value={name} onChange={(event) => setName(event.target.value)} />
+                  <input type="text" id="name" name="name" className="form-control " value={name} onChange={(event) => setName(event.target.value)} required/>
                 </div>
 
                 <div className="form-outline mb-4">
                   <label className="form-label" for="email">Your Email</label>
-                  <input type="email" id="email" name="email" className="form-control " value={email} onChange={(event) => setEmail(event.target.value)} />
+                  <input type="email" id="email" name="email" className="form-control " value={email} onChange={(event) => setEmail(event.target.value)} required/>
                 </div>
 
                 <div className="form-outline mb-4">
                   <label className="form-label" for="password">Password</label>
-                  <input type="password" id="password" name="password" className="form-control " value={password} onChange={(event) => setPassword(event.target.value)} />
+                  <input type="password" id="password" name="password" className="form-control " value={password} onChange={(event) => setPassword(event.target.value)} required/>
                 </div>
-
+                <div className="form-outline mb-4">
+                  <label className="form-label" htmlFor="confirmPassword">Confirm Password</label>
+                  <input
+                    className="form-control"
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={confirmPassword}
+                    onChange={(event) => setConfirmPassword(event.target.value)}
+                    required
+                  />
+                </div>
                 <div className="form-check d-flex justify-content-center" style={{alignItems: "center",marginTop: "20px", marginBottom: "20px"}}>
-                  <input className="form-check-input me-2" type="checkbox" value="" id="terms_service" style={{position: "static", width: "30px", margin: "0"}}/>
+                  <input className="form-check-input me-2" type="checkbox" value="" id="terms_service" style={{position: "static", width: "30px", margin: "0"}} required/>
                   <label className="form-check-label" for="terms_service">
                     I agree all statements in <Link to="/terms-service" className="text-body"><u>Terms of service</u></Link>
                   </label>

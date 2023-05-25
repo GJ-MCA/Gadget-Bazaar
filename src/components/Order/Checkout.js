@@ -8,7 +8,7 @@ import $ from 'jquery';
 const config = require("../../config/config");
 export const Checkout = () => {
     
-	const {setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses, couponCode, setCouponCode, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount, cartFinalWithoutShipping, setCartFinalWithoutShipping, setDiscountedPriceWithoutShipping } = useContext(GadgetBazaarContext);
+	const {setCartCount, cartItems, setCartItems, currentUser, setCurrentUser, cartFinalTotal, setCartFinalTotal, checkoutSavedAddresses, setCheckoutSavedAddresses, couponCode, setCouponCode, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount, cartFinalWithoutShipping, setCartFinalWithoutShipping, setDiscountedPriceWithoutShipping, checkoutMainTotal, setCheckoutMainTotal } = useContext(GadgetBazaarContext);
     const [setName] = useState(null);
     const [selectedBillAddressId, setSelectedBillAddressId] = useState("");
     const [selectedShipAddressId, setSelectedShipAddressId] = useState("");
@@ -37,9 +37,9 @@ export const Checkout = () => {
             setCartItems(data['cartItems']);
             setCartFinalTotal(data['cartTotalAmount'])
             setCartFinalWithoutShipping((data['cartTotalAmount']) - 40)
-
             console.log(data['cart'][0].coupon_code);
             if(data['cart']){
+                setCheckoutMainTotal(data['cart'].total);
                 if(data['cart'][0].coupon_code){
                     fetchCouponFromId(token, data['cart'][0].coupon_code).then((data)=>{
                         if(data.coupon_code_found){
@@ -260,8 +260,11 @@ export const Checkout = () => {
         // calling checkout api
         try {
             let dataTotal = cartFinalTotal;
-            if(isCouponCodeApplied)
+            let dataCouponCode = null;
+            if(isCouponCodeApplied){
                 dataTotal = discountedPrice;
+                dataCouponCode = couponCode;
+            }
             const response = await fetch(`${config.checkoutUrl}`, {
                 method: 'POST',
                 headers: {
@@ -273,7 +276,9 @@ export const Checkout = () => {
                     billing_address: dataBillingAddressId,
                     shipping_method: 'Default',
                     items: cartItems,
-                    total: dataTotal
+                    total: dataTotal,
+                    main_total: checkoutMainTotal,
+                    coupon_code: dataCouponCode,
                 }),
             });
             if (!response.ok) {
