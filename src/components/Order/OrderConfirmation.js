@@ -6,6 +6,7 @@ import {GadgetBazaarContext} from '../../context/GadgetBazaarContext';
 import fetchCartItems, { fetchCouponFromId, getShippingMethodById } from '../../helpers/cartHelper';
 import Stripe from 'stripe';
 import { updateLoader } from '../../helpers/generalHelper';
+import { setPageTitle } from '../../helpers/titleHelper';
 
 export const OrderConfirmation = () => {
     const {cartItems, setCartItems, cartFinalTotal, setCartFinalTotal, couponCode, setCouponCode, isCouponCodeApplied, setIsCouponCodeApplied, couponDiscountPercentages, setCouponDiscountPercentages, couponDiscount, setCouponDiscount, discountedPrice, setDiscountedPrice, discountAmount, setDiscountAmount, cartFinalWithoutShipping, setCartFinalWithoutShipping, discountedPriceWithoutShipping, setDiscountedPriceWithoutShipping } = useContext(GadgetBazaarContext);
@@ -28,7 +29,7 @@ export const OrderConfirmation = () => {
               const orderId = userOrder.orderId;
               const token = localStorage.getItem('auth-token');
               if (token) {
-                const orderDetailsResponse = await fetchOrderById(token, orderId);
+                const orderDetailsResponse = await fetchOrderById(token, userOrder.secret_order_id);
                 if (orderDetailsResponse.success) {
                   setDataBillingAddressId(orderDetailsResponse.order_details[0].billing_address);
                   setDataShippingAddressId(orderDetailsResponse.order_details[0].shipping_address);
@@ -93,7 +94,8 @@ export const OrderConfirmation = () => {
                         'Access-Control-Allow-Origin': '*'
                     },
                     body: JSON.stringify({
-                        order_id: userOrder.orderId
+                        order_id: userOrder.orderId,
+                        secret_order_id: userOrder.secret_order_id
                     })
                 })
                 .then(function(response) {
@@ -117,6 +119,7 @@ export const OrderConfirmation = () => {
     }
     return (
         <div className="container" style={{marginTop: "104px"}}>
+            {setPageTitle("Order Confirmation")}
             <div className="row">
                 <div className="col w-100">
                     <h1 style={{ textAlign: 'center',fontSize: '2rem',fontWeight: 'bold',margin: '2rem 0', fontFamily: '-apple-system, BlinkMacSystemFont,Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif'}}>Confirm Your Order <br/> 
@@ -172,12 +175,13 @@ export const OrderConfirmation = () => {
                         {cartItems.length === 0 ? (
                             <p>No items in cart</p>
                         ) : (
-                            <ul className="list-group mb-3 sticky-top checkout-items-container" style={{ maxHeight: '865px', overflowY: 'auto' }}>
+                            <ul className="list-group mb-3 sticky-top checkout-items-container" style={{ maxHeight: '865px', overflowY: 'auto', paddingBottom: "5px" }}>
                                 {cartItems.map((cartItem) => (
                                 <li key={cartItem.product_id.id} className="list-group-item d-flex justify-content-between lh-condensed">
                                     <div>
                                         <h6 className="my-0 text-left">{cartItem.product_id.name} x {cartItem.quantity}</h6>
-                                        <small className="text-muted text-left">{cartItem.product_id.description}</small>
+                                        
+                                        <small className="text-muted text-left">{cartItem.product_id.description.slice(0, 120)}{cartItem.product_id.description.length > 120 ? '...' : ''}</small>
                                     </div>
                                     <div>
                                         <div className="text-muted text-right">&#8377;{cartItem.price}/Item</div>
@@ -203,7 +207,7 @@ export const OrderConfirmation = () => {
                                     </li>
                                 </>
                                 )}
-                                <li className="list-group-item d-flex justify-content-between">
+                                <li className="list-group-item d-flex justify-content-between" style={{minHeight: "51px"}}>
                                     <span>Total</span>
                                     <strong>&#8377;{isCouponCodeApplied ? discountedPrice : cartFinalTotal}</strong>
                                 </li>

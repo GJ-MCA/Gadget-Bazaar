@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import { adminMiddleware, getDashboardCounts } from '../../helpers/adminHelper';
 import { updateLoader } from '../../helpers/generalHelper';
+import { setPageTitle } from '../../helpers/titleHelper';
 export const AdminDashboard = () => {
 
   const [total_customers, setTotalCustomers] = useState(0);
@@ -49,6 +50,7 @@ export const AdminDashboard = () => {
   
   return (
     <>
+    {setPageTitle("Dashboard")}
         <div className="content">
           <div className="stats-btn">
             <button onClick={updateDashboardCounts} disabled={isUpdateNowBtnDisabled}>

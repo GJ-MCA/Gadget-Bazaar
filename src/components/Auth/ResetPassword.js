@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { updateLoader } from '../../helpers/generalHelper';
+import { setPageTitle } from '../../helpers/titleHelper';
 const config = require("../../config/config");
 
 const ResetPassword = () => {
@@ -58,6 +59,7 @@ const ResetPassword = () => {
 
   return (
     <div className="container">
+      {setPageTitle("Reset Password")}
       <div className="row justify-content-center">
         <div className="col-md-6 mt-5 mb-5">
         {errors.length > 0 && (

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { updateLoader } from '../../../helpers/generalHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 const config = require("../../../config/config");
 const AdminForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -44,6 +45,7 @@ const AdminForgotPassword = () => {
   return (
     <section className="bg-image"
     style={{backgroundImage: "url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp')"}}>
+      {setPageTitle("Forgot Password")}
       <div className="mask d-flex align-items-center gradient-custom-3 admin-login-page">
         <div className="container mb-5" style={{marginTop: "104px"}}>
           <div className="row justify-content-center">

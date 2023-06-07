@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext} from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
+import { setPageTitle } from '../../helpers/titleHelper';
 const config = require("../../config/config")
 function Search() {
   const [query, setQuery] = useState('');
@@ -116,8 +117,10 @@ function Search() {
   
   return (
     <>
+    {setPageTitle("Search")}
       {query ? (
         <section className="product_section layout_padding search_results">
+          {setPageTitle(`"${query.length > 8 ? `${query.slice(0, 8)}...` : query}" Search Results`)}
         <div className="container">
           <div className="heading_container heading_center">
             <h2>

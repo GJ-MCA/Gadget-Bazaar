@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { updateLoader } from '../../../helpers/generalHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 const config = require("../../../config/config");
 
 const AdminResetPassword = () => {
@@ -60,6 +61,7 @@ const AdminResetPassword = () => {
   return (
     <section className="bg-image"
     style={{backgroundImage: "url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp')"}}>
+      {setPageTitle("Reset Password")}
       <div className="mask d-flex align-items-center gradient-custom-3 admin-login-page">
         <div className="container">
           <div className="row justify-content-center">

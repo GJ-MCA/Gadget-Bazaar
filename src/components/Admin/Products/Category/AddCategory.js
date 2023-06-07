@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { addNeccessaryClasses } from '../../../../helpers/adminHelper';
 import { updateLoader } from '../../../../helpers/generalHelper';
+import { setPageTitle } from '../../../../helpers/titleHelper';
 
 function AddCategory() {
   const [name, setName] = useState('');
@@ -57,6 +58,7 @@ function AddCategory() {
 
   return (
     <div className='content'>
+      {setPageTitle("Add Category")}
       <h2>Add Category</h2>
       <form className='admin-form'>
         {message && message.length > 0 && (

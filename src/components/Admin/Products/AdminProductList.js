@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminFrontBrandsPostFix, adminFrontProductsPostFix, adminFrontSpecificationsPostFix } from '../../../helpers/adminHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 const config = require("../../../config/config");
 const AdminProductList = () => {
   const [products, setProducts] = useState([]);
@@ -40,6 +41,7 @@ const AdminProductList = () => {
   };
   return (
     <div className="content">
+      {setPageTitle("Product List")}
       <h2>Product List</h2>
       <button onClick={handleAddSProductClick}>Add Product</button>
       <button className='ml-3' onClick={handleBrandsClick}>Brands</button>

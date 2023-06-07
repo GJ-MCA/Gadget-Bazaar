@@ -1,8 +1,10 @@
 import React from 'react';
+import { setPageTitle } from '../helpers/titleHelper';
 
 const Contact = () => {
   return (
     <div className="container my-5">
+      {setPageTitle("Contact Us")}
       <div className="row">
         <div className="col-md-6 mx-auto">
           <h1 className="text-center mb-4">Contact Us</h1>

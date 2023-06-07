@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { Link, useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontCategoryPostFix, } from '../../../../helpers/adminHelper';
+import { setPageTitle } from '../../../../helpers/titleHelper';
 
 function CategoryList() {
   const [categories, setCategories] = useState([]);
@@ -30,6 +31,7 @@ function CategoryList() {
   }
   return (
     <div className='main-table-container content'>
+      {setPageTitle("Category List")}
       <h2>Category List</h2>
       <button onClick={handleAddCategoryClick}>Add Category</button>
         {categories && categories.length > 0 ? 

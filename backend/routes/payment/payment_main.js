@@ -14,7 +14,7 @@ const Order_Item = require('../../models/Order_Item');
 const { sendEmail } = require('../../services/emailService');
 //ROUTE: 1 - Create checkout session - POST "backend-gadgetbazaar/payment/create-payment-session"
 router.post('/create-payment-session', fetchuser, async (req, res) => {
-    const { order_id } = req.body;
+    const { order_id, secret_order_id } = req.body;
     const token = req.headers['auth-token'];
     let orderData, order_details, stripe_session;
   
@@ -26,7 +26,7 @@ router.post('/create-payment-session', fetchuser, async (req, res) => {
           'Content-Type': 'application/json',
           'auth-token': token
         },
-        body: JSON.stringify({ order_id: order_id })
+        body: JSON.stringify({ order_id: secret_order_id })
       });
       orderData = await response.json();
       order_details = orderData.order_details[0];
@@ -37,6 +37,12 @@ router.post('/create-payment-session', fetchuser, async (req, res) => {
   
     // Create a Stripe session
     try {
+      let payment_total = 0;
+      if(order_details.coupon_code){
+        payment_total = order_details.discounted_total * 100;
+      }else{
+        payment_total = order_details.total * 100;
+      }
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         mode: 'payment',
@@ -45,7 +51,7 @@ router.post('/create-payment-session', fetchuser, async (req, res) => {
         line_items: [{
           price_data: {
             currency: 'inr',
-            unit_amount: order_details.total * 100,
+            unit_amount: payment_total, /* Need to convert rupees to paise */
             product_data: {
               name: 'Total Amount'
             }
@@ -54,7 +60,6 @@ router.post('/create-payment-session', fetchuser, async (req, res) => {
         }],
         client_reference_id: order_id // Pass order_id as client_reference_id
       });
-  
       stripe_session = session.id;
       console.log("Session: ");
       console.log(session)  
@@ -75,18 +80,26 @@ router.post('/stripe-webhook', async (req, res) => {
         const checkoutOrderId = checkoutSession.client_reference_id;
         const checkoutPaymentIntentId = checkoutSession.payment_intent;
         const checkoutPaymentStatus = checkoutSession.payment_status;
+        console.log(checkoutPaymentStatus)
+        console.log(checkoutPaymentStatus === "paid")
         if(checkoutSession && checkoutOrderId && checkoutPaymentIntentId && checkoutPaymentStatus){
-            if(checkoutPaymentStatus === "paid"){
+          console.log("--------------------------------")
+          console.log("Inside first If")
+          if(checkoutPaymentStatus === "paid"){
+              console.log("Inside second If")
               try {
                 // Get order details from the database
-                const orderDetails = await Order_Detail.findOne({ order_id: checkoutOrderId }).populate('user_id').exec();
+                console.log(checkoutSession.client_reference_id);
+                console.log(checkoutOrderId);
+                const orderDetails = await Order_Detail.findOne({ order_reference_code: checkoutOrderId }).populate('user_id').exec();
                 if (!orderDetails) {
                   throw new Error('Order not found in checkout session webhook');
                 }
-              
+                console.log(orderDetails)
                 // Update order status to 'paid'
                 orderDetails.payment_status = 'paid';
                 await orderDetails.save();
+                console.log(orderDetails)
               
                 // Create a payment record with the Stripe session ID
                 try{
@@ -94,6 +107,7 @@ router.post('/stripe-webhook', async (req, res) => {
                     user_id: orderDetails.user_id,
                     payment_order_id: checkoutPaymentIntentId,
                     order_id: orderDetails,
+                    status: "paid"
                   });
                   await paymentRecord.save();
                 }catch(err){
@@ -102,7 +116,7 @@ router.post('/stripe-webhook', async (req, res) => {
               
                 try {
                   // Get order items from the database
-                  const orderItems = await Order_Item.find({ order_id: checkoutOrderId }).populate('product_id').exec();
+                  const orderItems = await Order_Item.find({ order_id: orderDetails._id }).populate('product_id').exec();
               
                   // Update Sales Table for each order item
                   for (let i = 0; i < orderItems.length; i++) {
@@ -116,8 +130,6 @@ router.post('/stripe-webhook', async (req, res) => {
                       quantitySold: orderItem.quantity,
                       productId: orderItem.product_id
                     };
-                    console.log("Salesdata")
-                    console.log(salesData)
                     const existingSales = await ProductSale.findOne({
                       date: salesData.date,
                       month: salesData.month,
@@ -132,13 +144,7 @@ router.post('/stripe-webhook', async (req, res) => {
                     } else {
                       const newSales = new ProductSale(salesData);
                       await newSales.save();
-                      console.log("New Sale Data: ")
-                      console.log(newSales)
                     }
-                    console.log("Salesdata")
-                    console.log(salesData)
-                    console.log("Existing Sale Data: ")
-                    console.log(existingSales)
                   }
                   let estimated_delivery_date = orderDetails.estimated_delivery_date;
                   const dateTime = new Date(estimated_delivery_date);

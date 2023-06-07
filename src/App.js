@@ -76,6 +76,9 @@ import ProductSalesReport from './components/Admin/Reports/ProductSalesReport';
 import ReviewList from './components/Admin/Products/Reviews/ReviewList';
 import EditReview from './components/Admin/Products/Reviews/EditReview';
 import AdminProfile from './components/Admin/AdminProfile';
+import MyAddresses from './components/Dashboard/MyAddresses';
+import EditAddress from './components/Dashboard/EditAddress';
+import AddAddress from './components/Dashboard/AddAddress';
 const AdminLayout = ({ children }) => {
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -299,6 +302,18 @@ const router = createBrowserRouter([
       {
         path: '/my-account',
         element: <MyAccount/>,
+      },
+      {
+        path: '/my-addresses',
+        element: <MyAddresses/>,
+      },
+      {
+        path: '/my-addresses/add',
+        element: <AddAddress/>,
+      },
+      {
+        path: '/my-addresses/edit/:address_id',
+        element: <EditAddress/>,
       },
       {
         path: '/profile',

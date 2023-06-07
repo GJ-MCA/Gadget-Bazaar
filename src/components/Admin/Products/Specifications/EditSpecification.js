@@ -4,6 +4,7 @@ import { addNeccessaryClasses, adminFrontSpecificationsPostFix } from '../../../
 import { adminProductAPIUrl } from '../../../../config/config';
 import { data } from 'jquery';
 import { updateLoader } from '../../../../helpers/generalHelper';
+import { setPageTitle } from '../../../../helpers/titleHelper';
 
 function EditSpecification() {
   const { id } = useParams();
@@ -78,6 +79,7 @@ function EditSpecification() {
 
   return (
     <div className='content'>
+      {setPageTitle("Edit Specification")}
       <h2>Edit Specification</h2>
       <form className='admin-form'>
       {message && (

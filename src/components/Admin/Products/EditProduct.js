@@ -4,6 +4,7 @@ import { adminProductAPIUrl } from '../../../config/config';
 import { addNeccessaryClasses, adminFrontBrandsPostFix, adminFrontCategoryPostFix, adminFrontSpecificationsPostFix } from '../../../helpers/adminHelper';
 import { event } from 'jquery';
 import { updateLoader } from '../../../helpers/generalHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -250,128 +251,129 @@ const EditProduct = () => {
         updateLoader(false);
         };
 
-return (
-<div className="container-fluid content">
-    <div className="row">
-        <div className="col-lg-12">
-            <h2>Edit Product</h2>
-            {message && (
-                <div className='alert alert-success'>
-                    {message}
-                </div>
-            )}
-            {errors.length > 0 && (
-                <div className="alert alert-danger">
-                    <ul style={{paddingLeft: "15px", marginBottom: "0"}}>
-                    {errors.map((error, index) => (
-                        <li key={index}>{error.msg}</li>
-                    ))}
-                    </ul>
-                </div>
-            )}
-            <form>
-                <div className="form-group">
-                    <label htmlFor="name">Name</label>
-                    <input type="text" className="form-control" id="name" name="name" value={name} onChange={handleInputChange} required />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="description">Description</label>
-                    <textarea className="form-control" id="description" name="description" value={description} onChange={handleInputChange} required></textarea>
-                </div>
-                <div className="form-group form-group-half">
-                    <label htmlFor="sku">SKU</label>
-                    <input type="text" className="form-control" id="sku" name="sku" value={sku} onChange={handleInputChange} required />
-                </div>
-                <div className="form-group form-group-half">
-                <label htmlFor="category">Category</label>
-                    <select className="form-control" id="category" name="category" value={category || ''} onChange={handleCategoryChange} required>
-                    <option value="">-- Select Category --</option>
-                    {fetchedCategories.map((category) => (
-                    <option key={category._id} value={category._id}>
-                    {category.name}
-                    </option>
-                    ))}
-                    </select>
-                </div>
-                <div className="form-group form-group-half">
-                    <label htmlFor="brand">Brand</label>
-                    <select className="form-control" id="brand" name="brand" value={brand || ''} onChange={handleBrandChange} required>
-                    <option value="">-- Select Brand --</option>
-                    {fetchedBrands.map((brand) => (
-                    <option key={brand._id} value={brand._id}>
-                    {brand.name}
-                    </option>
-                    ))}
-                    </select>
-                </div>
-                <label className='mr-3 d-block'>Specifications(Optional):</label>
-                <div className='specifications-container mt-3'>
-                    {specificationForms.map((form, index) => (
-                        <div key={index} className="form-group spec-form-group">
-                            <label htmlFor={`specification-${index}`}>Specification {index + 1}</label>
-                            <select
-                            className={`form-control ${index === 0 ? "first" : ""}`}
-                            id={`specification-${index}`}
-                            name="specification"
-                            value={form.specification}
-                            onChange={(event) => handleSpecificationFormChange(event, index)}
-                            required
-                            >
-                            <option value="">Select a specification</option>
-                            {specifications.map((spec) => (
-                                <option key={spec._id} value={spec._id}>
-                                {spec.name} : {spec.value}
-                                </option>
-                            ))}
-                            </select>
-                            {index !== 0 && (
-                            <button type="button" onClick={() => removeSpecificationForm(index)}>
-                                Remove
-                            </button>
-                            )}
-                        </div>
-                        ))}
-                    <button className='add-spec-btn' type="button" onClick={addSpecificationForm}>
-                    Add
-                    </button>
-                </div>
-                <div className="form-group"  style={{width: "49%", display: "inline-block", marginRight: "30px"}}>
-                <label htmlFor="price">Product Price</label>
-                <input type="text" className="form-control" id="price" name="price" value={price} onChange={handleInputChange} />
-                </div>
-                <div className="form-group" style={{width: "49%", display: "inline-block"}}>
-                <label htmlFor="quantity">Product Quantity</label>
-                <input type="number" className="form-control" id="quantity" name="quantity" value={quantity} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label htmlFor="images">Product Images</label>
-                    <input type="file" className="form-control-file" id="images" name="images"  onChange={(event) => handleImages(event)} multiple />
-                    {previewImages && previewImages.length > 0 && (
-                        <div className='image-preview-container'>
-                            {previewImages.map((image, index) => (
-                            <div key={index} className="image-preview">
-                                <img src={image} alt={`Product Image ${index}`} />
-                                <button type="button" onClick={() => {
-                                const newImages = [...previewImages];
-                                const newUrls = [...imageURLs];
-                                newImages.splice(index, 1);
-                                newUrls.splice(index, 1);
-                                setPreviewImages(newImages);
-                                setImageURLs(newUrls);
-                                }}>Remove</button>
-                            </div>
-                            ))}
+    return (
+        <div className="container-fluid content">
+            {setPageTitle("Edit Product")}
+            <div className="row">
+                <div className="col-lg-12">
+                    <h2>Edit Product</h2>
+                    {message && (
+                        <div className='alert alert-success'>
+                            {message}
                         </div>
                     )}
+                    {errors.length > 0 && (
+                        <div className="alert alert-danger">
+                            <ul style={{paddingLeft: "15px", marginBottom: "0"}}>
+                            {errors.map((error, index) => (
+                                <li key={index}>{error.msg}</li>
+                            ))}
+                            </ul>
+                        </div>
+                    )}
+                    <form>
+                        <div className="form-group">
+                            <label htmlFor="name">Name</label>
+                            <input type="text" className="form-control" id="name" name="name" value={name} onChange={handleInputChange} required />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="description">Description</label>
+                            <textarea className="form-control" id="description" name="description" value={description} onChange={handleInputChange} required></textarea>
+                        </div>
+                        <div className="form-group form-group-half">
+                            <label htmlFor="sku">SKU</label>
+                            <input type="text" className="form-control" id="sku" name="sku" value={sku} onChange={handleInputChange} required />
+                        </div>
+                        <div className="form-group form-group-half">
+                        <label htmlFor="category">Category</label>
+                            <select className="form-control" id="category" name="category" value={category || ''} onChange={handleCategoryChange} required>
+                            <option value="">-- Select Category --</option>
+                            {fetchedCategories.map((category) => (
+                            <option key={category._id} value={category._id}>
+                            {category.name}
+                            </option>
+                            ))}
+                            </select>
+                        </div>
+                        <div className="form-group form-group-half">
+                            <label htmlFor="brand">Brand</label>
+                            <select className="form-control" id="brand" name="brand" value={brand || ''} onChange={handleBrandChange} required>
+                            <option value="">-- Select Brand --</option>
+                            {fetchedBrands.map((brand) => (
+                            <option key={brand._id} value={brand._id}>
+                            {brand.name}
+                            </option>
+                            ))}
+                            </select>
+                        </div>
+                        <label className='mr-3 d-block'>Specifications(Optional):</label>
+                        <div className='specifications-container mt-3'>
+                            {specificationForms.map((form, index) => (
+                                <div key={index} className="form-group spec-form-group">
+                                    <label htmlFor={`specification-${index}`}>Specification {index + 1}</label>
+                                    <select
+                                    className={`form-control ${index === 0 ? "first" : ""}`}
+                                    id={`specification-${index}`}
+                                    name="specification"
+                                    value={form.specification}
+                                    onChange={(event) => handleSpecificationFormChange(event, index)}
+                                    required
+                                    >
+                                    <option value="">Select a specification</option>
+                                    {specifications.map((spec) => (
+                                        <option key={spec._id} value={spec._id}>
+                                        {spec.name} : {spec.value}
+                                        </option>
+                                    ))}
+                                    </select>
+                                    {index !== 0 && (
+                                    <button type="button" onClick={() => removeSpecificationForm(index)}>
+                                        Remove
+                                    </button>
+                                    )}
+                                </div>
+                                ))}
+                            <button className='add-spec-btn' type="button" onClick={addSpecificationForm}>
+                            Add
+                            </button>
+                        </div>
+                        <div className="form-group"  style={{width: "49%", display: "inline-block", marginRight: "30px"}}>
+                        <label htmlFor="price">Product Price</label>
+                        <input type="text" className="form-control" id="price" name="price" value={price} onChange={handleInputChange} />
+                        </div>
+                        <div className="form-group" style={{width: "49%", display: "inline-block"}}>
+                        <label htmlFor="quantity">Product Quantity</label>
+                        <input type="number" className="form-control" id="quantity" name="quantity" value={quantity} onChange={handleInputChange} />
+                        </div>
+                        <div>
+                            <label htmlFor="images">Product Images</label>
+                            <input type="file" className="form-control-file" id="images" name="images"  onChange={(event) => handleImages(event)} multiple />
+                            {previewImages && previewImages.length > 0 && (
+                                <div className='image-preview-container'>
+                                    {previewImages.map((image, index) => (
+                                    <div key={index} className="image-preview">
+                                        <img src={image} alt={`Product Image ${index}`} />
+                                        <button type="button" onClick={() => {
+                                        const newImages = [...previewImages];
+                                        const newUrls = [...imageURLs];
+                                        newImages.splice(index, 1);
+                                        newUrls.splice(index, 1);
+                                        setPreviewImages(newImages);
+                                        setImageURLs(newUrls);
+                                        }}>Remove</button>
+                                    </div>
+                                    ))}
+                                </div>
+                            )}
 
+                        </div>
+                        <button type="button" onClick={handleSubmit} disabled={isLoading}>
+                        {isLoading ? 'Loading...' : 'Save Product'}
+                        </button>
+                    </form>
                 </div>
-                <button type="button" onClick={handleSubmit} disabled={isLoading}>
-                {isLoading ? 'Loading...' : 'Save Product'}
-                </button>
-            </form>
+            </div>
         </div>
-    </div>
-</div>
-);
+    );
 };
 export default EditProduct;

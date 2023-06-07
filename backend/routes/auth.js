@@ -12,6 +12,7 @@ const isLoggedIn = require('../middleware/isLoggedIn');
 const emailService = require('../services/emailService');
 const checkAdminUser = require('../middleware/checkAdminUser');
 const userProvider = require("../provider/user");
+const Address = require('../models/Address');
 
 
 //ROUTE: 1 - Create a User - Registration - POST "backend-gadgetbazaar/auth/createuser"
@@ -458,6 +459,111 @@ router.post('/email/verifyotp/:otp', fetchuser, async (req, res) => {
     res.status(500).json({ message: 'Internal server error: '+ err });
   }
 });
+// ROUTE: 14 - Get All Addresses - GET "/backend-gadgetbazaar/auth/addresses/getall" Login Required
+router.get('/addresses/getall', async (req, res) => {
+  try {
+    const addresses = await Address.find();
+    res.json(addresses);
+  } catch (error) {
+    console.error('Error fetching addresses:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+// ROUTE: 15 - Edit Address - PUT "/backend-gadgetbazaar/auth/addresses/edit/:id" Login Required
+router.put('/addresses/edit/:id', async (req, res) => {
+  const { id } = req.params;
+  const { address_line_1, address_line_2, city, state, country, pincode, contact } = req.body;
+
+  try {
+    // Find the address by ID
+    const address = await Address.findById(id);
+
+    if (!address) {
+      return res.status(200).json({ errors: [{ msg:'Address not found'}], success: false});
+    }
+     // Check if required fields are passed
+     if (!address_line_1 || !city || !state || !pincode) {
+      return res.status(200).json({ errors: [{msg:'Required fields are missing'}],success: false });
+    }
 
 
+    // Update the address fields
+    address.address_line_1 = address_line_1;
+    address.address_line_2 = address_line_2;
+    address.city = city;
+    address.state = state;
+    address.country = country;
+    address.pincode = pincode;
+    address.contact = contact;
+
+    // Save the updated address
+    await address.save();
+    res.json({address, success: "Address updated successfully"});
+  } catch (error) {
+    console.error('Error updating address:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+router.get('/addresses/:id', async (req, res) => {
+  try {
+    const address = await Address.findById(req.params.id);
+    if (!address) {
+      return res.status(404).json({ message: 'Address not found' });
+    }
+    console.log(address)
+    
+    res.json(address);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Unable to fetch address by id' });
+  }
+});
+router.post('/addresses/create', fetchuser,[
+  body('address_line_1', 'Please enter Address line 1!').notEmpty(),
+  body('city', 'Please select a city!').notEmpty(),
+  body('state', 'Please select a state!').notEmpty(),
+  body('pincode', 'Please enter pincode!').notEmpty(),
+], async (req, res) => {
+  // Retrieve the address data from the request body
+  const user_id = req.user.id;
+  const { address_line_1, address_line_2, city, state, country, pincode, contact } = req.body;
+
+  try {
+    // Check if required fields are passed
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array(), success: false });
+    }
+    if (!address_line_1 || !city || !state || !pincode) {
+      return res.status(400).json({ errors: [{ msg: 'Required fields are missing' }], success: false });
+    }
+
+       // Check if an address with the same details already exists
+       const existingAddress = await Address.findOne({ address_line_1, city, state,country, pincode, user_id });
+
+       if (existingAddress) {
+         return res.status(200).json({ errors: [{ msg: 'Address with the same details already exists' }], success: false });
+       }
+    // Create a new address instance
+    const newAddress = new Address({
+      user_id,
+      address_line_1,
+      address_line_2,
+      city,
+      state,
+      country,
+      pincode,
+      contact
+    });
+
+    // Save the new address to the database
+    const savedAddress = await newAddress.save();
+
+    // Assuming the address is successfully added, you can send a response back
+    res.status(200).json({ address: savedAddress, success: 'Address added successfully' });
+  } catch (error) {
+    console.error('Error adding address:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 module.exports = router;

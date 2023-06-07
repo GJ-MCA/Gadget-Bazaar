@@ -3,6 +3,7 @@ import { adminProductAPIUrl } from '../../../../config/config';
 import { useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontSpecificationsPostFix } from '../../../../helpers/adminHelper';
 import { updateLoader } from '../../../../helpers/generalHelper';
+import { setPageTitle } from '../../../../helpers/titleHelper';
 
 function AddSpecification() {
   const [name, setName] = useState('');
@@ -41,6 +42,7 @@ function AddSpecification() {
 
   return (
     <div className='content'>
+      {setPageTitle("Add Specification")}
       <h2>Add Specification</h2>
       <form className='admin-form'>
       {errors.length > 0 && (

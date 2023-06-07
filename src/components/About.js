@@ -1,10 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { setPageTitle } from '../helpers/titleHelper'
 export const About = () => {
   return (
   <>
        {/* inner page section */}
        <section className="inner_page_head">
+       {setPageTitle("About Us")}
         <div className="container_fuild">
           <div className="row">
             <div className="col-md-12">

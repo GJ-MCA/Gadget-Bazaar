@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminMainAPIUrl, adminProductAPIUrl } from '../../../config/config';
 import { Link, useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontPromotionsPostFix } from '../../../helpers/adminHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 
 function PromotionList() {
   const [promos, setPromos] = useState([]);
@@ -40,6 +41,7 @@ function PromotionList() {
   }
   return (
     <div className='main-table-container content'>
+      {setPageTitle("Promotions List")}
       <h2>Promotions List</h2>
       <button onClick={handleAddPromoClick}>Add Promotion</button>
       {console.log(promos)}

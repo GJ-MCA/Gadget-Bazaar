@@ -4,6 +4,7 @@ import { clearCart } from '../../helpers/cartHelper';
 import { myOrdersPreUrl } from '../../config/config';
 import { updateLoader } from '../../helpers/generalHelper';
 import { Link } from 'react-router-dom';
+import { setPageTitle } from '../../helpers/titleHelper';
 export const PaymentSuccess = () => {
   const [referenceCode, setReferenceCode] = useState('');
   const token = localStorage.getItem('auth-token');
@@ -13,7 +14,7 @@ export const PaymentSuccess = () => {
       try {
         updateLoader(true);
         if(userOrder){
-          const data = await fetchOrderById(token, userOrder.orderId);
+          const data = await fetchOrderById(token, userOrder.secret_order_id);
           console.log(data.order_details[0].order_reference_code)
           setReferenceCode(data.order_details[0].order_reference_code);
           await clearCart(token);
@@ -30,6 +31,7 @@ export const PaymentSuccess = () => {
 
   return (
     <div className='container payment-success-container'>
+      {setPageTitle("Payment Success")}
       <div className='payment-success-image-container'>
         <img src='/assets/img/payment_success.png' alt='Payment Success' />
       </div>

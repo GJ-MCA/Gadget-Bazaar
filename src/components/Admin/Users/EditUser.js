@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { adminMainAPIUrl } from '../../../config/config';
 import { addNeccessaryClasses, getUserRoleValues } from '../../../helpers/adminHelper';
 import { updateLoader } from '../../../helpers/generalHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 
 function EditUser() {
   const { id } = useParams();
@@ -88,6 +89,7 @@ function EditUser() {
     };
   return (
     <div className='content'>
+      {setPageTitle("Edit User")}
       <h2>Edit User</h2>
       {isUser ? (
         <form className='admin-form'>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminMainAPIUrl, adminProductAPIUrl } from '../../../config/config';
 import { Link, useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontUsersPostFix } from '../../../helpers/adminHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 
 function UserList() {
   const [users, setUsers] = useState([]);
@@ -40,6 +41,7 @@ function UserList() {
   }
   return (
     <div className='main-table-container content'>
+      {setPageTitle("Users List")}
       <h2>Users List</h2>
       <button onClick={handleAddUserClick}>Add User</button>
       {console.log(users)}

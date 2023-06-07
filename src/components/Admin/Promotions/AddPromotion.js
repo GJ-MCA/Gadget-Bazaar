@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { adminMainAPIUrl } from '../../../config/config';
 import { useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontPromotionsPostFix, getPromotionStatusValues } from '../../../helpers/adminHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 
 function AddPromotion() {
   const [promotionName, setPromotionName] = useState('');
@@ -78,6 +79,7 @@ function AddPromotion() {
 
   return (
     <div className='content'>
+      {setPageTitle("Add Promotion")}
       <h2>Add Promotion</h2>
       <form className='admin-form'>
       {message && (

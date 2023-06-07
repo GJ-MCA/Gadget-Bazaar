@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react'
 import {ProductList} from './Products/ProductList'
 import { Link } from 'react-router-dom'
 import { orderAPIUrl } from '../config/config';
+import { setPageTitle } from '../helpers/titleHelper';
 const config = require("../config/config");
 
 export const Home = () => {
    const [coupon, setCoupon] = useState(null);
 
    useEffect(() => {
+     window.scrollTo(0, 0);
      async function fetchCoupon() {
        try {
          const response = await fetch(`${orderAPIUrl}/get-active-coupon`);
@@ -23,7 +25,8 @@ export const Home = () => {
      fetchCoupon();
    }, []);
   return (
-    <> 
+     <> 
+     {setPageTitle("Home")}
 	<div className="hero_area">
          {/* <!-- slider section --> */}
          {coupon && (
@@ -45,7 +48,7 @@ export const Home = () => {
                                     <br/>
                                     On Everything
                                  </h1>
-                                 <p>
+                                 <p style={{maxWidth: "550px"}}>
                                  Ready to save on your next order? Use the code '{coupon && coupon.coupon_code && coupon.coupon_code}' to enjoy '{coupon && coupon.promotion_name && coupon.promotion_name}' on everything. Don't wait, shop now!
                                  </p>
                                  <div className="btn-box">

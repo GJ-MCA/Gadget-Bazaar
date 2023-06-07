@@ -5,6 +5,7 @@ import Slider from "react-slick";
 import { updateLoader } from '../../helpers/generalHelper';
 import ProductReview from './ProductReview';
 import ProductReviewList from './ProductReviewList';
+import { setPageTitle } from '../../helpers/titleHelper';
 
 const config = require("../../config/config");
 
@@ -136,6 +137,7 @@ export const ProductDetail = () => {
   return (
     
     <>
+    {setPageTitle(`${product.name ? product.name : "Product Detail"}`)}
     <link rel="stylesheet" type="text/css" charSet="UTF-8" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" /> 
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" />
     <section className="py-5 product-detail-section" style={{marginTop: "104px"}}>

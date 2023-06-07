@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { GadgetBazaarContext } from '../../../context/GadgetBazaarContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { updateLoader } from '../../../helpers/generalHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 const config = require("../../../config/config")
 
 export const Categories = () => {
@@ -32,6 +33,7 @@ export const Categories = () => {
 
   return (
     <>
+    {setPageTitle("Categories")}
       <section className="product_section layout_padding">
         <div className="container">
           <div className="heading_container heading_center">

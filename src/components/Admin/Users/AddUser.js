@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { adminMainAPIUrl } from '../../../config/config';
 import { addNeccessaryClasses, getUserRoleValues } from '../../../helpers/adminHelper';
 import { updateLoader } from '../../../helpers/generalHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 
 function AddUser() {
   const { id } = useParams();
@@ -76,6 +77,7 @@ function AddUser() {
     };
   return (
     <div className='content'>
+      {setPageTitle("Add User")}
       <h2>Add User</h2>
         <form className='admin-form'>
              {message && (

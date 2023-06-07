@@ -3,6 +3,7 @@ import { fetchOrderByReferenceCode } from '../../helpers/orderHelper';
 import { useLoginMiddleware } from '../../helpers/userHelper';
 import { Link, useParams } from 'react-router-dom';
 import { pdpPagePreUrl } from '../../config/config';
+import { setPageTitle } from '../../helpers/titleHelper';
 const MyOrderItems = () => {
   const [order_items, setOrderItems] = useState([]);
   const { order_reference_code } = useParams();
@@ -49,14 +50,15 @@ const MyOrderItems = () => {
   
   return (
     <div className='container my-orders-container' style={{marginTop: "104px"}}>
+      {setPageTitle("My Order Items")}
       <h2>My Order Items</h2>
       {isOrderFound ? (
         <>
         { <h5>Order Id: {order_reference_code}</h5>}
         <h5>Order Date & Time: {new Date(order_items.order_date).toLocaleString()}</h5>
         <h5>Total Amount: &#8377;{Number(order_items.total).toFixed(2)}</h5>
-        {order_items.coupon_code && (<h5>Coupon Code Used: {order_items.coupon_code.coupon_code}</h5>)}
-        {order_items.discounted_total && (<h5>Discounted Amount: &#8377;{Number(order_items.total).toFixed(2)}</h5>)}
+        {order_items.coupon_code && (<h5>Coupon Code Used: {order_items.coupon_code.coupon_code} (Saved &#8377; {(order_items.total - order_items.discounted_total)})</h5>)}
+        {order_items.discounted_total && (<h5>Discounted Amount: &#8377;{Number(order_items.discounted_total).toFixed(2)}</h5>)}
         <h5>Order Status: {capitalizeFirstLetter(order_items.order_status)}</h5>
         <h5>Estimated Delivery Date: {order_items.estimated_delivery_date ? formatEstimatedDate(order_items.estimated_delivery_date) : "Calculating, Please check again later."}</h5>
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { setPageTitle } from '../../helpers/titleHelper';
 export const PaymentFailed = () => {
   return (
     <div className='container payment-success-container'>
+      {setPageTitle("Payment Failed")}
       <div className='payment-success-image-container'>
         <img src='/assets/img/payment_failed.jpg' alt='Payment Failed' />
       </div>

@@ -3,6 +3,7 @@ import { fetchAllOrdersForCurrentUser } from '../../helpers/orderHelper';
 import { useLoginMiddleware } from '../../helpers/userHelper';
 import { myOrdersPreUrl } from '../../config/config';
 import { Link } from 'react-router-dom';
+import { setPageTitle } from '../../helpers/titleHelper';
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
 
@@ -28,6 +29,7 @@ const MyOrders = () => {
 
   return (
     <div className='container my-orders-container' style={{minHeight: "30vh", marginTop: "104px"}}>
+      {setPageTitle("My Orders")}
       <h2>My Orders</h2>
       {orders.length > 0 ? (
         <div className='table-container'>

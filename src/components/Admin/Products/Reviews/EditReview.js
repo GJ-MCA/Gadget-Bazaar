@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { adminMainAPIUrl } from '../../../../config/config';
 import { addNeccessaryClasses, adminFrontProductReviewPostFix } from '../../../../helpers/adminHelper';
 import { updateLoader } from '../../../../helpers/generalHelper';
+import { setPageTitle } from '../../../../helpers/titleHelper';
 
 const EditReview = () => {
   const { id } = useParams();
@@ -84,6 +85,7 @@ const EditReview = () => {
 
   return (
     <div className='content'>
+      {setPageTitle("Edit Review")}
       <h2>Edit Review</h2>
       {message && (
           <div className='alert alert-success'>

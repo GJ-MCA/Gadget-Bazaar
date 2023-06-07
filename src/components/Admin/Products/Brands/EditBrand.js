@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { addNeccessaryClasses, adminFrontBrandsPostFix } from '../../../../helpers/adminHelper';
 import { updateLoader } from '../../../../helpers/generalHelper';
+import { setPageTitle } from '../../../../helpers/titleHelper';
 
 const EditBrand = () => {
   const { id } = useParams();
@@ -81,6 +82,8 @@ const EditBrand = () => {
 
   return (
     <div className='content'>
+      {setPageTitle("Edit Brand")}
+      <h2> Edit Brand </h2>
       {error ? (
         <p>{error}</p>
       ) : (

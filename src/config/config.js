@@ -17,6 +17,7 @@ const jwtSecret = "G@dgetB^z@^r_$ecured"; //JWT Token For Auth
 const adminBaseUrl = `${clientUrl}/gadgetbazaar/admin` //Admin Base URL
 const adminLoginUrl = `${adminBaseUrl}/auth/login` //Admin Login URL
 const adminDashboardUrl = `${adminBaseUrl}/dashboard` //Admin Dashboard URL
+const productListPagePreUrl = `${clientUrl}/products`; //Product List Page URL
 const pdpPagePreUrl = `${clientUrl}/product/`; //PDP Prefix URL
 const categoriesPagePreUrl = `${clientUrl}/categories`; //Categories Prefix URL
 const myOrdersPreUrl = `${clientUrl}/my-orders/`; //My Orders Prefix URL
@@ -39,6 +40,7 @@ module.exports = {
     adminBaseUrl,
     adminLoginUrl,
     adminDashboardUrl,
+    productListPagePreUrl,
     pdpPagePreUrl,
     categoriesPagePreUrl,
     myOrdersPreUrl,

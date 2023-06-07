@@ -3,6 +3,7 @@ import { adminProductAPIUrl } from '../../../config/config';
 import { useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontBrandsPostFix, adminFrontCategoryPostFix, adminFrontSpecificationsPostFix } from '../../../helpers/adminHelper';
 import { updateLoader } from '../../../helpers/generalHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 
 const AddProduct = () => {
   const [name, setName] = useState('');
@@ -215,6 +216,7 @@ const AddProduct = () => {
   
   return (
     <div className='content'>
+      {setPageTitle("Add Product")}
       <h2>Add Product</h2>
       <form>
         {message && (

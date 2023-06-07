@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminMainAPIUrl } from '../../../../config/config';
 import { Link, useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontProductReviewPostFix, adminFrontProductsPostFix, adminFrontUsersPostFix } from '../../../../helpers/adminHelper';
+import { setPageTitle } from '../../../../helpers/titleHelper';
 
 function ReviewList() {
   const [reviews, setReviews] = useState([]);
@@ -27,6 +28,7 @@ function ReviewList() {
 
   return (
     <div className='main-table-container content'>
+      {setPageTitle("Review List")}
       <h2>Review List</h2>
       {reviews && reviews.length > 0 ? (
         <div className='table-container mt-4'>

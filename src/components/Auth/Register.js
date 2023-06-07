@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";     
 import { Link } from 'react-router-dom';
+import { setPageTitle } from '../../helpers/titleHelper';
 const config = require("../../config/config");
 
 
@@ -57,6 +58,7 @@ function Register() {
 
   return (
     <>
+    {setPageTitle("Register")}
       <section className="bg-image"
   style={{backgroundImage: "url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp')"}}>
   <div className="mask d-flex align-items-center h-100 gradient-custom-3">

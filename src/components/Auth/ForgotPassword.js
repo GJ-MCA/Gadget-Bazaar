@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { updateLoader } from '../../helpers/generalHelper';
+import { setPageTitle } from '../../helpers/titleHelper';
 const config = require("../../config/config");
 
 const ForgotPassword = () => {
@@ -44,7 +45,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="container mb-5" style={{marginTop: "104px"}}>
-
+    {setPageTitle("Forgot Password")}
       <div className="row justify-content-center">
         <div className="col-md-6 mt-5 mb-5">
         {message && <p className={`alert ${message.includes("not") || message.includes("Please") ? "alert-danger":"alert-success"}`}>{message}</p>}

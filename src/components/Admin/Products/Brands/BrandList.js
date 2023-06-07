@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { Link, useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontBrandsPostFix } from '../../../../helpers/adminHelper';
+import { setPageTitle } from '../../../../helpers/titleHelper';
 
 function BrandList() {
   const [brands, setBrands] = useState([]);
@@ -30,6 +31,7 @@ function BrandList() {
   }
   return (
     <div className='main-table-container content'>
+      {setPageTitle("Brand List")}
       <h2>Brand List</h2>
       <button onClick={handleAddBrandClick}>Add Brand</button>
         {brands && brands.length > 0 ? 

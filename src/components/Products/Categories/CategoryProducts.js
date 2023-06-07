@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext} from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { GadgetBazaarContext } from '../../../context/GadgetBazaarContext';
 import { updateLoader } from '../../../helpers/generalHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 const config = require("../../../config/config")
 function CategoryProducts() {
   const [categoryName, setCategoryName] = useState('');
@@ -119,8 +120,11 @@ function CategoryProducts() {
   
   return (
     <>
+    {setPageTitle(`Products in Category`)}
       {name ? (
         <section className="product_section layout_padding search_results">
+          {setPageTitle(`${name ? name + " Category Products" : "Products in Category"}`)}
+
         <div className="container">
           <div className="heading_container heading_center">
             <h2>

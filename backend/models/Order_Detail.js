@@ -14,14 +14,10 @@ const orderDetailSchema = new Schema({
     required: true
   },
   total: {
-      type: Number,
-      default: 0,
-      get: function(value) {
-        return value.toFixed(2);
-      },
-      set: function(value) {
-        return parseFloat(value);
-      }
+    type: Number,
+    get: v => (v/100).toFixed(2),
+    set: v => v*100,
+    default: null
   },
   discounted_total:{
     type: Number,

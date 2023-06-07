@@ -3,6 +3,7 @@ import { getOrderByReferenceCode, getOrderStatusValues, updateOrderEstimatedDeli
 import { Link, useParams } from 'react-router-dom';
 import { pdpPagePreUrl } from '../../../config/config';
 import { updateLoader } from '../../../helpers/generalHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 const OrderItems = () => {
   const [order_items, setOrderItems] = useState([]);
   const [orderStatusValues, setOrderStatusValues] = useState([]);
@@ -128,6 +129,7 @@ const OrderItems = () => {
   
   return (
     <div className='container my-orders-container content' style={{marginTop: "104px"}}>
+      {setPageTitle("Order Items")}
       <h2>Order Items</h2>
       {isOrderFound ? (
         <>

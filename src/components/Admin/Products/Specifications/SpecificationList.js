@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminProductAPIUrl } from '../../../../config/config';
 import { Link, useNavigate } from 'react-router-dom';
 import { addNeccessaryClasses, adminFrontSpecificationsPostFix } from '../../../../helpers/adminHelper';
+import { setPageTitle } from '../../../../helpers/titleHelper';
 
 function SpecificationList() {
   const [specs, setSpecs] = useState([]);
@@ -32,6 +33,7 @@ function SpecificationList() {
 
   return (
     <div className='main-table-container content'>
+      {setPageTitle("Specification List")}
       <h2>Specification List</h2>
       <button onClick={handleAddSpecClick}>Add Specification</button>
       {console.log(specs)}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
 import { fetchCurrentUser } from '../../helpers/userHelper';
+import { setPageTitle } from '../../helpers/titleHelper';
 const config = require('../../config/config');
 
 
@@ -78,6 +79,7 @@ const Login = () => {
 
   return (
     <>
+    {setPageTitle("Login")}
     <section className="bg-image"
 style={{backgroundImage: "url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp')"}}>
 <div className="mask d-flex align-items-center h-100 gradient-custom-3">

@@ -5,6 +5,7 @@ import { GadgetBazaarContext } from '../../context/GadgetBazaarContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginMiddleware } from '../../helpers/userHelper';
 import { updateLoader } from '../../helpers/generalHelper';
+import { setPageTitle } from '../../helpers/titleHelper';
 
 const config = require("../../config/config");
 const PUBLIC_CSS_DIR = `${process.env.PUBLIC_URL}/assets/css`;
@@ -232,6 +233,7 @@ export const ShoppingCart = () => {
 
   return (
     <>
+    {setPageTitle("Shopping Cart")}
      <link rel="stylesheet" href={`${PUBLIC_CSS_DIR}/shopping_cart.css`} />
 
         <section className="h-100 h-custom" style={{ backgroundColor: 'rgb(255, 131, 131)',marginTop: "104px" }}>

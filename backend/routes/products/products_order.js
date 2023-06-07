@@ -57,11 +57,14 @@ router.post('/cart/add', fetchuser, async (req, res) => {
     const cartItemDetails = await Cart_Item_Details.find({ cart_item_id: cartItem._id });
     let cartTotalAmount = 0.0;
     cartItemDetails.forEach((item) => {
+      console.log(item.item_total)
       cartTotalAmount += parseFloat(item.item_total);
     });
-    cartTotalAmount += cartItem.shipping_charge;
+    cartTotalAmount += parseFloat(cartItem.shipping_charge);
     cartTotalAmount = parseFloat(cartTotalAmount).toFixed(2);
-    cartItem.total = cartTotalAmount * 100;
+    console.log("Cart total amount: ")
+    console.log(cartTotalAmount)
+    cartItem.total = cartTotalAmount;
     await cartItem.save();
     res.json({ success: true, cartItems: cartItemDetails, cartTotalAmount });
   } catch (error) {
@@ -104,21 +107,36 @@ router.post('/checkout', fetchuser, async (req, res) => {
       current_shipping_method = await ShippingMethod.findOne({ shipping_method: "Standard" }).exec();
       shipping_charge = 40.00;
     }
-    let orderReferenceCode = null;
-    let orderIDExists = true;
-    while (orderIDExists) {
-      const dateTime = moment().format("YYYYMMDDhhmmss");
-      const randomString = shortid.generate();
-      orderReferenceCode = `GB_ORD${dateTime}_${randomString}`;
-      orderIDExists = await checkIfOrderRefIDExists(orderReferenceCode);
+    let orderDetails = await OrderDetails.findOne({user_id: user_id, payment_status: "pending"}).exec();
+    console.log(orderDetails)
+    if(!orderDetails){
+      let orderReferenceCode = null;
+      let orderIDExists = true;
+      console.log(main_total)
+      while (orderIDExists) {
+        const dateTime = moment().format("YYYYMMDDhhmmss");
+        const randomString = shortid.generate();
+        orderReferenceCode = `GB_ORD${dateTime}_${randomString}`;
+        orderIDExists = await checkIfOrderRefIDExists(orderReferenceCode);
+      }
+      orderDetails = new OrderDetails({ order_reference_code: orderReferenceCode,user_id, shipping_address, billing_address, shipping_method: current_shipping_method , shipping_charge, total: main_total, discounted_total: total});
     }
     let coupon_obj =  null;
+    console.log("coupon_code:")
+    console.log(coupon_code)
     if(coupon_code){
       coupon_obj = await Promotion.findOne({
         coupon_code
       });
+      console.log(coupon_obj)
+      if(coupon_obj){
+        orderDetails.coupon_code = coupon_obj;
+      }else{
+        orderDetails.coupon_code = null;
+      }
+    }else{
+      orderDetails.coupon_code = null;
     }
-    const orderDetails = new OrderDetails({ order_reference_code: orderReferenceCode,user_id, shipping_address, billing_address, shipping_method: current_shipping_method , shipping_charge, total: main_total, discounted_total: total, coupon_code});
     console.log("------------------------------------------")
     console.log("------------------------------------------")
     console.log("------------------------------------------")
@@ -155,20 +173,36 @@ router.post('/checkout', fetchuser, async (req, res) => {
     console.log(groupedItems)
     console.log("OrderDetail: ")
     // Create OrderItems records
-    const orderItems = Object.values(groupedItems).map(item => {
-      console.log("Item before creating orderitems: ")
-      console.log(item)
-      return new OrderItems({
-        order_id: orderDetails.id,
-        product_id: item.id,
-        price: item.price,
-        quantity: item.quantity
-      })
-    });
+    const orderItems = [];
+
+    for (const item of Object.values(groupedItems)) {
+      const existingItem = await OrderItems.findOne({ order_id: orderDetails.id, product_id: item.id }).exec();
+      
+      if (existingItem) {
+        // Item already exists, update its quantity and price
+        existingItem.quantity += item.quantity;
+        existingItem.price += parseFloat(item.price);
+        orderItems.push(existingItem);
+      } else {
+        // Item doesn't exist, create a new OrderItems object
+        const newItem = new OrderItems({
+          order_id: orderDetails.id,
+          product_id: item.id,
+          price: item.price,
+          quantity: item.quantity
+        });
+        orderItems.push(newItem);
+      }
+    }
     
     console.log(orderDetails)
     console.log("OrderItems: ")
     console.log(orderItems)
+    console.log("----------------------------")
+    console.log("----------------------------")
+    console.log(orderDetails)
+    console.log("----------------------------")
+    console.log("----------------------------")
     await Promise.all([orderDetails.save(), ...orderItems.map(item => {
       console.log("Item before saving: ")
       console.log(item); 

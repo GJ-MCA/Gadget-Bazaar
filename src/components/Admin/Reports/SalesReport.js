@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminFrontReportsPostFix, generateSalesReportPdf } from '../../../helpers/adminHelper';
 import { Link } from 'react-router-dom';
+import { setPageTitle } from '../../../helpers/titleHelper';
 
 const generatePdfUrl = async (data,fromDate,toDate) => {
     const pdfDocGenerator = generateSalesReportPdf(data,fromDate,toDate);
@@ -69,6 +70,7 @@ const SalesReport = () => {
   }
   return (
     <div className='content'>
+      {setPageTitle("Sales Report")}
       <h1 className='mb-2'>Sales Report</h1>
       <Link to={adminFrontReportsPostFix} className='mb-4 d-inline-block'>Go Back to Reports</Link>
       <form onSubmit={handleSubmit} className='admin-form'>

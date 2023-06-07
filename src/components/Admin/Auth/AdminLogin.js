@@ -1,5 +1,6 @@
 import React, { useState, useEffect  } from 'react';
 import { Link, useNavigate } from "react-router-dom";
+import { setPageTitle } from '../../../helpers/titleHelper';
 const config = require('../../../config/config');
 
 
@@ -67,6 +68,7 @@ const AdminLogin = () => {
 
   return (
     <>
+    {setPageTitle("Login")}
     <section className="bg-image"
 style={{backgroundImage: "url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp')"}}>
 <div className="mask d-flex align-items-center gradient-custom-3 admin-login-page">

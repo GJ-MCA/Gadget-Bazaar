@@ -5,6 +5,7 @@ import {fetchCurrentUser} from '../../helpers/userHelper';
 import {getCountries, getStates, getCities, addAddress} from '../../helpers/addressHelper';
 import { Link, useNavigate } from 'react-router-dom';
 import $ from 'jquery';
+import { setPageTitle } from '../../helpers/titleHelper';
 const config = require("../../config/config");
 export const Checkout = () => {
     
@@ -39,7 +40,7 @@ export const Checkout = () => {
             setCartFinalWithoutShipping((data['cartTotalAmount']) - 40)
             console.log(data['cart'][0].coupon_code);
             if(data['cart']){
-                setCheckoutMainTotal(data['cart'].total);
+                setCheckoutMainTotal(data['cart'][0].total);
                 if(data['cart'][0].coupon_code){
                     fetchCouponFromId(token, data['cart'][0].coupon_code).then((data)=>{
                         if(data.coupon_code_found){
@@ -288,7 +289,7 @@ export const Checkout = () => {
             console.log(data);
             // redirect to the order confirmation page
             if(data["orderDetails"]){
-                localStorage.setItem('user_order', JSON.stringify({ orderId: data["orderDetails"]._id }));
+                localStorage.setItem('user_order', JSON.stringify({ orderId: data["orderDetails"].order_reference_code, secret_order_id: data["orderDetails"]._id }));
                 navigate('/order-confirmation');
             }else{
                 alert("Something went wrong, Please try again");
@@ -301,6 +302,7 @@ export const Checkout = () => {
       
   return (
     <>
+    {setPageTitle("Checkout")}
         <div className="container">
             <div className="py-5 text-center">
                 <img className="d-block mx-auto mb-4" src="/assets/img/logo.png" alt="" width="200"/>

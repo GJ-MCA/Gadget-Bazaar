@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUserProfile, updateUserProfile } from '../../helpers/userHelper';
 import { updateLoader } from '../../helpers/generalHelper';
+import { setPageTitle } from '../../helpers/titleHelper';
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -256,6 +257,7 @@ const Profile = () => {
   }
   return (
     <>
+    {setPageTitle("My Profile")}
       <div className="container bootstrap snippet">
         <div className="row">
           <div className="col-sm-10">

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminMainAPIUrl, orderAPIUrl } from '../../../config/config';
 import { adminFrontOrdersPostFix, addNeccessaryClasses, adminFrontUsersPostFix } from '../../../helpers/adminHelper';
+import { setPageTitle } from '../../../helpers/titleHelper';
 
 function OrderList() {
   const [orders, setOrders] = useState([]);
@@ -17,10 +18,6 @@ function OrderList() {
     
     addNeccessaryClasses();
   }, []);
-
-  const handleAddOrderClick = () => {
-    navigate(adminFrontOrdersPostFix + '/add');
-  };
 
   const handleEditOrderClick = (id) => {
     if (id) {
@@ -41,8 +38,8 @@ function OrderList() {
   }
   return (
     <div className='main-table-container content'>
+      {setPageTitle("Order List")}
       <h2>Order List</h2>
-      <button onClick={handleAddOrderClick}>Add Order</button>
       {console.log(orders)}
         {orders && orders.length > 0 ? 
         <>
