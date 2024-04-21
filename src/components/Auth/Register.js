@@ -109,7 +109,7 @@ function Register() {
                 <div className="form-check d-flex justify-content-center" style={{alignItems: "center",marginTop: "20px", marginBottom: "20px"}}>
                   <input className="form-check-input me-2" type="checkbox" value="" id="terms_service" style={{position: "static", width: "30px", margin: "0"}} required/>
                   <label className="form-check-label" for="terms_service">
-                    I agree all statements in <Link to="/terms-service" className="text-body"><u>Terms of service</u></Link>
+                    I agree all statements in <Link to="https://www.termsofservicegenerator.net/live.php?token=qq25d9Gbbh74zuzeH6QICDIM9EMBZdG7" className="text-body"><u>Terms of service</u></Link>
                   </label>
                 </div>
 
