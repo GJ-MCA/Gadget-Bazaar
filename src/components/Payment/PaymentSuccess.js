@@ -39,6 +39,7 @@ export const PaymentSuccess = () => {
         <h2>Payment Successful!</h2>
         <p>Your order has been placed successfully.</p>
         {referenceCode && <p>Your order id is: <Link to={myOrdersPreUrl + referenceCode}>{referenceCode}</Link></p>}
+        <p> Please contact return@gadgetbazaar.com to return the product.</p>
       </div>
     </div>
   );
