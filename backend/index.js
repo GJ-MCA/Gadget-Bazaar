@@ -1,9 +1,22 @@
 const connectToMongo = require('./db');
 const express = require('express')
 const cors = require('cors');
-connectToMongo();
+
 const app = express()
 const port = 5000
+
+// Connect to MongoDB
+const startServer = async () => {
+  try {
+    await connectToMongo();
+    app.listen(port, () => {
+      console.log(`Gadgetbazaar Backend listening on port http://localhost:${port}`)
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +46,5 @@ app.use('/backend-gadgetbazaar/admin/products', require('./routes/admin/admin_pr
 app.use('/backend-gadgetbazaar/order', require('./routes/products/products_order'));
 app.use('/backend-gadgetbazaar/payment', require('./routes/payment/payment_main'));
 
-app.listen(port, () => {
-  console.log(`Gadgetbazaar Backend listening on port http://localhost:${port}`)
-})
+// Start the server
+startServer();

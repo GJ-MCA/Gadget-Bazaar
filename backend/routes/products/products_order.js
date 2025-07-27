@@ -752,6 +752,7 @@ router.get('/getallorders', fetchuser, async (req, res) => {
 router.get('/get-active-coupon', async (req, res) => {
   try {
     const coupon = await Promotion.findOne({ status: 'Active'});
+    console.log("GJ CURRENT Coupon: ", coupon);
     const currentDate = new Date().toISOString(); // convert current date to ISO string in UTC
     if (coupon && coupon.expiry_date.toISOString() >= currentDate) { // compare dates in UTC
       res.status(200).json(coupon);
