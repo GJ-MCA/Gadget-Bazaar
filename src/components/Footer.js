@@ -14,9 +14,9 @@ export const Footer = () => {
                         <Link to="/"><img width="210" src="/assets/img/logo.png" alt="Gadget Bazaar" /></Link>
                       </div>
                       <div className="information_f">
-                        <p><strong>ADDRESS:</strong> Gadget Bazaar Corporate House, CH-01 Adani Shantigram, Inspire Business Park, S. G. Highway, Ahmedabad-382421</p>
-                        <p><strong>TELEPHONE:</strong> +91 987 654 3210</p>
-                        <p><strong>EMAIL:</strong> contact@gadgetbazaar.com</p>
+                        <p><strong>ADDRESS:</strong> XX-XX XXXX, Dummy Address Road, Dummy City - XXXXXX</p>
+                        <p><strong>TELEPHONE:</strong> +91 XX XX XX XXXX</p>
+                        <p><strong>EMAIL:</strong> contact@example.com</p>
                       </div>
                    </div>
                </div>
@@ -51,7 +51,9 @@ export const Footer = () => {
       </footer>
       {/* <!-- footer end --> */}
       <div className="cpy_">
-         <p className="mx-auto">© 2023 All Rights Reserved By <Link to="/">Gadget Bazaar</Link>         
+         <p className="mx-auto">© {new Date().getFullYear()} All Rights Reserved By <Link to="/">Gadget Bazaar</Link></p>
+         <p className="mx-auto" style={{marginTop: "10px", fontSize: "0.9em", color: "#999"}}>
+           This is a college project and not a real e-commerce website. All content is for demonstration purposes only.
          </p>
       </div>
     </>

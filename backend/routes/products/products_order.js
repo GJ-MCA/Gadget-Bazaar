@@ -264,7 +264,6 @@ router.patch('/updatecart', fetchuser, async (req, res) => {
         }
       );
       if(cartItemDetails){
-        existingQuantity = cartItemDetails.quantity || 0;
         remainingQuantity = product.quantity - requiredQuantity;
       }else{
         remainingQuantity = product.quantity - requiredQuantity;

@@ -28,7 +28,7 @@ export const About = () => {
                 <h2>Introduction</h2>
               </div>
             <p>Welcome to GadgetBazaar, your number one source for all things tech. We're dedicated to giving you the very best of products, with a focus on quality, affordability and customer satisfaction.</p>
-            <p>Founded in 2021, GadgetBazaar has come a long way from its beginnings in a small office in Ahmedabad. When we first started out, our passion for technology drove us to research and review the latest gadgets, and gave us the impetus to turn hard work and inspiration into a booming online store. We now serve customers all over the world, and are thrilled to be a part of the tech industry.</p>
+            <p>Founded in 2021, GadgetBazaar is a demo e-commerce platform created as a college project. Our passion for technology drove us to research and review the latest gadgets, and gave us the inspiration to create this demonstration store. This is a project to showcase web development skills and e-commerce functionality.</p>
             <p>We hope you enjoy our products as much as we enjoy offering them to you. If you have any questions or comments, please don't hesitate to <Link to="/contact" class="text-primary">contact us</Link>.</p>
             <p>Sincerely,<br/>The GadgetBazaar Team</p>
          </div>

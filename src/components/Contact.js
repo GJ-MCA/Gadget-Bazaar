@@ -8,6 +8,9 @@ const Contact = () => {
       <div className="row">
         <div className="col-md-6 mx-auto">
           <h1 className="text-center mb-4">Contact Us</h1>
+          <div className="alert alert-info mb-4">
+            <strong>Note:</strong> This is a demo project. The contact form is for demonstration purposes only and does not actually send messages.
+          </div>
           <form>
             <div className="mb-3">
               <label htmlFor="name" className="form-label">Name</label>
